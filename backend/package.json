@@ -1,0 +1,17 @@
+{
+  "name": "codeforge-backend",
+  "version": "1.0.0",
+  "description": "CodeForge - sandboxed code execution engine",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dockerode": "^4.0.2",
+    "uuid": "^9.0.1",
+    "cors": "^2.8.5"
+  }
+}
