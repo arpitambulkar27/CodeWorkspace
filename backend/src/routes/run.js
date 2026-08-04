@@ -1,31 +1,43 @@
+// backend/routes/run.js
 const express = require("express");
-const { runCode } = require("../runner/dockerRunner");
-const { LANGUAGES } = require("../languages/config");
-
 const router = express.Router();
+const { executionQueue } = require("../../queue");
 
-// GET /api/languages -> list supported languages (for the frontend dropdown)
-router.get("/languages", (req, res) => {
-  res.json({ languages: Object.keys(LANGUAGES) });
-});
-
-// POST /api/run -> { language, code, stdin? }
 router.post("/run", async (req, res) => {
-  const { language, code, stdin } = req.body;
+  const { language, code, stdin, roomId } = req.body;
 
+  // Validation checks
   if (!language || typeof code !== "string") {
-    return res.status(400).json({ error: "Both 'language' and 'code' are required." });
+    return res
+      .status(400)
+      .json({ error: "Both 'language' and 'code' are required." });
   }
+
   if (code.length > 20000) {
-    return res.status(400).json({ error: "Code exceeds max allowed length (20,000 chars)." });
+    return res
+      .status(400)
+      .json({ error: "Code exceeds max length (20,000 chars)." });
   }
 
   try {
-    const result = await runCode({ language, code, stdin });
-    res.json(result);
+    // Add job to BullMQ Queue (Producer)
+    const job = await executionQueue.add("execute-script", {
+      language,
+      code,
+      stdin,
+      roomId,
+      timestamp: Date.now(),
+    });
+
+    // Return non-blocking 202 Accepted response immediately (<5ms)
+    res.status(202).json({
+      status: "queued",
+      jobId: job.id,
+      message: "Code execution job queued successfully.",
+    });
   } catch (err) {
-    console.error("Execution error:", err.message);
-    res.status(400).json({ error: err.message });
+    console.error("Queue Push Error:", err.message);
+    res.status(500).json({ error: "Failed to queue code execution task." });
   }
 });
 

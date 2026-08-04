@@ -9,9 +9,14 @@
     "dev": "node --watch src/index.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
+    "@google/genai": "^2.14.0",
+    "bullmq": "^6.0.6",
+    "cors": "^2.8.6",
     "dockerode": "^4.0.2",
-    "uuid": "^9.0.1",
-    "cors": "^2.8.5"
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "ioredis": "^6.0.0",
+    "socket.io": "^4.8.3",
+    "uuid": "^9.0.1"
   }
 }

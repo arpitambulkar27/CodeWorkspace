@@ -1,0 +1,65 @@
+/* src/index.css */
+
+/* 1. Global Box-Sizing Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. Force Viewport Bounds & Kill Vite Defaults */
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #0d1117;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 3. Stop Flex Children (Monaco Editor) from blowing out horizontally */
+div {
+  min-width: 0;
+}
+
+/* Dark Mode Markdown Formatting inside AI Sidebar */
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  color: #58a6ff;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.markdown-body ul, .markdown-body ol {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.markdown-body li {
+  margin-bottom: 4px;
+}
+
+.markdown-body code {
+  background-color: #161b22;
+  color: #f0883e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.markdown-body pre {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 10px;
+  overflow-x: auto;
+  margin: 10px 0;
+}
+
+.markdown-body pre code {
+  background-color: transparent;
+  color: #e6edf3;
+  padding: 0;
+}
