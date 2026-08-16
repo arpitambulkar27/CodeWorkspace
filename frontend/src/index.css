@@ -1,5 +1,6 @@
 /* src/index.css */
-
+/* frontend/src/index.css */
+@import "tailwindcss";
 /* 1. Global Box-Sizing Reset */
 *, *::before, *::after {
   box-sizing: border-box;

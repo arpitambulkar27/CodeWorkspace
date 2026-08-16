@@ -1,39 +1,41 @@
-// backend/src/index.js
 const path = require("path");
-// Explicitly resolve .env path relative to this file's folder
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
-
-// Debug log to verify key detection on startup
-console.log(
-  "🔑 Gemini API Key Status:",
-  process.env.GEMINI_API_KEY ? "Loaded ✅" : "MISSING ❌",
-);
 
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
 
+// Import MongoDB connection
+const connectDB = require("./config/db");
+
 // Import Worker & Routes
 const { initExecutionWorker } = require("../workers/executionWorker");
 const runRoutes = require("./routes/run");
 const aiRoutes = require("./routes/ai");
+const authRoutes = require("./routes/auth");
+const workspaceRoutes = require("./routes/workspaces");
 
 const app = express();
 const server = http.createServer(app);
 
-// Enable CORS and JSON parsing
+// Connect to MongoDB
+connectDB();
+
+// Middlewares
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-// Health Endpoint
+// Health Check
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
-// Mount REST Routes
+// REST Routes
 app.use("/api", runRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/workspaces", workspaceRoutes);
 
-// Initialize Socket.io Instance
+// Socket.io Setup
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -41,7 +43,6 @@ const io = new Server(server, {
   },
 });
 
-// Socket.io Room & Collaboration Handlers
 io.on("connection", (socket) => {
   console.log(`🔌 [Socket.io] Client connected: ${socket.id}`);
 
@@ -58,11 +59,10 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`🔌 [Socket.id] Client disconnected: ${socket.id}`);
+    console.log(`🔌 [Socket.io] Client disconnected: ${socket.id}`);
   });
 });
 
-// INITIALIZE WORKER HERE (After 'io' is created)
 initExecutionWorker(io);
 
 const PORT = process.env.PORT || 5000;
