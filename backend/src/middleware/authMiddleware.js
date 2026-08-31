@@ -20,7 +20,8 @@ const protect = async (req, res, next) => {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const secret = process.env.JWT_SECRET || "codeforge_jwt_secret_key_2026_production_grade";
+    const decoded = jwt.verify(token, secret);
 
     // Fetch user (excluding password)
     req.user = await User.findById(decoded.id).select("-password");

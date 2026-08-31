@@ -15,6 +15,10 @@ const runRoutes = require("./routes/run");
 const aiRoutes = require("./routes/ai");
 const authRoutes = require("./routes/auth");
 const workspaceRoutes = require("./routes/workspaces");
+const problemRoutes = require("./routes/problems");
+const metricsRoutes = require("./routes/metrics");
+const telemetryRoutes = require("./routes/telemetry");
+const { httpRequestCounter, activeSocketsGauge } = require("./services/metrics");
 
 const app = express();
 const server = http.createServer(app);
@@ -26,14 +30,31 @@ connectDB();
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
-// Health Check
-app.get("/health", (req, res) => res.json({ status: "ok" }));
+// Prometheus HTTP Request Duration Tracking Middleware
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    if (req.path !== "/metrics" && req.path !== "/health") {
+      httpRequestCounter.inc({
+        method: req.method,
+        route: req.baseUrl + (req.route?.path || req.path),
+        status_code: res.statusCode,
+      });
+    }
+  });
+  next();
+});
+
+// Health Check & Telemetry Routes
+app.get("/health", (req, res) => res.json({ status: "ok", docker: "ready", timestamp: new Date() }));
+app.use("/metrics", metricsRoutes);
+app.use("/api/telemetry", telemetryRoutes);
 
 // REST Routes
 app.use("/api", runRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);
+app.use("/api/problems", problemRoutes);
 
 // Socket.io Setup
 const io = new Server(server, {
@@ -43,22 +64,86 @@ const io = new Server(server, {
   },
 });
 
+// Set io on app so REST routes can emit socket events
+app.set("io", io);
+
+// In-memory active room participants state
+const roomUsers = new Map(); // roomId -> Map(socketId -> username)
+
 io.on("connection", (socket) => {
+  activeSocketsGauge.inc();
   console.log(`🔌 [Socket.io] Client connected: ${socket.id}`);
 
-  socket.on("join-room", ({ roomId, username }) => {
-    socket.join(roomId);
-    socket.to(roomId).emit("user-joined", { username, socketId: socket.id });
+  socket.on("join-room", ({ roomId, roomCode, username }) => {
+    const targetRoom = roomId || roomCode;
+    if (!targetRoom) return;
+
+    socket.join(targetRoom);
+    socket.roomId = targetRoom;
+    socket.username = username || "Developer";
+
+    if (!roomUsers.has(targetRoom)) {
+      roomUsers.set(targetRoom, new Map());
+    }
+    const participants = roomUsers.get(targetRoom);
+    participants.set(socket.id, socket.username);
+
+    const userList = Array.from(participants.values());
+
+    // Broadcast updated participant list to all clients in room
+    io.to(targetRoom).emit("room-participants", {
+      roomId: targetRoom,
+      participants: userList,
+      count: userList.length,
+    });
+
+    socket.to(targetRoom).emit("user-joined", {
+      username: socket.username,
+      socketId: socket.id,
+      count: userList.length,
+    });
+
     console.log(
-      `👥 [Socket.io] User ${username} (${socket.id}) joined room: ${roomId}`,
+      `👥 [Socket.io] User ${socket.username} (${socket.id}) joined room: ${targetRoom} [Count: ${userList.length}]`
     );
   });
 
-  socket.on("code-change", ({ roomId, code }) => {
-    socket.to(roomId).emit("code-update", code);
+  socket.on("code-change", ({ roomId, roomCode, code }) => {
+    const targetRoom = roomId || roomCode;
+    if (targetRoom) {
+      socket.to(targetRoom).emit("code-update", code);
+      socket.to(targetRoom).emit("code-change", code);
+    }
+  });
+
+  socket.on("cursor-position", ({ roomId, roomCode, position }) => {
+    const targetRoom = roomId || roomCode;
+    if (targetRoom) {
+      socket.to(targetRoom).emit("cursor-update", {
+        username: socket.username,
+        socketId: socket.id,
+        position,
+      });
+    }
   });
 
   socket.on("disconnect", () => {
+    activeSocketsGauge.dec();
+    const roomId = socket.roomId;
+    if (roomId && roomUsers.has(roomId)) {
+      const participants = roomUsers.get(roomId);
+      participants.delete(socket.id);
+      if (participants.size === 0) {
+        roomUsers.delete(roomId);
+      } else {
+        const userList = Array.from(participants.values());
+        io.to(roomId).emit("room-participants", {
+          roomId,
+          participants: userList,
+          count: userList.length,
+        });
+      }
+    }
     console.log(`🔌 [Socket.io] Client disconnected: ${socket.id}`);
   });
 });
@@ -67,5 +152,5 @@ initExecutionWorker(io);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`🚀 CodeForge backend running on http://localhost:${PORT}`);
+  console.log(`🚀 CodeWorkspace backend running on http://localhost:${PORT}`);
 });

@@ -7,7 +7,8 @@ const { protect } = require("../middleware/authMiddleware");
 
 // Helper function to generate JWT
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+  const secret = process.env.JWT_SECRET || "codeforge_jwt_secret_key_2026_production_grade";
+  return jwt.sign({ id }, secret, {
     expiresIn: "7d",
   });
 };
@@ -69,6 +70,33 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", protect, async (req, res) => {
   res.json(req.user);
+});
+
+// @route   PUT /api/auth/profile
+// @desc    Update user profile username or email
+router.put("/profile", protect, async (req, res) => {
+  try {
+    const { username, email } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    if (username) user.username = username.trim();
+    if (email) user.email = email.trim();
+
+    const updatedUser = await user.save();
+    res.json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      avatar: updatedUser.avatar,
+      token: generateToken(updatedUser._id),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to update profile." });
+  }
 });
 
 module.exports = router;

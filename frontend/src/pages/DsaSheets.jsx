@@ -1,0 +1,866 @@
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { 
+  Code2, Search, ExternalLink, CheckCircle, Circle, 
+  ArrowLeft, BookOpen, LogOut, ChevronRight, ChevronDown, 
+  Flame
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+
+import striverData from "../data/striverA2Z.json";
+import babbarData from "../data/loveBabbar450.json";
+
+// Dynamic Animated Cosmic Background Canvas
+const DynamicCosmosCanvas = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let animationFrameId;
+
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener("resize", handleResize);
+
+    const particles = Array.from({ length: 60 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      radius: Math.random() * 1.6 + 0.4,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.4 + 0.15,
+      color: ["#ffffff", "#e4e4e7", "#a1a1aa", "#71717a"][Math.floor(Math.random() * 4)],
+    }));
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.06 * (1 - dist / 100)})`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      particles.forEach((p) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx *= -1;
+        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+      });
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+        opacity: 0.5,
+      }}
+    />
+  );
+};
+
+// Safe Problem Filtering Helper
+const getFilteredProblems = (problems, searchQuery, difficultyFilter) => {
+  if (!Array.isArray(problems)) return [];
+  const q = (searchQuery || "").trim().toLowerCase();
+  const diff = (difficultyFilter || "All").trim().toLowerCase();
+
+  return problems.filter((prob) => {
+    if (!prob) return false;
+    const title = (prob.title || "").toLowerCase();
+    const probDiff = (prob.difficulty || "").toLowerCase();
+
+    const matchesSearch = q === "" || title.includes(q);
+    const matchesDiff = diff === "all" || probDiff === diff;
+
+    return matchesSearch && matchesDiff;
+  });
+};
+
+export default function DsaSheets() {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth() || {};
+
+  const [activeSheetId, setActiveSheetId] = useState("striver-a2z");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("All");
+
+  const currentSheet = activeSheetId === "striver-a2z" ? striverData : babbarData;
+  const rawTopics = useMemo(() => currentSheet?.topics || [], [currentSheet]);
+
+  // Local Storage Solved Tracking
+  const [solvedMap, setSolvedMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem("codeforge_solved_problems");
+      if (!saved) return {};
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        const map = {};
+        parsed.forEach((id) => { map[id] = true; });
+        return map;
+      }
+      return parsed || {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Group topics cleanly by Step/Category (delimited by ' → ')
+  const groupedData = useMemo(() => {
+    const groups = [];
+    const groupMap = new Map();
+
+    rawTopics.forEach((topic, idx) => {
+      let parentTitle = topic.topicName || `Topic ${idx + 1}`;
+      let subTitle = "";
+      let hasArrow = false;
+
+      if (topic.topicName && topic.topicName.includes(" → ")) {
+        hasArrow = true;
+        const parts = topic.topicName.split(" → ");
+        parentTitle = parts[0].trim();
+        subTitle = parts.slice(1).join(" → ").trim();
+      }
+
+      if (!groupMap.has(parentTitle)) {
+        const newGroup = {
+          groupKey: `group-${groupMap.size}`,
+          groupTitle: parentTitle,
+          hasSubcategories: hasArrow,
+          subcategories: []
+        };
+        groupMap.set(parentTitle, newGroup);
+        groups.push(newGroup);
+      }
+
+      const currentGroup = groupMap.get(parentTitle);
+      if (hasArrow) {
+        currentGroup.hasSubcategories = true;
+      }
+      currentGroup.subcategories.push({
+        topicId: topic.topicId || `sub-${idx}`,
+        subTitle: subTitle || topic.topicName,
+        problems: topic.problems || []
+      });
+    });
+
+    return groups;
+  }, [rawTopics]);
+
+  // Accordion state
+  const [expandedGroups, setExpandedGroups] = useState({});
+  const [expandedSubcategories, setExpandedSubcategories] = useState({});
+
+  useEffect(() => {
+    if (groupedData.length > 0) {
+      const initialGroups = {};
+      const initialSub = {};
+
+      groupedData.slice(0, 3).forEach((g) => {
+        initialGroups[g.groupKey] = true;
+        g.subcategories.forEach((sub) => {
+          initialSub[sub.topicId] = true;
+        });
+      });
+
+      setExpandedGroups(initialGroups);
+      setExpandedSubcategories(initialSub);
+    }
+  }, [activeSheetId, groupedData]);
+
+  const isFiltering = searchQuery.trim() !== "" || difficultyFilter.toLowerCase() !== "all";
+
+  const toggleGroup = (groupKey) => {
+    setExpandedGroups((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }));
+  };
+
+  const toggleSubcategory = (topicId) => {
+    setExpandedSubcategories((prev) => ({ ...prev, [topicId]: !prev[topicId] }));
+  };
+
+  const toggleSolved = (probId, slug) => {
+    setSolvedMap((prev) => {
+      const isAlreadySolved = !!prev[probId] || (slug && !!prev[slug]);
+      const updated = { ...prev };
+      if (isAlreadySolved) {
+        delete updated[probId];
+        if (slug) delete updated[slug];
+      } else {
+        updated[probId] = true;
+        if (slug) updated[slug] = true;
+      }
+      localStorage.setItem("codeforge_solved_problems", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleLogout = () => {
+    if (logout) logout();
+    else localStorage.clear();
+    navigate("/?auth=login");
+  };
+
+  // Compute stats
+  let allSheetProblems = [];
+  rawTopics.forEach((topic) => {
+    allSheetProblems = allSheetProblems.concat(topic.problems || []);
+  });
+
+  const totalProblemsCount = currentSheet.totalProblems || allSheetProblems.length;
+  const solvedProblemsCount = allSheetProblems.filter(
+    (p) => p && (solvedMap[p.id] || (p.slug && solvedMap[p.slug]))
+  ).length;
+  const overallProgressPercent =
+    totalProblemsCount > 0 ? Math.round((solvedProblemsCount / totalProblemsCount) * 100) : 0;
+
+  return (
+    <div className="cd-root">
+      <DynamicCosmosCanvas />
+
+      <style>{`
+        .cd-root {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+          width: 100vw;
+          background-color: #09090b;
+          color: #ffffff;
+          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+          overflow-x: hidden;
+          position: relative;
+        }
+
+        .cd-scrollable {
+          overflow-y: auto;
+        }
+        .cd-scrollable::-webkit-scrollbar {
+          width: 6px;
+        }
+        .cd-scrollable::-webkit-scrollbar-thumb {
+          background: #27272a;
+          border-radius: 4px;
+        }
+
+        @keyframes smoothPop {
+          0% {
+            opacity: 0;
+            transform: scale(0.97) translateY(6px);
+          }
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+        .cd-animate-pop {
+          animation: smoothPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .cd-topbar {
+          height: 60px;
+          background-color: rgba(12, 12, 14, 0.9);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid #27272a;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 28px;
+          position: sticky;
+          top: 0;
+          z-index: 40;
+          flex-shrink: 0;
+        }
+
+        .cd-logo-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background-color: #18181b;
+          border: 1px solid #3f3f46;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .cd-btn-bw {
+          background-color: #ffffff;
+          color: #09090b;
+          border: none;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 12.5px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+        }
+        .cd-btn-bw:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
+        }
+
+        .cd-btn-outline {
+          background-color: #121215;
+          color: #ffffff;
+          border: 1px solid #27272a;
+          border-radius: 8px;
+          padding: 8px 14px;
+          font-size: 12.5px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .cd-btn-outline:hover {
+          background-color: #18181b;
+          border-color: #52525b;
+        }
+
+        .cd-card {
+          background: #121215;
+          border: 1px solid #27272a;
+          border-radius: 12px;
+          padding: 22px;
+        }
+
+        /* Sheet Accordion Card Style */
+        .cd-sheet-accordion {
+          background-color: #121215;
+          border: 1px solid #27272a;
+          border-radius: 8px;
+          overflow: hidden;
+          transition: all 0.2s ease;
+        }
+        .cd-sheet-accordion:hover {
+          border-color: #3f3f46;
+        }
+
+        .cd-sheet-header {
+          padding: 16px 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+          background-color: #121215;
+          user-select: none;
+          transition: background-color 0.2s ease;
+        }
+        .cd-sheet-header:hover {
+          background-color: #18181b;
+        }
+
+        .cd-list-item {
+          background-color: #09090b;
+          border: 1px solid #27272a;
+          border-radius: 8px;
+          padding: 12px 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          transition: all 0.2s ease;
+        }
+        .cd-list-item:hover {
+          border-color: #3f3f46;
+          background-color: #141418;
+        }
+      `}</style>
+
+      {/* 1. TOPBAR */}
+      <header className="cd-topbar">
+        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          <button 
+            onClick={() => navigate("/dashboard")} 
+            className="cd-btn-outline"
+            style={{ padding: "6px 12px", fontSize: "12px" }}
+          >
+            <ArrowLeft size={14} /> Dashboard
+          </button>
+          <div style={{ height: "18px", width: "1px", backgroundColor: "#27272a" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div className="cd-logo-btn">
+              <Code2 size={18} color="#ffffff" />
+            </div>
+            <div>
+              <span style={{ fontSize: "15px", fontWeight: "800", color: "#ffffff", display: "block" }}>DSA Practice Sheets</span>
+              <span style={{ fontSize: "10px", color: "#a1a1aa", display: "block" }}>Curated interview roadmaps with direct platform redirection</span>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div 
+            style={{ width: "34px", height: "34px", borderRadius: "50%", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "#ffffff", fontWeight: "bold" }}
+            title={user?.email || "User Profile"}
+          >
+            {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
+          </div>
+          <button 
+            onClick={handleLogout}
+            style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.25)", color: "#f87171", borderRadius: "8px", padding: "8px 12px", fontSize: "12px", cursor: "pointer" }}
+            title="Log Out"
+          >
+            <LogOut size={15} color="#f87171" />
+          </button>
+        </div>
+      </header>
+
+      {/* 2. MAIN CONTENT AREA */}
+      <main className="cd-scrollable" style={{ flex: 1, padding: "32px 28px", zIndex: 10 }}>
+        <div style={{ maxWidth: "1240px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "24px" }}>
+          
+          {/* HEADER & SHEET SELECTOR TABS */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px" }}>
+            <div>
+              <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "10px", letterSpacing: "-0.02em" }}>
+                Structured DSA Practice Sheets
+              </h1>
+              <p style={{ margin: "4px 0 0 0", fontSize: "13.5px", color: "#a1a1aa" }}>
+                Select a sheet to view topic modules, problem lists, and direct platform links.
+              </p>
+            </div>
+
+            {/* SHEET SELECTOR TABS */}
+            <div style={{ display: "flex", gap: "10px", background: "#121215", padding: "4px", borderRadius: "10px", border: "1px solid #27272a" }}>
+              <button
+                onClick={() => {
+                  setActiveSheetId("striver-a2z");
+                  setSearchQuery("");
+                  setDifficultyFilter("All");
+                }}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  backgroundColor: activeSheetId === "striver-a2z" ? "#ffffff" : "transparent",
+                  color: activeSheetId === "striver-a2z" ? "#09090b" : "#a1a1aa",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <BookOpen size={15} /> Striver A2Z Sheet
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveSheetId("love-babbar-450");
+                  setSearchQuery("");
+                  setDifficultyFilter("All");
+                }}
+                style={{
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  fontSize: "13px",
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  backgroundColor: activeSheetId === "love-babbar-450" ? "#ffffff" : "transparent",
+                  color: activeSheetId === "love-babbar-450" ? "#09090b" : "#a1a1aa",
+                  border: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  transition: "all 0.2s ease"
+                }}
+              >
+                <Flame size={15} /> Love Babbar 450
+              </button>
+            </div>
+          </div>
+
+          {/* OVERALL SHEET PROGRESS BANNER */}
+          <div className="cd-card cd-animate-pop" style={{ padding: "20px 24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", flexWrap: "wrap", gap: "12px" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "#fbbf24", marginBottom: "4px" }}>
+                  <Flame size={16} />
+                  <span style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.05em" }}>Sheet Progress</span>
+                </div>
+                <h2 style={{ margin: 0, fontSize: "19px", fontWeight: "800", color: "#ffffff" }}>
+                  {currentSheet?.sheetTitle || "DSA Practice Sheet"}
+                </h2>
+                <span style={{ fontSize: "12px", color: "#a1a1aa", display: "block", marginTop: "4px" }}>
+                  {solvedProblemsCount} of {totalProblemsCount} problems completed ({overallProgressPercent}%)
+                </span>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <span style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff", background: "#18181b", border: "1px solid #3f3f46", padding: "6px 14px", borderRadius: "8px" }}>
+                  {overallProgressPercent}% Completed
+                </span>
+              </div>
+            </div>
+
+            {/* Overall Progress Bar */}
+            <div style={{ width: "100%", height: "8px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "4px", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${overallProgressPercent}%`, backgroundColor: "#ffffff", borderRadius: "4px", transition: "width 0.3s ease" }} />
+            </div>
+          </div>
+
+          {/* SEARCH & DIFFICULTY FILTER CONTROLS */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+            
+            {/* Title Search Input */}
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "8px", padding: "8px 14px", width: "340px" }}>
+              <Search size={16} color="#71717a" />
+              <input 
+                type="text" 
+                placeholder="Search problem title..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: "13px", width: "100%" }}
+              />
+            </div>
+
+            {/* Difficulty Filter Pills */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "12.5px", color: "#a1a1aa", fontWeight: "600" }}>Filter:</span>
+              {["All", "Easy", "Medium", "Hard"].map((diff) => {
+                const isActive = difficultyFilter.toLowerCase() === diff.toLowerCase();
+                return (
+                  <button
+                    key={diff}
+                    onClick={() => setDifficultyFilter(diff)}
+                    style={{
+                      padding: "6px 14px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: "700",
+                      cursor: "pointer",
+                      backgroundColor: isActive ? "#ffffff" : "#121215",
+                      color: isActive ? "#09090b" : "#a1a1aa",
+                      border: isActive ? "none" : "1px solid #27272a",
+                      transition: "all 0.2s ease"
+                    }}
+                  >
+                    {diff.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* TOPIC ACCORDION LIST */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {groupedData.map((group) => {
+              // Compute filtered subcategories safely
+              const filteredSubcategories = group.subcategories.map((sub) => {
+                const matching = getFilteredProblems(sub.problems, searchQuery, difficultyFilter);
+                return {
+                  ...sub,
+                  matchingProblems: matching
+                };
+              }).filter((sub) => !isFiltering || sub.matchingProblems.length > 0);
+
+              const groupHasMatches = filteredSubcategories.some((sub) => sub.matchingProblems.length > 0);
+              if (isFiltering && !groupHasMatches) return null;
+
+              const isGroupOpen = isFiltering ? true : !!expandedGroups[group.groupKey];
+
+              // Group totals
+              const groupTotalCount = group.subcategories.reduce((acc, s) => acc + (s.problems ? s.problems.length : 0), 0);
+              const groupSolvedCount = group.subcategories.reduce(
+                (acc, s) => acc + (s.problems || []).filter((p) => p && (solvedMap[p.id] || (p.slug && solvedMap[p.slug]))).length,
+                0
+              );
+
+              // CASE 1: Single-level Flat Topic Accordion (e.g. Love Babbar: Array, Matrix, String, etc.)
+              if (!group.hasSubcategories || group.subcategories.length === 1) {
+                const singleSub = filteredSubcategories[0] || group.subcategories[0] || { problems: [], matchingProblems: [] };
+                const problemsToDisplay = isFiltering ? (singleSub.matchingProblems || []) : (singleSub.problems || []);
+
+                return (
+                  <div key={group.groupKey} className="cd-sheet-accordion cd-animate-pop">
+                    {/* Header */}
+                    <div 
+                      onClick={() => toggleGroup(group.groupKey)}
+                      className="cd-sheet-header"
+                      style={{ borderBottom: isGroupOpen ? "1px solid #27272a" : "none" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                        <span style={{ fontSize: "15px", fontWeight: "700", color: "#ffffff" }}>
+                          {group.groupTitle}
+                        </span>
+                        <span style={{ fontSize: "13px", fontWeight: "600", color: "#a1a1aa" }}>
+                          {groupSolvedCount} / {groupTotalCount}
+                        </span>
+                      </div>
+
+                      <div>
+                        {isGroupOpen ? <ChevronDown size={16} color="#a1a1aa" /> : <ChevronRight size={16} color="#a1a1aa" />}
+                      </div>
+                    </div>
+
+                    {/* Problems Table */}
+                    {isGroupOpen && (
+                      <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: "8px", backgroundColor: "#09090b" }}>
+                        {problemsToDisplay.length === 0 ? (
+                          <div style={{ padding: "12px", textAlign: "center", color: "#a1a1aa", fontSize: "12.5px" }}>
+                            No problems match the filter in this topic.
+                          </div>
+                        ) : (
+                          problemsToDisplay.map((prob) => {
+                            if (!prob) return null;
+                            const isSolved = !!solvedMap[prob.id] || (prob.slug && !!solvedMap[prob.slug]);
+                            const probDiff = (prob.difficulty || "Medium").toLowerCase();
+
+                            return (
+                              <div 
+                                key={prob.id}
+                                className="cd-list-item"
+                                style={{ opacity: isSolved ? 0.75 : 1 }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                                  <button
+                                    onClick={() => toggleSolved(prob.id, prob.slug)}
+                                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                                    title={isSolved ? "Mark Unsolved" : "Mark Solved"}
+                                  >
+                                    {isSolved ? (
+                                      <CheckCircle size={18} color="#10b981" />
+                                    ) : (
+                                      <Circle size={18} color="#52525b" />
+                                    )}
+                                  </button>
+
+                                  <span style={{ fontSize: "13.5px", fontWeight: "600", color: "#ffffff", textDecoration: isSolved ? "line-through" : "none" }}>
+                                    {prob.title}
+                                  </span>
+                                </div>
+
+                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                  <span style={{ 
+                                    fontSize: "10.5px", 
+                                    fontWeight: "700", 
+                                    textTransform: "uppercase",
+                                    color: probDiff === "easy" ? "#34d399" : probDiff === "medium" ? "#fbbf24" : "#f87171", 
+                                    background: probDiff === "easy" ? "rgba(16, 185, 129, 0.1)" : probDiff === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(239, 68, 68, 0.1)", 
+                                    border: probDiff === "easy" ? "1px solid rgba(16, 185, 129, 0.25)" : probDiff === "medium" ? "1px solid rgba(245, 158, 11, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", 
+                                    padding: "2px 8px", 
+                                    borderRadius: "5px" 
+                                  }}>
+                                    {prob.difficulty || "Medium"}
+                                  </span>
+
+                                  <a
+                                    href={prob.url || "https://leetcode.com/"}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="cd-btn-bw"
+                                    style={{ textDecoration: "none", fontSize: "12px", padding: "6px 12px" }}
+                                  >
+                                    <span>Solve on {prob.platform || "Platform"}</span> <ExternalLink size={12} />
+                                  </a>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              // CASE 2: Multi-subcategories Step Accordion (e.g. Striver A2Z Steps)
+              return (
+                <div key={group.groupKey} className="cd-sheet-accordion cd-animate-pop">
+                  {/* Step Header */}
+                  <div 
+                    onClick={() => toggleGroup(group.groupKey)}
+                    className="cd-sheet-header"
+                    style={{ borderBottom: isGroupOpen ? "1px solid #27272a" : "none" }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                      <span style={{ fontSize: "15px", fontWeight: "800", color: "#ffffff" }}>
+                        {group.groupTitle}
+                      </span>
+                      <span style={{ fontSize: "13px", fontWeight: "600", color: "#a1a1aa" }}>
+                        {groupSolvedCount} / {groupTotalCount}
+                      </span>
+                    </div>
+
+                    <div>
+                      {isGroupOpen ? <ChevronDown size={16} color="#a1a1aa" /> : <ChevronRight size={16} color="#a1a1aa" />}
+                    </div>
+                  </div>
+
+                  {/* Subcategories List */}
+                  {isGroupOpen && (
+                    <div style={{ padding: "12px 16px", display: "flex", flexDirection: "column", gap: "10px", backgroundColor: "#0c0c0e" }}>
+                      {filteredSubcategories.map((sub) => {
+                        const isSubOpen = isFiltering ? true : !!expandedSubcategories[sub.topicId];
+                        const problemsToDisplay = isFiltering ? (sub.matchingProblems || []) : (sub.problems || []);
+
+                        const subTotalCount = (sub.problems || []).length;
+                        const subSolvedCount = (sub.problems || []).filter(
+                          (p) => p && (solvedMap[p.id] || (p.slug && solvedMap[p.slug]))
+                        ).length;
+
+                        return (
+                          <div 
+                            key={sub.topicId} 
+                            style={{ 
+                              backgroundColor: "#121215", 
+                              border: "1px solid #27272a", 
+                              borderRadius: "8px", 
+                              overflow: "hidden" 
+                            }}
+                          >
+                            {/* Subcategory Header */}
+                            <div 
+                              onClick={() => toggleSubcategory(sub.topicId)}
+                              style={{ 
+                                padding: "12px 16px", 
+                                display: "flex", 
+                                justifyContent: "space-between", 
+                                alignItems: "center", 
+                                cursor: "pointer", 
+                                backgroundColor: "#121215",
+                                borderBottom: isSubOpen ? "1px solid #27272a" : "none" 
+                              }}
+                            >
+                              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                {isSubOpen ? <ChevronDown size={15} color="#a1a1aa" /> : <ChevronRight size={15} color="#a1a1aa" />}
+                                <h4 style={{ margin: 0, fontSize: "14px", fontWeight: "700", color: "#e4e4e7" }}>
+                                  {sub.subTitle}
+                                </h4>
+                              </div>
+
+                              <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: "600" }}>
+                                {subSolvedCount} / {subTotalCount}
+                              </span>
+                            </div>
+
+                            {/* Subcategory Problems List */}
+                            {isSubOpen && (
+                              <div style={{ padding: "10px 12px", display: "flex", flexDirection: "column", gap: "8px", backgroundColor: "#09090b" }}>
+                                {problemsToDisplay.length === 0 ? (
+                                  <div style={{ padding: "10px", textAlign: "center", color: "#a1a1aa", fontSize: "12.5px" }}>
+                                    No problems match the filter.
+                                  </div>
+                                ) : (
+                                  problemsToDisplay.map((prob) => {
+                                    if (!prob) return null;
+                                    const isSolved = !!solvedMap[prob.id] || (prob.slug && !!solvedMap[prob.slug]);
+                                    const probDiff = (prob.difficulty || "Medium").toLowerCase();
+
+                                    return (
+                                      <div 
+                                        key={prob.id}
+                                        className="cd-list-item"
+                                        style={{ opacity: isSolved ? 0.75 : 1 }}
+                                      >
+                                        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                                          <button
+                                            onClick={() => toggleSolved(prob.id, prob.slug)}
+                                            style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                                            title={isSolved ? "Mark Unsolved" : "Mark Solved"}
+                                          >
+                                            {isSolved ? (
+                                              <CheckCircle size={18} color="#10b981" />
+                                            ) : (
+                                              <Circle size={18} color="#52525b" />
+                                            )}
+                                          </button>
+
+                                          <span style={{ fontSize: "13.5px", fontWeight: "600", color: "#ffffff", textDecoration: isSolved ? "line-through" : "none" }}>
+                                            {prob.title}
+                                          </span>
+                                        </div>
+
+                                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                          <span style={{ 
+                                            fontSize: "10.5px", 
+                                            fontWeight: "700", 
+                                            textTransform: "uppercase",
+                                            color: probDiff === "easy" ? "#34d399" : probDiff === "medium" ? "#fbbf24" : "#f87171", 
+                                            background: probDiff === "easy" ? "rgba(16, 185, 129, 0.1)" : probDiff === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(239, 68, 68, 0.1)", 
+                                            border: probDiff === "easy" ? "1px solid rgba(16, 185, 129, 0.25)" : probDiff === "medium" ? "1px solid rgba(245, 158, 11, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", 
+                                            padding: "2px 8px", 
+                                            borderRadius: "5px" 
+                                          }}>
+                                            {prob.difficulty || "Medium"}
+                                          </span>
+
+                                          <a
+                                            href={prob.url || "https://leetcode.com/"}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="cd-btn-bw"
+                                            style={{ textDecoration: "none", fontSize: "12px", padding: "6px 12px" }}
+                                          >
+                                            <span>Solve on {prob.platform || "Platform"}</span> <ExternalLink size={12} />
+                                          </a>
+                                        </div>
+                                      </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+        </div>
+      </main>
+    </div>
+  );
+}

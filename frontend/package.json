@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "seed:sheets": "node scripts/fetchCompleteSheets.js",
+    "extract:babbar": "node scripts/extractBabbarSheet.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },

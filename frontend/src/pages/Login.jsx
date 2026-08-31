@@ -1,11 +1,15 @@
-// frontend/src/pages/Login.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { 
+  Code2, Mail, Lock, ArrowRight, ShieldCheck, Cpu, 
+  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, Terminal
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,6 +19,17 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -30,150 +45,311 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-slate-100 flex font-sans overflow-hidden">
-      
-      {/* 🟢 LEFT PANEL: SaaS Showcase */}
-      <div className="hidden lg:flex flex-1 relative bg-[#0b0f19] border-r border-slate-800/80 p-12 flex-col justify-between overflow-hidden">
-        
-        <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none" />
+    <div className="cf-auth-root">
+      <style>{`
+        .cf-auth-root {
+          min-height: 100vh;
+          width: 100vw;
+          display: flex;
+          background-color: #07090e;
+          color: #e6edf3;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          overflow: hidden;
+          position: relative;
+        }
 
-        <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16 18l6-6-6-6M8 6l-6 6 6 6" />
-            </svg>
+        /* Ambient Glow Background Orbs */
+        .cf-ambient-orb-1 {
+          position: absolute;
+          top: -150px;
+          left: -100px;
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(7, 9, 14, 0) 70%);
+          pointer-events: none;
+        }
+        .cf-ambient-orb-2 {
+          position: absolute;
+          bottom: -150px;
+          right: -100px;
+          width: 600px;
+          height: 600px;
+          background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, rgba(7, 9, 14, 0) 70%);
+          pointer-events: none;
+        }
+
+        /* Grid Background Pattern */
+        .cf-bg-grid {
+          position: absolute;
+          inset: 0;
+          background-image: radial-gradient(#1e293b 1px, transparent 1px);
+          background-size: 32px 32px;
+          opacity: 0.15;
+          pointer-events: none;
+        }
+
+        /* Left SaaS Showcase Panel */
+        .cf-auth-left {
+          flex: 1.1;
+          background: linear-gradient(135deg, #0b0f19 0%, #080c14 100%);
+          border-right: 1px solid #1e293b;
+          padding: 50px 60px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          position: relative;
+          z-index: 10;
+        }
+
+        @media (max-width: 1024px) {
+          .cf-auth-left { display: none; }
+        }
+
+        .cf-input-wrapper {
+          position: relative;
+          width: 100%;
+          margin-bottom: 20px;
+        }
+
+        .cf-input-field {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 14px 16px 14px 44px;
+          background-color: #0d1117;
+          border: 1px solid #21262d;
+          border-radius: 12px;
+          color: #f0f6fc;
+          font-size: 14px;
+          outline: none;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cf-input-field::placeholder {
+          color: #6e7681;
+        }
+
+        /* Vibrant Focus & Hover Input Effect */
+        .cf-input-field:hover {
+          border-color: #388bfd;
+          background-color: #111622;
+          box-shadow: 0 0 16px rgba(56, 139, 253, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .cf-input-field:focus {
+          border-color: #58a6ff;
+          background-color: #111622;
+          box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25), 0 0 20px rgba(56, 139, 253, 0.3);
+        }
+
+        .cf-input-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: #8b949e;
+          transition: color 0.25s ease;
+          pointer-events: none;
+        }
+
+        .cf-input-wrapper:focus-within .cf-input-icon {
+          color: #58a6ff;
+        }
+
+        .cf-btn-submit {
+          width: 100%;
+          padding: 14px 24px;
+          background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #1d4ed8 100%);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 12px;
+          color: #ffffff;
+          font-weight: 700;
+          font-size: 15px;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 10px;
+        }
+
+        .cf-btn-submit:hover:not(:disabled) {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 30px -4px rgba(37, 99, 235, 0.6);
+          filter: brightness(1.1);
+        }
+
+        .cf-btn-submit:active:not(:disabled) {
+          transform: translateY(0);
+        }
+
+        .cf-btn-submit:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .cf-auth-card {
+          background-color: rgba(13, 17, 23, 0.85);
+          border: 1px solid #21262d;
+          border-radius: 20px;
+          padding: 40px;
+          width: 100%;
+          max-width: 440px;
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 139, 253, 0.08);
+          backdrop-filter: blur(16px);
+          position: relative;
+          z-index: 20;
+          transition: border-color 0.3s ease;
+        }
+        .cf-auth-card:hover {
+          border-color: rgba(56, 139, 253, 0.4);
+        }
+      `}</style>
+
+      <div className="cf-bg-grid" />
+      <div className="cf-ambient-orb-1" />
+      <div className="cf-ambient-orb-2" />
+
+      {/* 🟢 LEFT SHOWCASE PANEL */}
+      <div className="cf-auth-left">
+        {/* Brand Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ padding: "10px", backgroundColor: "rgba(56, 139, 253, 0.15)", borderRadius: "12px", border: "1px solid rgba(56, 139, 253, 0.3)" }}>
+            <Code2 size={26} color="#58a6ff" />
           </div>
-          <span className="text-xl font-black tracking-wider text-white">
-            CodeForge
-          </span>
+          <div>
+            <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "800", letterSpacing: "-0.5px", color: "#ffffff" }}>CodeForge</h1>
+            <span style={{ fontSize: "11px", color: "#58a6ff", fontWeight: "bold" }}>Cloud IDE & Technical Interview Platform</span>
+          </div>
         </div>
 
-        <div className="relative z-10 my-auto max-w-lg">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-6">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            Next-Gen Cloud Workspaces
+        {/* Feature Showcase Hero */}
+        <div style={{ margin: "auto 0", maxWidth: "520px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", borderRadius: "20px", backgroundColor: "rgba(56, 139, 253, 0.12)", border: "1px solid rgba(56, 139, 253, 0.25)", color: "#58a6ff", fontSize: "12px", fontWeight: "bold", marginBottom: "20px" }}>
+            <Sparkles size={14} /> Next-Gen Developer Workspaces
           </div>
 
-          <h2 className="text-4xl font-extrabold tracking-tight text-white leading-tight mb-4">
-            Isolated Developer IDE Environments on Demand
+          <h2 style={{ fontSize: "36px", fontWeight: "900", color: "#ffffff", lineHeight: "1.25", letterSpacing: "-0.8px", margin: "0 0 16px 0" }}>
+            Isolated Execution Sandboxes on Demand
           </h2>
-          <p className="text-slate-400 text-sm leading-relaxed mb-8">
-            Experience zero-latency real-time collaboration, sandboxed Docker execution, and intelligent AI code reviews inside a personal workspace.
+          <p style={{ fontSize: "14px", color: "#8b949e", lineHeight: "1.6", margin: "0 0 28px 0" }}>
+            Experience zero-latency real-time pair programming, sandboxed Docker code execution, and Gemini AI-powered automated code reviews.
           </p>
 
-          <div className="bg-[#0f172a]/90 border border-slate-800 rounded-xl overflow-hidden shadow-2xl backdrop-blur-md">
-            <div className="bg-[#1e293b]/60 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+          {/* Micro Terminal Window */}
+          <div style={{ backgroundColor: "#0d1117", border: "1px solid #21262d", borderRadius: "14px", overflow: "hidden", boxShadow: "0 16px 36px rgba(0, 0, 0, 0.5)" }}>
+            <div style={{ backgroundColor: "#161b22", padding: "10px 16px", borderBottom: "1px solid #21262d", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "6px" }}>
+                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#ff5f56" }} />
+                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#ffbd2e" }} />
+                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#27c93f" }} />
               </div>
-              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3" />
-                </svg>
-                main.py — Docker Sandbox
+              <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#8b949e", display: "flex", alignItems: "center", gap: "6px" }}>
+                <Terminal size={12} color="#58a6ff" /> main.py — Docker Runner
               </span>
             </div>
-            <div className="p-4 font-mono text-xs text-slate-300 space-y-1.5">
-              <p className="text-slate-500"># Initializing ephemeral container...</p>
-              <p><span className="text-purple-400">import</span> <span className="text-blue-400">codeforge</span></p>
-              <p><span className="text-blue-400">workspace</span> = codeforge.<span className="text-emerald-400">mount</span>(<span className="text-amber-300">"user-session"</span>)</p>
-              <p className="text-emerald-400">✓ Container booted in 0.24s [Memory limit: 256MB]</p>
+            <div style={{ padding: "16px", fontFamily: "Consolas, Monaco, monospace", fontSize: "12px", color: "#e6edf3", lineHeight: "1.7" }}>
+              <p style={{ margin: 0, color: "#8b949e" }}># Booting ephemeral container...</p>
+              <p style={{ margin: "4px 0" }}><span style={{ color: "#a371f7" }}>import</span> <span style={{ color: "#79c0ff" }}>codeforge</span></p>
+              <p style={{ margin: "4px 0" }}><span style={{ color: "#79c0ff" }}>sandbox</span> = codeforge.<span style={{ color: "#7ee787" }}>mount</span>(<span style={{ color: "#a5d6ff" }}>"python:3.10-slim"</span>)</p>
+              <p style={{ margin: "8px 0 0 0", color: "#3fb950", fontWeight: "bold" }}>✓ Container initialized in 0.18s [Memory: 128MB | CPU: 0.5]</p>
             </div>
           </div>
         </div>
 
-        <div className="relative z-10 flex items-center gap-6 text-xs text-slate-400 border-t border-slate-800/60 pt-6">
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-            Ephemeral Isolation
+        {/* Bottom Highlights */}
+        <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <ShieldCheck size={16} color="#3fb950" /> Ephemeral Isolation
           </div>
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            BullMQ Asynchronous Queues
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Cpu size={16} color="#58a6ff" /> BullMQ Task Queues
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Zap size={16} color="#d29922" /> Socket.io Multiplayer
           </div>
         </div>
       </div>
 
-      {/* 🔵 RIGHT PANEL: Spacious Auth Card */}
-      <div className="flex-1 flex items-center justify-center p-8 relative">
-        <div className="w-full max-w-md space-y-8 relative z-10">
-          
-          <div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white">
+      {/* 🔵 RIGHT AUTH FORM PANEL */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyCenter: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
+        
+        <div className="cf-auth-card">
+          <div style={{ marginBottom: "30px" }}>
+            <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
               Sign in to CodeForge
             </h2>
-            <p className="text-slate-400 text-sm mt-2">
-              Enter your credentials to access your developer environment
+            <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+              Enter your registered credentials to launch your cloud IDE
             </p>
           </div>
 
           {error && (
-            <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-sm font-medium">
-              ⚠️ {error}
+            <div style={{ padding: "14px 16px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px" }}>
+              <AlertCircle size={18} />
+              <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
+          <form onSubmit={handleSubmit}>
+            <div className="cf-input-wrapper">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
                 Work Email
               </label>
+              <Mail className="cf-input-icon" size={18} />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="developer@codeforge.io"
-                className="w-full px-4 py-3 bg.0f172a bg-[#0f172a] border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                className="cf-input-field"
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-300 mb-2">
+            <div className="cf-input-wrapper">
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
                 Password
               </label>
+              <Lock className="cf-input-icon" size={18} />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full px-4 py-3 bg-[#0f172a] border border-slate-800 rounded-xl text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                className="cf-input-field"
+                style={{ paddingRight: "44px" }}
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: "absolute", right: "14px", top: "40px", background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: 0 }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold text-sm rounded-xl shadow-lg shadow-blue-600/25 transition-all flex items-center justify-center gap-2 cursor-pointer mt-4"
-            >
+            <button type="submit" disabled={loading} className="cf-btn-submit">
               {loading ? (
-                <span>Authenticating...</span>
+                <>
+                  <Loader2 size={18} className="animate-spin" /> Authenticating...
+                </>
               ) : (
                 <>
                   <span>Sign In to Workspace</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
+                  <ArrowRight size={18} />
                 </>
               )}
             </button>
           </form>
 
-          <div className="text-center pt-6 border-t border-slate-800/80">
-            <p className="text-sm text-slate-400">
+          <div style={{ textAlign: "center", marginTop: "28px", paddingTop: "20px", borderTop: "1px solid #21262d" }}>
+            <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
               Don't have an account yet?{" "}
-              <Link to="/signup" className="text-blue-400 hover:text-blue-300 font-semibold hover:underline">
+              <Link to="/signup" style={{ color: "#58a6ff", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>
                 Create Account
               </Link>
             </p>

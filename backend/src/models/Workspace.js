@@ -6,12 +6,13 @@ const workspaceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+      index: true,
     },
     title: {
       type: String,
       required: [true, "Workspace title is required"],
       trim: true,
-      default: "Untitled Project",
+      default: "Untitled Workspace",
     },
     language: {
       type: String,
@@ -23,9 +24,23 @@ const workspaceSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    files: [
+      {
+        id: { type: String, required: true },
+        name: { type: String, required: true },
+        type: { type: String, enum: ["file", "folder"], required: true },
+        parentId: { type: String, default: null },
+        content: { type: String, default: "" },
+        language: { type: String, default: "javascript" },
+      },
+    ],
     customInput: {
       type: String,
       default: "",
+    },
+    isPublic: {
+      type: Boolean,
+      default: false,
     },
   },
   {

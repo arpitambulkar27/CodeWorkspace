@@ -1,0 +1,3681 @@
+{
+  "sheetId": "love-babbar-450",
+  "sheetTitle": "Love Babbar 450 DSA Cracker",
+  "totalProblems": 448,
+  "topics": [
+    {
+      "topicId": "lb-topic-1",
+      "topicName": "Array",
+      "problems": [
+        {
+          "id": "lb-1-1",
+          "title": "Reverse the array",
+          "difficulty": "Easy",
+          "slug": "reverse-the-array",
+          "url": "https://www.geeksforgeeks.org/write-a-program-to-reverse-an-array-or-string/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-2",
+          "title": "Find the maximum and minimum element in an array",
+          "difficulty": "Easy",
+          "slug": "find-the-maximum-and-minimum-element-in-an-array",
+          "url": "https://www.geeksforgeeks.org/maximum-and-minimum-in-an-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-3",
+          "title": "Find the \"Kth\" max and min element of an array",
+          "difficulty": "Medium",
+          "slug": "find-the-kth-max-and-min-element-of-an-array",
+          "url": "https://practice.geeksforgeeks.org/problems/kth-smallest-element5635/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-4",
+          "title": "Given an array which consists of only 0, 1 and 2. Sort the array without using any sorting algo",
+          "difficulty": "Easy",
+          "slug": "given-an-array-which-consists-of-only-0-1-and-2-sort-the-array-without-using-any-sorting-algo",
+          "url": "https://practice.geeksforgeeks.org/problems/sort-an-array-of-0s-1s-and-2s/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-5",
+          "title": "Move all the negative elements to one side of the array",
+          "difficulty": "Easy",
+          "slug": "move-all-the-negative-elements-to-one-side-of-the-array",
+          "url": "https://www.geeksforgeeks.org/move-negative-numbers-beginning-positive-end-constant-extra-space/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-6",
+          "title": "Find the Union and Intersection of the two sorted arrays.",
+          "difficulty": "Easy",
+          "slug": "find-the-union-and-intersection-of-the-two-sorted-arrays",
+          "url": "https://leetcode.com/problems/intersection-of-two-arrays/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-7",
+          "title": "Write a program to cyclically rotate an array by one.",
+          "difficulty": "Hard",
+          "slug": "write-a-program-to-cyclically-rotate-an-array-by-one",
+          "url": "https://leetcode.com/problems/rotate-array/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-8",
+          "title": "find Largest sum contiguous Subarray [V. IMP]",
+          "difficulty": "Easy",
+          "slug": "find-largest-sum-contiguous-subarray-v-imp",
+          "url": "https://leetcode.com/problems/maximum-subarray/submissions/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-9",
+          "title": "Minimise the maximum difference between heights [V.IMP]",
+          "difficulty": "Easy",
+          "slug": "minimise-the-maximum-difference-between-heights-v-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/minimize-the-heights3351/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-10",
+          "title": "Minimum no. of Jumps to reach end of an array",
+          "difficulty": "Hard",
+          "slug": "minimum-no-of-jumps-to-reach-end-of-an-array",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-number-of-jumps/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-11",
+          "title": "find duplicate in an array of N+1 Integers",
+          "difficulty": "Medium",
+          "slug": "find-duplicate-in-an-array-of-n-1-integers",
+          "url": "https://leetcode.com/problems/find-the-duplicate-number/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-12",
+          "title": "Merge 2 sorted arrays without using Extra space.",
+          "difficulty": "Hard",
+          "slug": "merge-2-sorted-arrays-without-using-extra-space",
+          "url": "https://practice.geeksforgeeks.org/problems/merge-two-sorted-arrays5135/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-13",
+          "title": "Kadane's Algo [V.V.V.V.V IMP]",
+          "difficulty": "Easy",
+          "slug": "kadane-s-algo-v-v-v-v-v-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/kadanes-algorithm/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-14",
+          "title": "Merge Intervals",
+          "difficulty": "Medium",
+          "slug": "merge-intervals",
+          "url": "https://leetcode.com/problems/merge-intervals/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-15",
+          "title": "Next Permutation",
+          "difficulty": "Medium",
+          "slug": "next-permutation",
+          "url": "https://leetcode.com/problems/next-permutation/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-16",
+          "title": "Count Inversion",
+          "difficulty": "Hard",
+          "slug": "count-inversion",
+          "url": "https://practice.geeksforgeeks.org/problems/inversion-of-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-17",
+          "title": "Best time to buy and Sell stock",
+          "difficulty": "Easy",
+          "slug": "best-time-to-buy-and-sell-stock",
+          "url": "https://leetcode.com/problems/best-time-to-buy-and-sell-stock/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-1-18",
+          "title": "find all pairs on integer array whose sum is equal to given number",
+          "difficulty": "Easy",
+          "slug": "find-all-pairs-on-integer-array-whose-sum-is-equal-to-given-number",
+          "url": "https://practice.geeksforgeeks.org/problems/count-pairs-with-given-sum5022/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-19",
+          "title": "find common elements In 3 sorted arrays",
+          "difficulty": "Easy",
+          "slug": "find-common-elements-in-3-sorted-arrays",
+          "url": "https://practice.geeksforgeeks.org/problems/common-elements1132/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-20",
+          "title": "Rearrange the array in alternating positive and negative items with O(1) extra space",
+          "difficulty": "Hard",
+          "slug": "rearrange-the-array-in-alternating-positive-and-negative-items-with-o-1-extra-space",
+          "url": "https://www.geeksforgeeks.org/rearrange-array-alternating-positive-negative-items-o1-extra-space/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-21",
+          "title": "Find if there is any subarray with sum equal to 0",
+          "difficulty": "Easy",
+          "slug": "find-if-there-is-any-subarray-with-sum-equal-to-0",
+          "url": "https://practice.geeksforgeeks.org/problems/subarray-with-0-sum/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-22",
+          "title": "Find factorial of a large number",
+          "difficulty": "Hard",
+          "slug": "find-factorial-of-a-large-number",
+          "url": "https://practice.geeksforgeeks.org/problems/factorials-of-large-numbers/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-23",
+          "title": "find maximum product subarray",
+          "difficulty": "Medium",
+          "slug": "find-maximum-product-subarray",
+          "url": "https://practice.geeksforgeeks.org/problems/maximum-product-subarray3604/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-24",
+          "title": "Find longest coinsecutive subsequence",
+          "difficulty": "Medium",
+          "slug": "find-longest-coinsecutive-subsequence",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-consecutive-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-25",
+          "title": "Given an array of size n and a number k, fin all elements that appear more than \" n/k \" times.",
+          "difficulty": "Easy",
+          "slug": "given-an-array-of-size-n-and-a-number-k-fin-all-elements-that-appear-more-than-n-k-times",
+          "url": "https://www.geeksforgeeks.org/given-an-array-of-of-size-n-finds-all-the-elements-that-appear-more-than-nk-times/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-26",
+          "title": "Maximum profit by buying and selling a share atmost twice",
+          "difficulty": "Hard",
+          "slug": "maximum-profit-by-buying-and-selling-a-share-atmost-twice",
+          "url": "https://www.geeksforgeeks.org/maximum-profit-by-buying-and-selling-a-share-at-most-twice/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-27",
+          "title": "Find whether an array is a subset of another array",
+          "difficulty": "Easy",
+          "slug": "find-whether-an-array-is-a-subset-of-another-array",
+          "url": "https://practice.geeksforgeeks.org/problems/array-subset-of-another-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-28",
+          "title": "Find the triplet that sum to a given value",
+          "difficulty": "Hard",
+          "slug": "find-the-triplet-that-sum-to-a-given-value",
+          "url": "https://practice.geeksforgeeks.org/problems/triplet-sum-in-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-29",
+          "title": "Trapping Rain water problem",
+          "difficulty": "Easy",
+          "slug": "trapping-rain-water-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/trapping-rain-water/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-30",
+          "title": "Chocolate Distribution problem",
+          "difficulty": "Easy",
+          "slug": "chocolate-distribution-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/chocolate-distribution-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-31",
+          "title": "Smallest Subarray with sum greater than a given value",
+          "difficulty": "Hard",
+          "slug": "smallest-subarray-with-sum-greater-than-a-given-value",
+          "url": "https://www.geeksforgeeks.org/minimum-length-subarray-sum-greater-given-value/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-32",
+          "title": "Three way partitioning of an array around a given value",
+          "difficulty": "Easy",
+          "slug": "three-way-partitioning-of-an-array-around-a-given-value",
+          "url": "https://practice.geeksforgeeks.org/problems/three-way-partitioning/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-33",
+          "title": "Minimum swaps required bring elements less equal K together",
+          "difficulty": "Easy",
+          "slug": "minimum-swaps-required-bring-elements-less-equal-k-together",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-swaps-required-to-bring-all-elements-less-than-or-equal-to-k-together/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-34",
+          "title": "Minimum no. of operations required to make an array palindrome",
+          "difficulty": "Easy",
+          "slug": "minimum-no-of-operations-required-to-make-an-array-palindrome",
+          "url": "https://practice.geeksforgeeks.org/problems/palindromic-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-35",
+          "title": "Median of 2 sorted arrays of equal size",
+          "difficulty": "Hard",
+          "slug": "median-of-2-sorted-arrays-of-equal-size",
+          "url": "https://www.geeksforgeeks.org/median-of-two-sorted-arrays/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-1-36",
+          "title": "Median of 2 sorted arrays of different size",
+          "difficulty": "Hard",
+          "slug": "median-of-2-sorted-arrays-of-different-size",
+          "url": "https://www.geeksforgeeks.org/median-of-two-sorted-arrays-of-different-sizes/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-2",
+      "topicName": "Matrix",
+      "problems": [
+        {
+          "id": "lb-2-37",
+          "title": "Spiral traversal on a Matrix",
+          "difficulty": "Easy",
+          "slug": "spiral-traversal-on-a-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/spirally-traversing-a-matrix/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-38",
+          "title": "Search an element in a matriix",
+          "difficulty": "Medium",
+          "slug": "search-an-element-in-a-matriix",
+          "url": "https://leetcode.com/problems/search-a-2d-matrix/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-2-39",
+          "title": "Find median in a row wise sorted matrix",
+          "difficulty": "Medium",
+          "slug": "find-median-in-a-row-wise-sorted-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/median-in-a-row-wise-sorted-matrix1527/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-40",
+          "title": "Find row with maximum no. of 1's",
+          "difficulty": "Hard",
+          "slug": "find-row-with-maximum-no-of-1-s",
+          "url": "https://practice.geeksforgeeks.org/problems/row-with-max-1s0023/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-41",
+          "title": "Print elements in sorted order using row-column wise sorted matrix",
+          "difficulty": "Easy",
+          "slug": "print-elements-in-sorted-order-using-row-column-wise-sorted-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/sorted-matrix/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-42",
+          "title": "Maximum size rectangle",
+          "difficulty": "Medium",
+          "slug": "maximum-size-rectangle",
+          "url": "https://practice.geeksforgeeks.org/problems/max-rectangle/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-43",
+          "title": "Find a specific pair in matrix",
+          "difficulty": "Hard",
+          "slug": "find-a-specific-pair-in-matrix",
+          "url": "https://www.geeksforgeeks.org/find-a-specific-pair-in-matrix/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-44",
+          "title": "Rotate matrix by 90 degrees",
+          "difficulty": "Medium",
+          "slug": "rotate-matrix-by-90-degrees",
+          "url": "https://www.geeksforgeeks.org/rotate-a-matrix-by-90-degree-in-clockwise-direction-without-using-any-extra-space/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-45",
+          "title": "Kth smallest element in a row-cpumn wise sorted matrix",
+          "difficulty": "Easy",
+          "slug": "kth-smallest-element-in-a-row-cpumn-wise-sorted-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/kth-element-in-matrix/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-2-46",
+          "title": "Common elements in all rows of a given matrix",
+          "difficulty": "Hard",
+          "slug": "common-elements-in-all-rows-of-a-given-matrix",
+          "url": "https://www.geeksforgeeks.org/common-elements-in-all-rows-of-a-given-matrix/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-3",
+      "topicName": "String",
+      "problems": [
+        {
+          "id": "lb-3-47",
+          "title": "Reverse a String",
+          "difficulty": "Easy",
+          "slug": "reverse-a-string",
+          "url": "https://leetcode.com/problems/reverse-string/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-3-48",
+          "title": "Check whether a String is Palindrome or not",
+          "difficulty": "Easy",
+          "slug": "check-whether-a-string-is-palindrome-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/palindrome-string0817/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-49",
+          "title": "Find Duplicate characters in a string",
+          "difficulty": "Easy",
+          "slug": "find-duplicate-characters-in-a-string",
+          "url": "https://www.geeksforgeeks.org/print-all-the-duplicates-in-the-input-string/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-50",
+          "title": "Why strings are immutable in Java?",
+          "difficulty": "Medium",
+          "slug": "why-strings-are-immutable-in-java",
+          "url": "https://www.geeksforgeeks.org/java-string-is-immutable-what-exactly-is-the-meaning/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-51",
+          "title": "Write a Code to check whether one string is a rotation of another",
+          "difficulty": "Easy",
+          "slug": "write-a-code-to-check-whether-one-string-is-a-rotation-of-another",
+          "url": "https://www.geeksforgeeks.org/a-program-to-check-if-strings-are-rotations-of-each-other/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-52",
+          "title": "Write a Program to check whether a string is a valid shuffle of two strings or not",
+          "difficulty": "Hard",
+          "slug": "write-a-program-to-check-whether-a-string-is-a-valid-shuffle-of-two-strings-or-not",
+          "url": "https://www.programiz.com/java-programming/examples/check-valid-shuffle-of-strings",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-53",
+          "title": "Count and Say problem",
+          "difficulty": "Easy",
+          "slug": "count-and-say-problem",
+          "url": "https://leetcode.com/problems/count-and-say/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-3-54",
+          "title": "Write a program to find the longest Palindrome in a string.[ Longest palindromic Substring]",
+          "difficulty": "Medium",
+          "slug": "write-a-program-to-find-the-longest-palindrome-in-a-string-longest-palindromic-substring",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-palindrome-in-a-string/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-55",
+          "title": "Find Longest Recurring Subsequence in String",
+          "difficulty": "Easy",
+          "slug": "find-longest-recurring-subsequence-in-string",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-repeating-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-56",
+          "title": "Print all Subsequences of a string.",
+          "difficulty": "Medium",
+          "slug": "print-all-subsequences-of-a-string",
+          "url": "https://www.geeksforgeeks.org/print-subsequences-string/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-57",
+          "title": "Print all the permutations of the given string",
+          "difficulty": "Easy",
+          "slug": "print-all-the-permutations-of-the-given-string",
+          "url": "https://practice.geeksforgeeks.org/problems/permutations-of-a-given-string/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-58",
+          "title": "Split the Binary string into two substring with equal 0�s and 1�s",
+          "difficulty": "Easy",
+          "slug": "split-the-binary-string-into-two-substring-with-equal-0-s-and-1-s",
+          "url": "https://leetcode.com/problems/count-binary-substrings/submissions/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-3-59",
+          "title": "Word Wrap Problem [VERY IMP].",
+          "difficulty": "Medium",
+          "slug": "word-wrap-problem-very-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/word-wrap/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-60",
+          "title": "EDIT Distance [Very Imp]",
+          "difficulty": "Medium",
+          "slug": "edit-distance-very-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/edit-distance3702/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-61",
+          "title": "Find next greater number with same set of digits. [Very Very IMP]",
+          "difficulty": "Easy",
+          "slug": "find-next-greater-number-with-same-set-of-digits-very-very-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/next-permutation/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-62",
+          "title": "Balanced Parenthesis problem.[Imp]",
+          "difficulty": "Easy",
+          "slug": "balanced-parenthesis-problem-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/parenthesis-checker/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-63",
+          "title": "Word break Problem[ Very Imp]",
+          "difficulty": "Medium",
+          "slug": "word-break-problem-very-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/word-break/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-64",
+          "title": "Rabin Karp Algo",
+          "difficulty": "Hard",
+          "slug": "rabin-karp-algo",
+          "url": "https://www.geeksforgeeks.org/rabin-karp-algorithm-for-pattern-searching/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-65",
+          "title": "KMP Algo",
+          "difficulty": "Easy",
+          "slug": "kmp-algo",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-prefix-suffix2527/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-66",
+          "title": "Convert a Sentence into its equivalent mobile numeric keypad sequence.",
+          "difficulty": "Easy",
+          "slug": "convert-a-sentence-into-its-equivalent-mobile-numeric-keypad-sequence",
+          "url": "https://www.geeksforgeeks.org/convert-sentence-equivalent-mobile-numeric-keypad-sequence/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-67",
+          "title": "Minimum number of bracket reversals needed to make an expression balanced.",
+          "difficulty": "Hard",
+          "slug": "minimum-number-of-bracket-reversals-needed-to-make-an-expression-balanced",
+          "url": "https://practice.geeksforgeeks.org/problems/count-the-reversals/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-68",
+          "title": "Count All Palindromic Subsequence in a given String.",
+          "difficulty": "Medium",
+          "slug": "count-all-palindromic-subsequence-in-a-given-string",
+          "url": "https://practice.geeksforgeeks.org/problems/count-palindromic-subsequences/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-69",
+          "title": "Count of number of given string in 2D character array",
+          "difficulty": "Easy",
+          "slug": "count-of-number-of-given-string-in-2d-character-array",
+          "url": "https://www.geeksforgeeks.org/find-count-number-given-string-present-2d-character-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-70",
+          "title": "Search a Word in a 2D Grid of characters.",
+          "difficulty": "Hard",
+          "slug": "search-a-word-in-a-2d-grid-of-characters",
+          "url": "https://practice.geeksforgeeks.org/problems/find-the-string-in-grid/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-71",
+          "title": "Boyer Moore Algorithm for Pattern Searching.",
+          "difficulty": "Hard",
+          "slug": "boyer-moore-algorithm-for-pattern-searching",
+          "url": "https://www.geeksforgeeks.org/boyer-moore-algorithm-for-pattern-searching/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-72",
+          "title": "Converting Roman Numerals to Decimal",
+          "difficulty": "Easy",
+          "slug": "converting-roman-numerals-to-decimal",
+          "url": "https://practice.geeksforgeeks.org/problems/roman-number-to-integer/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-73",
+          "title": "Longest Common Prefix",
+          "difficulty": "Easy",
+          "slug": "longest-common-prefix",
+          "url": "https://leetcode.com/problems/longest-common-prefix/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-3-74",
+          "title": "Number of flips to make binary string alternate",
+          "difficulty": "Easy",
+          "slug": "number-of-flips-to-make-binary-string-alternate",
+          "url": "https://practice.geeksforgeeks.org/problems/min-number-of-flips/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-75",
+          "title": "Find the first repeated word in string.",
+          "difficulty": "Easy",
+          "slug": "find-the-first-repeated-word-in-string",
+          "url": "https://practice.geeksforgeeks.org/problems/second-most-repeated-string-in-a-sequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-76",
+          "title": "Minimum number of swaps for bracket balancing.",
+          "difficulty": "Easy",
+          "slug": "minimum-number-of-swaps-for-bracket-balancing",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-swaps-for-bracket-balancing/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-77",
+          "title": "Find the longest common subsequence between two strings.",
+          "difficulty": "Easy",
+          "slug": "find-the-longest-common-subsequence-between-two-strings",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-common-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-78",
+          "title": "Program to generate all possible valid IP addresses from given  string.",
+          "difficulty": "Hard",
+          "slug": "program-to-generate-all-possible-valid-ip-addresses-from-given-string",
+          "url": "https://www.geeksforgeeks.org/program-generate-possible-valid-ip-addresses-given-string/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-79",
+          "title": "Write a program tofind the smallest window that contains all characters of string itself.",
+          "difficulty": "Hard",
+          "slug": "write-a-program-tofind-the-smallest-window-that-contains-all-characters-of-string-itself",
+          "url": "https://practice.geeksforgeeks.org/problems/smallest-distant-window/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-80",
+          "title": "Rearrange characters in a string such that no two adjacent are same",
+          "difficulty": "Medium",
+          "slug": "rearrange-characters-in-a-string-such-that-no-two-adjacent-are-same",
+          "url": "https://leetcode.com/problems/reorganize-string/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-3-81",
+          "title": "Minimum characters to be added at front to make string palindrome",
+          "difficulty": "Easy",
+          "slug": "minimum-characters-to-be-added-at-front-to-make-string-palindrome",
+          "url": "https://www.geeksforgeeks.org/minimum-characters-added-front-make-string-palindrome/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-82",
+          "title": "Given a sequence of words, print all anagrams together",
+          "difficulty": "Hard",
+          "slug": "given-a-sequence-of-words-print-all-anagrams-together",
+          "url": "https://practice.geeksforgeeks.org/problems/k-anagrams-1/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-83",
+          "title": "Find the smallest window in a string containing all characters of another string",
+          "difficulty": "Medium",
+          "slug": "find-the-smallest-window-in-a-string-containing-all-characters-of-another-string",
+          "url": "https://practice.geeksforgeeks.org/problems/smallest-window-in-a-string-containing-all-the-characters-of-another-string/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-84",
+          "title": "Recursively remove all adjacent duplicates",
+          "difficulty": "Easy",
+          "slug": "recursively-remove-all-adjacent-duplicates",
+          "url": "https://practice.geeksforgeeks.org/problems/consecutive-elements/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-85",
+          "title": "String matching where one string contains wildcard characters",
+          "difficulty": "Easy",
+          "slug": "string-matching-where-one-string-contains-wildcard-characters",
+          "url": "https://leetcode.com/problems/wildcard-matching/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-3-86",
+          "title": "Function to find Number of customers who could not get a computer",
+          "difficulty": "Medium",
+          "slug": "function-to-find-number-of-customers-who-could-not-get-a-computer",
+          "url": "https://www.geeksforgeeks.org/function-to-find-number-of-customers-who-could-not-get-a-computer/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-87",
+          "title": "Transform One String to Another using Minimum Number of Given Operation",
+          "difficulty": "Hard",
+          "slug": "transform-one-string-to-another-using-minimum-number-of-given-operation",
+          "url": "https://www.geeksforgeeks.org/transform-one-string-to-another-using-minimum-number-of-given-operation/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-88",
+          "title": "Check if two given strings are isomorphic to each other",
+          "difficulty": "Easy",
+          "slug": "check-if-two-given-strings-are-isomorphic-to-each-other",
+          "url": "https://practice.geeksforgeeks.org/problems/isomorphic-strings/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-3-89",
+          "title": "Recursively print all sentences that can be formed from list of word lists",
+          "difficulty": "Easy",
+          "slug": "recursively-print-all-sentences-that-can-be-formed-from-list-of-word-lists",
+          "url": "https://www.geeksforgeeks.org/recursively-print-all-sentences-that-can-be-formed-from-list-of-word-lists/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-4",
+      "topicName": "Searching & Sorting",
+      "problems": [
+        {
+          "id": "lb-4-90",
+          "title": "Find first and last positions of an element in a sorted array",
+          "difficulty": "Easy",
+          "slug": "find-first-and-last-positions-of-an-element-in-a-sorted-array",
+          "url": "https://practice.geeksforgeeks.org/problems/first-and-last-occurrences-of-x/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-91",
+          "title": "Find a Fixed Point (Value equal to index) in a given array",
+          "difficulty": "Easy",
+          "slug": "find-a-fixed-point-value-equal-to-index-in-a-given-array",
+          "url": "https://practice.geeksforgeeks.org/problems/value-equal-to-index-value1330/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-92",
+          "title": "Search in a rotated sorted array",
+          "difficulty": "Medium",
+          "slug": "search-in-a-rotated-sorted-array",
+          "url": "https://leetcode.com/problems/search-in-rotated-sorted-array/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-4-93",
+          "title": "square root of an integer",
+          "difficulty": "Easy",
+          "slug": "square-root-of-an-integer",
+          "url": "https://practice.geeksforgeeks.org/problems/count-squares3649/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-94",
+          "title": "Maximum and minimum of an array using minimum number of comparisons",
+          "difficulty": "Easy",
+          "slug": "maximum-and-minimum-of-an-array-using-minimum-number-of-comparisons",
+          "url": "https://practice.geeksforgeeks.org/problems/middle-of-three2926/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-95",
+          "title": "Optimum location of point to minimize total distance",
+          "difficulty": "Hard",
+          "slug": "optimum-location-of-point-to-minimize-total-distance",
+          "url": "https://www.geeksforgeeks.org/optimum-location-point-minimize-total-distance/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-96",
+          "title": "Find the repeating and the missing",
+          "difficulty": "Medium",
+          "slug": "find-the-repeating-and-the-missing",
+          "url": "https://practice.geeksforgeeks.org/problems/find-missing-and-repeating2512/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-97",
+          "title": "find majority element",
+          "difficulty": "Easy",
+          "slug": "find-majority-element",
+          "url": "https://practice.geeksforgeeks.org/problems/majority-element/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-98",
+          "title": "Searching in an array where adjacent differ by at most k",
+          "difficulty": "Easy",
+          "slug": "searching-in-an-array-where-adjacent-differ-by-at-most-k",
+          "url": "https://www.geeksforgeeks.org/searching-array-adjacent-differ-k/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-99",
+          "title": "find a pair with a given difference",
+          "difficulty": "Easy",
+          "slug": "find-a-pair-with-a-given-difference",
+          "url": "https://practice.geeksforgeeks.org/problems/find-pair-given-difference/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-100",
+          "title": "find four elements that sum to a given value",
+          "difficulty": "Hard",
+          "slug": "find-four-elements-that-sum-to-a-given-value",
+          "url": "https://practice.geeksforgeeks.org/problems/find-all-four-sum-numbers/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-101",
+          "title": "maximum sum such that no 2 elements are adjacent",
+          "difficulty": "Easy",
+          "slug": "maximum-sum-such-that-no-2-elements-are-adjacent",
+          "url": "https://practice.geeksforgeeks.org/problems/stickler-theif/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-102",
+          "title": "Count triplet with sum smaller than a given value",
+          "difficulty": "Medium",
+          "slug": "count-triplet-with-sum-smaller-than-a-given-value",
+          "url": "https://practice.geeksforgeeks.org/problems/count-triplets-with-sum-smaller-than-x5549/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-103",
+          "title": "merge 2 sorted arrays",
+          "difficulty": "Hard",
+          "slug": "merge-2-sorted-arrays",
+          "url": "https://practice.geeksforgeeks.org/problems/merge-two-sorted-arrays5135/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-104",
+          "title": "print all subarrays with 0 sum",
+          "difficulty": "Medium",
+          "slug": "print-all-subarrays-with-0-sum",
+          "url": "https://practice.geeksforgeeks.org/problems/zero-sum-subarrays/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-105",
+          "title": "Product array Puzzle",
+          "difficulty": "Easy",
+          "slug": "product-array-puzzle",
+          "url": "https://practice.geeksforgeeks.org/problems/product-array-puzzle/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-106",
+          "title": "Sort array according to count of set bits",
+          "difficulty": "Easy",
+          "slug": "sort-array-according-to-count-of-set-bits",
+          "url": "https://practice.geeksforgeeks.org/problems/sort-by-set-bit-count/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-107",
+          "title": "minimum no. of swaps required to sort the array",
+          "difficulty": "Medium",
+          "slug": "minimum-no-of-swaps-required-to-sort-the-array",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-swaps/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-108",
+          "title": "Bishu and Soldiers",
+          "difficulty": "Medium",
+          "slug": "bishu-and-soldiers",
+          "url": "https://www.hackerearth.com/problem/algorithm/bishu-and-soldiers-227/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-109",
+          "title": "Rasta and Kheshtak",
+          "difficulty": "Easy",
+          "slug": "rasta-and-kheshtak",
+          "url": "https://www.hackerearth.com/practice/algorithms/searching/binary-search/practice-problems/algorithm/rasta-and-kheshtak/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-110",
+          "title": "Kth smallest number again",
+          "difficulty": "Hard",
+          "slug": "kth-smallest-number-again",
+          "url": "https://www.hackerearth.com/practice/algorithms/searching/binary-search/practice-problems/algorithm/kth-smallest-number-again-2/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-111",
+          "title": "Find pivot element in a sorted array",
+          "difficulty": "Medium",
+          "slug": "find-pivot-element-in-a-sorted-array",
+          "url": "http://theoryofprogramming.com/2017/12/16/find-pivot-element-sorted-rotated-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-112",
+          "title": "K-th Element of Two Sorted Arrays",
+          "difficulty": "Hard",
+          "slug": "k-th-element-of-two-sorted-arrays",
+          "url": "https://practice.geeksforgeeks.org/problems/k-th-element-of-two-sorted-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-113",
+          "title": "Aggressive cows",
+          "difficulty": "Easy",
+          "slug": "aggressive-cows",
+          "url": "https://www.spoj.com/problems/AGGRCOW/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-114",
+          "title": "Book Allocation Problem",
+          "difficulty": "Hard",
+          "slug": "book-allocation-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/allocate-minimum-number-of-pages/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-115",
+          "title": "EKOSPOJ:",
+          "difficulty": "Hard",
+          "slug": "ekospoj",
+          "url": "https://www.spoj.com/problems/EKO/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-116",
+          "title": "Job Scheduling Algo",
+          "difficulty": "Hard",
+          "slug": "job-scheduling-algo",
+          "url": "https://www.geeksforgeeks.org/weighted-job-scheduling-log-n-time/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-117",
+          "title": "Missing Number in AP",
+          "difficulty": "Easy",
+          "slug": "missing-number-in-ap",
+          "url": "https://practice.geeksforgeeks.org/problems/arithmetic-number/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-118",
+          "title": "Smallest number with atleastn trailing zeroes infactorial",
+          "difficulty": "Easy",
+          "slug": "smallest-number-with-atleastn-trailing-zeroes-infactorial",
+          "url": "https://practice.geeksforgeeks.org/problems/smallest-factorial-number5929/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-119",
+          "title": "Painters Partition Problem:",
+          "difficulty": "Hard",
+          "slug": "painters-partition-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/allocate-minimum-number-of-pages/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-120",
+          "title": "ROTI-Prata SPOJ",
+          "difficulty": "Easy",
+          "slug": "roti-prata-spoj",
+          "url": "https://www.spoj.com/problems/PRATA/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-121",
+          "title": "DoubleHelix SPOJ",
+          "difficulty": "Easy",
+          "slug": "doublehelix-spoj",
+          "url": "https://www.spoj.com/problems/ANARC05B/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-122",
+          "title": "Subset Sums",
+          "difficulty": "Medium",
+          "slug": "subset-sums",
+          "url": "https://www.spoj.com/problems/SUBSUMS/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-123",
+          "title": "Findthe inversion count",
+          "difficulty": "Medium",
+          "slug": "findthe-inversion-count",
+          "url": "https://practice.geeksforgeeks.org/problems/inversion-of-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-124",
+          "title": "Implement Merge-sort in-place",
+          "difficulty": "Hard",
+          "slug": "implement-merge-sort-in-place",
+          "url": "https://www.geeksforgeeks.org/in-place-merge-sort/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-4-125",
+          "title": "Partitioning and Sorting Arrays with Many Repeated Entries",
+          "difficulty": "Easy",
+          "slug": "partitioning-and-sorting-arrays-with-many-repeated-entries",
+          "url": "https://www.baeldung.com/java-sorting-arrays-with-repeated-entries",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-5",
+      "topicName": "LinkedList",
+      "problems": [
+        {
+          "id": "lb-5-126",
+          "title": "Write a Program to reverse the Linked List. (Both Iterative and recursive)",
+          "difficulty": "Medium",
+          "slug": "write-a-program-to-reverse-the-linked-list-both-iterative-and-recursive",
+          "url": "https://www.geeksforgeeks.org/reverse-a-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-127",
+          "title": "Reverse a Linked List in group of Given Size. [Very Imp]",
+          "difficulty": "Hard",
+          "slug": "reverse-a-linked-list-in-group-of-given-size-very-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/reverse-a-linked-list-in-groups-of-given-size/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-128",
+          "title": "Write a program to Detect loop in a linked list.",
+          "difficulty": "Easy",
+          "slug": "write-a-program-to-detect-loop-in-a-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/detect-loop-in-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-129",
+          "title": "Write a program to Delete loop in a linked list.",
+          "difficulty": "Easy",
+          "slug": "write-a-program-to-delete-loop-in-a-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/remove-loop-in-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-130",
+          "title": "Find the starting point of the loop.�",
+          "difficulty": "Hard",
+          "slug": "find-the-starting-point-of-the-loop",
+          "url": "https://www.geeksforgeeks.org/find-first-node-of-loop-in-a-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-131",
+          "title": "Remove Duplicates in a sorted Linked List.",
+          "difficulty": "Easy",
+          "slug": "remove-duplicates-in-a-sorted-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/remove-duplicate-element-from-sorted-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-132",
+          "title": "Remove Duplicates in a Un-sorted Linked List.",
+          "difficulty": "Easy",
+          "slug": "remove-duplicates-in-a-un-sorted-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/remove-duplicates-from-an-unsorted-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-133",
+          "title": "Write a Program to Move the last element to Front in a Linked List.",
+          "difficulty": "Easy",
+          "slug": "write-a-program-to-move-the-last-element-to-front-in-a-linked-list",
+          "url": "https://www.geeksforgeeks.org/move-last-element-to-front-of-a-given-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-134",
+          "title": "Add �1� to a number represented as a Linked List.",
+          "difficulty": "Easy",
+          "slug": "add-1-to-a-number-represented-as-a-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/add-1-to-a-number-represented-as-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-135",
+          "title": "Add two numbers represented by linked lists.0",
+          "difficulty": "Easy",
+          "slug": "add-two-numbers-represented-by-linked-lists-0",
+          "url": "https://practice.geeksforgeeks.org/problems/add-two-numbers-represented-by-linked-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-136",
+          "title": "Intersection of two Sorted Linked List.",
+          "difficulty": "Easy",
+          "slug": "intersection-of-two-sorted-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/intersection-of-two-sorted-linked-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-137",
+          "title": "Intersection Point of two Linked Lists.",
+          "difficulty": "Easy",
+          "slug": "intersection-point-of-two-linked-lists",
+          "url": "https://practice.geeksforgeeks.org/problems/intersection-point-in-y-shapped-linked-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-138",
+          "title": "Merge Sort For Linked lists.[Very Important]",
+          "difficulty": "Medium",
+          "slug": "merge-sort-for-linked-lists-very-important",
+          "url": "https://practice.geeksforgeeks.org/problems/sort-a-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-139",
+          "title": "Quicksort for Linked Lists.[Very Important]",
+          "difficulty": "Hard",
+          "slug": "quicksort-for-linked-lists-very-important",
+          "url": "https://practice.geeksforgeeks.org/problems/quick-sort-on-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-140",
+          "title": "Find the middle Element of a linked list.",
+          "difficulty": "Easy",
+          "slug": "find-the-middle-element-of-a-linked-list",
+          "url": "https://leetcode.com/problems/middle-of-the-linked-list/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-5-141",
+          "title": "Check if a linked list is a circular linked list.",
+          "difficulty": "Easy",
+          "slug": "check-if-a-linked-list-is-a-circular-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/circular-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-142",
+          "title": "Split a Circular linked list into two halves.",
+          "difficulty": "Easy",
+          "slug": "split-a-circular-linked-list-into-two-halves",
+          "url": "https://practice.geeksforgeeks.org/problems/split-a-circular-linked-list-into-two-halves/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-143",
+          "title": "Write a Program to check whether the Singly Linked list is a palindrome or not.",
+          "difficulty": "Easy",
+          "slug": "write-a-program-to-check-whether-the-singly-linked-list-is-a-palindrome-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/check-if-linked-list-is-pallindrome/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-144",
+          "title": "Deletion from a Circular Linked List.",
+          "difficulty": "Easy",
+          "slug": "deletion-from-a-circular-linked-list",
+          "url": "https://www.geeksforgeeks.org/deletion-circular-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-145",
+          "title": "Reverse a Doubly Linked list.",
+          "difficulty": "Easy",
+          "slug": "reverse-a-doubly-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/reverse-a-doubly-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-146",
+          "title": "Find pairs with a given sum in a DLL.",
+          "difficulty": "Easy",
+          "slug": "find-pairs-with-a-given-sum-in-a-dll",
+          "url": "https://www.geeksforgeeks.org/find-pairs-given-sum-doubly-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-147",
+          "title": "Count triplets in a sorted DLL whose sum is equal to given value �X�.",
+          "difficulty": "Medium",
+          "slug": "count-triplets-in-a-sorted-dll-whose-sum-is-equal-to-given-value-x",
+          "url": "https://www.geeksforgeeks.org/count-triplets-sorted-doubly-linked-list-whose-sum-equal-given-value-x/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-148",
+          "title": "Sort a �k�sorted Doubly Linked list.[Very IMP]",
+          "difficulty": "Hard",
+          "slug": "sort-a-k-sorted-doubly-linked-list-very-imp",
+          "url": "https://www.geeksforgeeks.org/sort-k-sorted-doubly-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-149",
+          "title": "Rotate DoublyLinked list by N nodes.",
+          "difficulty": "Easy",
+          "slug": "rotate-doublylinked-list-by-n-nodes",
+          "url": "https://www.geeksforgeeks.org/rotate-doubly-linked-list-n-nodes/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-150",
+          "title": "Rotate a Doubly Linked list in group of Given Size.[Very IMP]",
+          "difficulty": "Medium",
+          "slug": "rotate-a-doubly-linked-list-in-group-of-given-size-very-imp",
+          "url": "https://www.geeksforgeeks.org/reverse-doubly-linked-list-groups-given-size/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-151",
+          "title": "Can we reverse a linked list in less than O(n) ?",
+          "difficulty": "Easy",
+          "slug": "can-we-reverse-a-linked-list-in-less-than-o-n",
+          "url": "https://www.geeksforgeeks.org/can-we-reverse-a-linked-list-in-less-than-on/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-152",
+          "title": "Why Quicksort is preferred for. Arrays and Merge Sort for LinkedLists ?",
+          "difficulty": "Easy",
+          "slug": "why-quicksort-is-preferred-for-arrays-and-merge-sort-for-linkedlists",
+          "url": "https://www.geeksforgeeks.org/why-quick-sort-preferred-for-arrays-and-merge-sort-for-linked-lists/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-153",
+          "title": "Flatten a Linked List",
+          "difficulty": "Easy",
+          "slug": "flatten-a-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/flattening-a-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-154",
+          "title": "Sort a LL of 0's, 1's and 2's",
+          "difficulty": "Easy",
+          "slug": "sort-a-ll-of-0-s-1-s-and-2-s",
+          "url": "https://practice.geeksforgeeks.org/problems/given-a-linked-list-of-0s-1s-and-2s-sort-it/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-155",
+          "title": "Clone a linked list with next and random pointer",
+          "difficulty": "Hard",
+          "slug": "clone-a-linked-list-with-next-and-random-pointer",
+          "url": "https://practice.geeksforgeeks.org/problems/clone-a-linked-list-with-next-and-random-pointer/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-156",
+          "title": "Merge K sorted Linked list",
+          "difficulty": "Medium",
+          "slug": "merge-k-sorted-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/merge-k-sorted-linked-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-157",
+          "title": "Multiply 2 no. represented by LL",
+          "difficulty": "Easy",
+          "slug": "multiply-2-no-represented-by-ll",
+          "url": "https://practice.geeksforgeeks.org/problems/multiply-two-linked-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-158",
+          "title": "Delete nodes which have a greater value on right side",
+          "difficulty": "Medium",
+          "slug": "delete-nodes-which-have-a-greater-value-on-right-side",
+          "url": "https://practice.geeksforgeeks.org/problems/delete-nodes-having-greater-value-on-right/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-159",
+          "title": "Segregate even and odd nodes in a Linked List",
+          "difficulty": "Easy",
+          "slug": "segregate-even-and-odd-nodes-in-a-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/segregate-even-and-odd-nodes-in-a-linked-list/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-160",
+          "title": "Program for n�th node from the end of a Linked List",
+          "difficulty": "Easy",
+          "slug": "program-for-n-th-node-from-the-end-of-a-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/nth-node-from-end-of-linked-list/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-5-161",
+          "title": "Find the first non-repeating character from a stream of characters",
+          "difficulty": "Easy",
+          "slug": "find-the-first-non-repeating-character-from-a-stream-of-characters",
+          "url": "https://practice.geeksforgeeks.org/problems/first-non-repeating-character-in-a-stream/0",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-6",
+      "topicName": "Binary Trees",
+      "problems": [
+        {
+          "id": "lb-6-162",
+          "title": "level order traversal",
+          "difficulty": "Easy",
+          "slug": "level-order-traversal",
+          "url": "https://practice.geeksforgeeks.org/problems/level-order-traversal/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-163",
+          "title": "Reverse Level Order traversal",
+          "difficulty": "Easy",
+          "slug": "reverse-level-order-traversal",
+          "url": "https://practice.geeksforgeeks.org/problems/reverse-level-order-traversal/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-164",
+          "title": "Height of a tree",
+          "difficulty": "Medium",
+          "slug": "height-of-a-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/height-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-165",
+          "title": "Diameter of a tree",
+          "difficulty": "Easy",
+          "slug": "diameter-of-a-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/diameter-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-166",
+          "title": "Mirror of a tree",
+          "difficulty": "Easy",
+          "slug": "mirror-of-a-tree",
+          "url": "https://www.geeksforgeeks.org/create-a-mirror-tree-from-the-given-binary-tree/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-167",
+          "title": "Inorder Traversal of a tree both using recursion and Iteration",
+          "difficulty": "Medium",
+          "slug": "inorder-traversal-of-a-tree-both-using-recursion-and-iteration",
+          "url": "https://www.techiedelight.com/inorder-tree-traversal-iterative-recursive/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-168",
+          "title": "Preorder Traversal of a tree both using recursion and Iteration",
+          "difficulty": "Medium",
+          "slug": "preorder-traversal-of-a-tree-both-using-recursion-and-iteration",
+          "url": "https://www.techiedelight.com/preorder-tree-traversal-iterative-recursive/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-169",
+          "title": "Postorder Traversal of a tree both using recursion and Iteration",
+          "difficulty": "Easy",
+          "slug": "postorder-traversal-of-a-tree-both-using-recursion-and-iteration",
+          "url": "https://www.techiedelight.com/postorder-tree-traversal-iterative-recursive/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-170",
+          "title": "Left View of a tree",
+          "difficulty": "Easy",
+          "slug": "left-view-of-a-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/left-view-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-171",
+          "title": "Right View of Tree",
+          "difficulty": "Easy",
+          "slug": "right-view-of-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/right-view-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-172",
+          "title": "Top View of a tree",
+          "difficulty": "Hard",
+          "slug": "top-view-of-a-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/top-view-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-173",
+          "title": "Bottom View of a tree",
+          "difficulty": "Easy",
+          "slug": "bottom-view-of-a-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/bottom-view-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-174",
+          "title": "Zig-Zag traversal of a binary tree",
+          "difficulty": "Easy",
+          "slug": "zig-zag-traversal-of-a-binary-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/zigzag-tree-traversal/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-175",
+          "title": "Check if a tree is balanced or not",
+          "difficulty": "Easy",
+          "slug": "check-if-a-tree-is-balanced-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/check-for-balanced-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-176",
+          "title": "Diagnol Traversal of a Binary tree",
+          "difficulty": "Medium",
+          "slug": "diagnol-traversal-of-a-binary-tree",
+          "url": "https://www.geeksforgeeks.org/diagonal-traversal-of-binary-tree/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-177",
+          "title": "Boundary traversal of a Binary tree",
+          "difficulty": "Easy",
+          "slug": "boundary-traversal-of-a-binary-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/boundary-traversal-of-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-178",
+          "title": "Construct Binary Tree from String with Bracket Representation",
+          "difficulty": "Hard",
+          "slug": "construct-binary-tree-from-string-with-bracket-representation",
+          "url": "https://www.techiedelight.com/place-convert-given-binary-tree-to-doubly-linked-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-179",
+          "title": "Convert Binary tree into Doubly Linked List",
+          "difficulty": "Hard",
+          "slug": "convert-binary-tree-into-doubly-linked-list",
+          "url": "https://practice.geeksforgeeks.org/problems/binary-tree-to-dll/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-180",
+          "title": "Convert Binary tree into Sum tree",
+          "difficulty": "Easy",
+          "slug": "convert-binary-tree-into-sum-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/transform-to-sum-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-181",
+          "title": "Construct Binary tree from Inorder and preorder traversal",
+          "difficulty": "Easy",
+          "slug": "construct-binary-tree-from-inorder-and-preorder-traversal",
+          "url": "https://practice.geeksforgeeks.org/problems/construct-tree-1/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-182",
+          "title": "Find minimum swaps required to convert a Binary tree into BST",
+          "difficulty": "Medium",
+          "slug": "find-minimum-swaps-required-to-convert-a-binary-tree-into-bst",
+          "url": "https://www.geeksforgeeks.org/minimum-swap-required-convert-binary-tree-binary-search-tree/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-183",
+          "title": "Check if Binary tree is Sum tree or not",
+          "difficulty": "Medium",
+          "slug": "check-if-binary-tree-is-sum-tree-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/sum-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-184",
+          "title": "Check if all leaf nodes are at same level or not",
+          "difficulty": "Easy",
+          "slug": "check-if-all-leaf-nodes-are-at-same-level-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/leaf-at-same-level/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-185",
+          "title": "Check if a Binary Tree contains duplicate subtrees of size 2 or more [ IMP ]",
+          "difficulty": "Easy",
+          "slug": "check-if-a-binary-tree-contains-duplicate-subtrees-of-size-2-or-more-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/duplicate-subtree-in-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-186",
+          "title": "Check if 2 trees are mirror or not",
+          "difficulty": "Medium",
+          "slug": "check-if-2-trees-are-mirror-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/check-mirror-in-n-ary-tree/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-187",
+          "title": "Sum of Nodes on the Longest path from root to leaf node",
+          "difficulty": "Easy",
+          "slug": "sum-of-nodes-on-the-longest-path-from-root-to-leaf-node",
+          "url": "https://practice.geeksforgeeks.org/problems/sum-of-the-longest-bloodline-of-a-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-188",
+          "title": "Check if given graph is tree or not.  [ IMP ]",
+          "difficulty": "Medium",
+          "slug": "check-if-given-graph-is-tree-or-not-imp",
+          "url": "https://www.geeksforgeeks.org/check-given-graph-tree/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-189",
+          "title": "Find Largest subtree sum in a tree",
+          "difficulty": "Easy",
+          "slug": "find-largest-subtree-sum-in-a-tree",
+          "url": "https://www.geeksforgeeks.org/find-largest-subtree-sum-tree/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-190",
+          "title": "Maximum Sum of nodes in Binary tree such that no two are adjacent",
+          "difficulty": "Hard",
+          "slug": "maximum-sum-of-nodes-in-binary-tree-such-that-no-two-are-adjacent",
+          "url": "https://www.geeksforgeeks.org/maximum-sum-nodes-binary-tree-no-two-adjacent/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-191",
+          "title": "Print all \"K\" Sum paths in a Binary tree",
+          "difficulty": "Hard",
+          "slug": "print-all-k-sum-paths-in-a-binary-tree",
+          "url": "https://www.geeksforgeeks.org/print-k-sum-paths-binary-tree/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-192",
+          "title": "Find LCA in a Binary tree",
+          "difficulty": "Medium",
+          "slug": "find-lca-in-a-binary-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-193",
+          "title": "Find distance between 2 nodes in a Binary tree",
+          "difficulty": "Easy",
+          "slug": "find-distance-between-2-nodes-in-a-binary-tree",
+          "url": "https://practice.geeksforgeeks.org/problems/min-distance-between-two-given-nodes-of-a-binary-tree/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-194",
+          "title": "Kth Ancestor of node in a Binary tree",
+          "difficulty": "Medium",
+          "slug": "kth-ancestor-of-node-in-a-binary-tree",
+          "url": "https://www.geeksforgeeks.org/kth-ancestor-node-binary-tree-set-2/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-195",
+          "title": "Find all Duplicate subtrees in a Binary tree [ IMP ]",
+          "difficulty": "Medium",
+          "slug": "find-all-duplicate-subtrees-in-a-binary-tree-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/duplicate-subtrees/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-6-196",
+          "title": "Tree Isomorphism Problem",
+          "difficulty": "Easy",
+          "slug": "tree-isomorphism-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/check-if-tree-is-isomorphic/1",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-7",
+      "topicName": "Binary Search Trees",
+      "problems": [
+        {
+          "id": "lb-7-197",
+          "title": "Fina a value in a BST",
+          "difficulty": "Easy",
+          "slug": "fina-a-value-in-a-bst",
+          "url": "https://www.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-198",
+          "title": "Deletion of a node in a BST",
+          "difficulty": "Medium",
+          "slug": "deletion-of-a-node-in-a-bst",
+          "url": "https://leetcode.com/problems/delete-node-in-a-bst/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-7-199",
+          "title": "Find min and max value in a BST\\",
+          "difficulty": "Easy",
+          "slug": "find-min-and-max-value-in-a-bst",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-element-in-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-200",
+          "title": "Find inorder successor and inorder predecessor in a BST",
+          "difficulty": "Easy",
+          "slug": "find-inorder-successor-and-inorder-predecessor-in-a-bst",
+          "url": "https://practice.geeksforgeeks.org/problems/predecessor-and-successor/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-201",
+          "title": "Check if a tree is a BST or not",
+          "difficulty": "Easy",
+          "slug": "check-if-a-tree-is-a-bst-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/check-for-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-202",
+          "title": "Populate Inorder successor of all nodes",
+          "difficulty": "Hard",
+          "slug": "populate-inorder-successor-of-all-nodes",
+          "url": "https://practice.geeksforgeeks.org/problems/populate-inorder-successor-for-all-nodes/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-203",
+          "title": "Find LCA  of 2 nodes in a BST",
+          "difficulty": "Easy",
+          "slug": "find-lca-of-2-nodes-in-a-bst",
+          "url": "https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-204",
+          "title": "Construct BST from preorder traversal",
+          "difficulty": "Hard",
+          "slug": "construct-bst-from-preorder-traversal",
+          "url": "https://www.geeksforgeeks.org/construct-bst-from-given-preorder-traversa/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-205",
+          "title": "Convert Binary tree into BST",
+          "difficulty": "Easy",
+          "slug": "convert-binary-tree-into-bst",
+          "url": "https://practice.geeksforgeeks.org/problems/binary-tree-to-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-206",
+          "title": "Convert a normal BST into a Balanced BST",
+          "difficulty": "Medium",
+          "slug": "convert-a-normal-bst-into-a-balanced-bst",
+          "url": "https://www.geeksforgeeks.org/convert-normal-bst-balanced-bst/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-207",
+          "title": "Merge two BST [ V.V.V>IMP ]",
+          "difficulty": "Medium",
+          "slug": "merge-two-bst-v-v-v-imp",
+          "url": "https://www.geeksforgeeks.org/merge-two-balanced-binary-search-trees/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-208",
+          "title": "Find Kth largest element in a BST",
+          "difficulty": "Easy",
+          "slug": "find-kth-largest-element-in-a-bst",
+          "url": "https://practice.geeksforgeeks.org/problems/kth-largest-element-in-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-209",
+          "title": "Find Kth smallest element in a BST",
+          "difficulty": "Easy",
+          "slug": "find-kth-smallest-element-in-a-bst",
+          "url": "https://practice.geeksforgeeks.org/problems/find-k-th-smallest-element-in-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-210",
+          "title": "Count pairs from 2 BST whose sum is equal to given value \"X\"",
+          "difficulty": "Easy",
+          "slug": "count-pairs-from-2-bst-whose-sum-is-equal-to-given-value-x",
+          "url": "https://practice.geeksforgeeks.org/problems/brothers-from-different-root/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-211",
+          "title": "Find the median of BST in O(n) time and O(1) space",
+          "difficulty": "Hard",
+          "slug": "find-the-median-of-bst-in-o-n-time-and-o-1-space",
+          "url": "https://www.geeksforgeeks.org/find-median-bst-time-o1-space/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-212",
+          "title": "Count BST ndoes that lie in a given range",
+          "difficulty": "Medium",
+          "slug": "count-bst-ndoes-that-lie-in-a-given-range",
+          "url": "https://practice.geeksforgeeks.org/problems/count-bst-nodes-that-lie-in-a-given-range/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-213",
+          "title": "Replace every element with the least greater element on its right",
+          "difficulty": "Easy",
+          "slug": "replace-every-element-with-the-least-greater-element-on-its-right",
+          "url": "https://www.geeksforgeeks.org/replace-every-element-with-the-least-greater-element-on-its-right/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-214",
+          "title": "Given \"n\" appointments, find the conflicting appointments",
+          "difficulty": "Hard",
+          "slug": "given-n-appointments-find-the-conflicting-appointments",
+          "url": "https://www.geeksforgeeks.org/given-n-appointments-find-conflicting-appointments/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-215",
+          "title": "Check preorder is valid or not",
+          "difficulty": "Medium",
+          "slug": "check-preorder-is-valid-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/preorder-to-postorder/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-216",
+          "title": "Check whether BST contains Dead end",
+          "difficulty": "Easy",
+          "slug": "check-whether-bst-contains-dead-end",
+          "url": "https://practice.geeksforgeeks.org/problems/check-whether-bst-contains-dead-end/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-217",
+          "title": "Largest BST in a Binary Tree [ V.V.V.V.V IMP ]",
+          "difficulty": "Easy",
+          "slug": "largest-bst-in-a-binary-tree-v-v-v-v-v-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/largest-bst/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-7-218",
+          "title": "Flatten BST to sorted list",
+          "difficulty": "Medium",
+          "slug": "flatten-bst-to-sorted-list",
+          "url": "https://www.geeksforgeeks.org/flatten-bst-to-sorted-list-increasing-order/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-8",
+      "topicName": "Greedy",
+      "problems": [
+        {
+          "id": "lb-8-219",
+          "title": "Activity Selection Problem",
+          "difficulty": "Easy",
+          "slug": "activity-selection-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/n-meetings-in-one-room/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-220",
+          "title": "Job SequencingProblem",
+          "difficulty": "Hard",
+          "slug": "job-sequencingproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/job-sequencing-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-221",
+          "title": "Huffman Coding",
+          "difficulty": "Easy",
+          "slug": "huffman-coding",
+          "url": "https://practice.geeksforgeeks.org/problems/huffman-encoding/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-222",
+          "title": "Water Connection Problem",
+          "difficulty": "Medium",
+          "slug": "water-connection-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/water-connection-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-223",
+          "title": "Fractional Knapsack Problem",
+          "difficulty": "Hard",
+          "slug": "fractional-knapsack-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/fractional-knapsack/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-224",
+          "title": "Greedy Algorithm to find Minimum number of Coins",
+          "difficulty": "Easy",
+          "slug": "greedy-algorithm-to-find-minimum-number-of-coins",
+          "url": "https://practice.geeksforgeeks.org/problems/coin-piles/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-225",
+          "title": "Maximum trains for which stoppage can be provided",
+          "difficulty": "Easy",
+          "slug": "maximum-trains-for-which-stoppage-can-be-provided",
+          "url": "https://www.geeksforgeeks.org/maximum-trains-stoppage-can-provided/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-226",
+          "title": "Minimum Platforms Problem",
+          "difficulty": "Hard",
+          "slug": "minimum-platforms-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-platforms/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-227",
+          "title": "Buy Maximum Stocks if i stocks can be bought on i-th day",
+          "difficulty": "Easy",
+          "slug": "buy-maximum-stocks-if-i-stocks-can-be-bought-on-i-th-day",
+          "url": "https://www.geeksforgeeks.org/buy-maximum-stocks-stocks-can-bought-th-day/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-228",
+          "title": "Find the minimum and maximum amount to buy all N candies",
+          "difficulty": "Easy",
+          "slug": "find-the-minimum-and-maximum-amount-to-buy-all-n-candies",
+          "url": "https://practice.geeksforgeeks.org/problems/shop-in-candy-store/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-229",
+          "title": "Minimize Cash Flow among a given set of friends who have borrowed money from each other",
+          "difficulty": "Easy",
+          "slug": "minimize-cash-flow-among-a-given-set-of-friends-who-have-borrowed-money-from-each-other",
+          "url": "https://www.geeksforgeeks.org/minimize-cash-flow-among-given-set-friends-borrowed-money/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-230",
+          "title": "Minimum Cost to cut a board into squares",
+          "difficulty": "Hard",
+          "slug": "minimum-cost-to-cut-a-board-into-squares",
+          "url": "https://www.geeksforgeeks.org/minimum-cost-cut-board-squares/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-231",
+          "title": "Check if it is possible to survive on Island",
+          "difficulty": "Easy",
+          "slug": "check-if-it-is-possible-to-survive-on-island",
+          "url": "https://www.geeksforgeeks.org/survival/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-232",
+          "title": "Find maximum meetings in one room",
+          "difficulty": "Hard",
+          "slug": "find-maximum-meetings-in-one-room",
+          "url": "https://www.geeksforgeeks.org/find-maximum-meetings-in-one-room/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-233",
+          "title": "Maximum product subset of an array",
+          "difficulty": "Easy",
+          "slug": "maximum-product-subset-of-an-array",
+          "url": "https://www.geeksforgeeks.org/maximum-product-subset-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-234",
+          "title": "Maximize array sum after K negations",
+          "difficulty": "Easy",
+          "slug": "maximize-array-sum-after-k-negations",
+          "url": "https://practice.geeksforgeeks.org/problems/maximize-sum-after-k-negations/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-235",
+          "title": "Maximize the sum of arr[i]*i",
+          "difficulty": "Easy",
+          "slug": "maximize-the-sum-of-arr-i-i",
+          "url": "https://practice.geeksforgeeks.org/problems/maximize-arrii-of-an-array/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-236",
+          "title": "Maximum sum of absolute difference of an array",
+          "difficulty": "Easy",
+          "slug": "maximum-sum-of-absolute-difference-of-an-array",
+          "url": "https://www.geeksforgeeks.org/maximum-sum-absolute-difference-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-237",
+          "title": "Maximize sum of consecutive differences in a circular array",
+          "difficulty": "Easy",
+          "slug": "maximize-sum-of-consecutive-differences-in-a-circular-array",
+          "url": "https://practice.geeksforgeeks.org/problems/swap-and-maximize/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-238",
+          "title": "Minimum sum of absolute difference of pairs of two arrays",
+          "difficulty": "Easy",
+          "slug": "minimum-sum-of-absolute-difference-of-pairs-of-two-arrays",
+          "url": "https://www.geeksforgeeks.org/minimum-sum-absolute-difference-pairs-two-arrays/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-239",
+          "title": "Program for Shortest Job First (or SJF) CPU Scheduling",
+          "difficulty": "Easy",
+          "slug": "program-for-shortest-job-first-or-sjf-cpu-scheduling",
+          "url": "https://www.geeksforgeeks.org/program-for-shortest-job-first-or-sjf-cpu-scheduling-set-1-non-preemptive/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-240",
+          "title": "Program for Least Recently Used (LRU) Page Replacement algorithm",
+          "difficulty": "Medium",
+          "slug": "program-for-least-recently-used-lru-page-replacement-algorithm",
+          "url": "https://practice.geeksforgeeks.org/problems/page-faults-in-lru/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-241",
+          "title": "Smallest subset with sum greater than all other elements",
+          "difficulty": "Easy",
+          "slug": "smallest-subset-with-sum-greater-than-all-other-elements",
+          "url": "https://www.geeksforgeeks.org/smallest-subset-sum-greater-elements/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-242",
+          "title": "Chocolate Distribution Problem",
+          "difficulty": "Easy",
+          "slug": "chocolate-distribution-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/chocolate-distribution-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-243",
+          "title": "DEFKIN -Defense of a Kingdom",
+          "difficulty": "Hard",
+          "slug": "defkin-defense-of-a-kingdom",
+          "url": "https://www.spoj.com/problems/DEFKIN/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-244",
+          "title": "DIEHARD -DIE HARD",
+          "difficulty": "Easy",
+          "slug": "diehard-die-hard",
+          "url": "https://www.spoj.com/problems/DIEHARD/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-245",
+          "title": "GERGOVIA -Wine trading in Gergovia",
+          "difficulty": "Easy",
+          "slug": "gergovia-wine-trading-in-gergovia",
+          "url": "https://www.spoj.com/problems/GERGOVIA/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-246",
+          "title": "Picking Up Chicks",
+          "difficulty": "Hard",
+          "slug": "picking-up-chicks",
+          "url": "https://www.spoj.com/problems/GCJ101BB/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-247",
+          "title": "CHOCOLA �Chocolate",
+          "difficulty": "Hard",
+          "slug": "chocola-chocolate",
+          "url": "https://www.spoj.com/problems/CHOCOLA/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-248",
+          "title": "ARRANGE -Arranging Amplifiers",
+          "difficulty": "Hard",
+          "slug": "arrange-arranging-amplifiers",
+          "url": "https://www.spoj.com/problems/ARRANGE/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-249",
+          "title": "K Centers Problem",
+          "difficulty": "Easy",
+          "slug": "k-centers-problem",
+          "url": "https://www.geeksforgeeks.org/k-centers-problem-set-1-greedy-approximate-algorithm/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-250",
+          "title": "Minimum Cost of ropes",
+          "difficulty": "Easy",
+          "slug": "minimum-cost-of-ropes",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-cost-of-ropes/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-251",
+          "title": "Find smallest number with given number of digits and sum of digits",
+          "difficulty": "Easy",
+          "slug": "find-smallest-number-with-given-number-of-digits-and-sum-of-digits",
+          "url": "https://practice.geeksforgeeks.org/problems/smallest-number5829/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-252",
+          "title": "Rearrange characters in a string such that no two adjacent are same",
+          "difficulty": "Medium",
+          "slug": "rearrange-characters-in-a-string-such-that-no-two-adjacent-are-same",
+          "url": "Rearrange characters in a string such that no two adjacent are same",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-8-253",
+          "title": "Find maximum sum possible equal sum of three stacks",
+          "difficulty": "Easy",
+          "slug": "find-maximum-sum-possible-equal-sum-of-three-stacks",
+          "url": "https://www.geeksforgeeks.org/find-maximum-sum-possible-equal-sum-three-stacks/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-9",
+      "topicName": "BackTracking",
+      "problems": [
+        {
+          "id": "lb-9-254",
+          "title": "Rat in a maze Problem",
+          "difficulty": "Medium",
+          "slug": "rat-in-a-maze-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/rat-in-a-maze-problem/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-255",
+          "title": "Printing all solutions in N-Queen Problem",
+          "difficulty": "Hard",
+          "slug": "printing-all-solutions-in-n-queen-problem",
+          "url": "https://www.geeksforgeeks.org/printing-solutions-n-queen-problem/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-256",
+          "title": "Word Break Problem using Backtracking",
+          "difficulty": "Hard",
+          "slug": "word-break-problem-using-backtracking",
+          "url": "https://practice.geeksforgeeks.org/problems/word-break-part-2/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-257",
+          "title": "Remove Invalid Parentheses",
+          "difficulty": "Easy",
+          "slug": "remove-invalid-parentheses",
+          "url": "https://leetcode.com/problems/remove-invalid-parentheses/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-9-258",
+          "title": "Sudoku Solver",
+          "difficulty": "Hard",
+          "slug": "sudoku-solver",
+          "url": "https://practice.geeksforgeeks.org/problems/solve-the-sudoku/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-259",
+          "title": "m Coloring Problem",
+          "difficulty": "Hard",
+          "slug": "m-coloring-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/m-coloring-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-260",
+          "title": "Print all palindromic partitions of a string",
+          "difficulty": "Hard",
+          "slug": "print-all-palindromic-partitions-of-a-string",
+          "url": "https://www.geeksforgeeks.org/given-a-string-print-all-possible-palindromic-partition/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-261",
+          "title": "Subset Sum Problem",
+          "difficulty": "Easy",
+          "slug": "subset-sum-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/subset-sum-problem2014/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-262",
+          "title": "The Knight�s tour problem",
+          "difficulty": "Hard",
+          "slug": "the-knight-s-tour-problem",
+          "url": "https://www.geeksforgeeks.org/the-knights-tour-problem-backtracking-1/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-263",
+          "title": "Tug of War",
+          "difficulty": "Hard",
+          "slug": "tug-of-war",
+          "url": "https://www.geeksforgeeks.org/tug-of-war/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-264",
+          "title": "Find shortest safe route in a path with landmines",
+          "difficulty": "Hard",
+          "slug": "find-shortest-safe-route-in-a-path-with-landmines",
+          "url": "https://www.geeksforgeeks.org/find-shortest-safe-route-in-a-path-with-landmines/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-265",
+          "title": "Combinational Sum",
+          "difficulty": "Easy",
+          "slug": "combinational-sum",
+          "url": "https://practice.geeksforgeeks.org/problems/combination-sum/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-266",
+          "title": "Find Maximum number possible by doing at-most K swaps",
+          "difficulty": "Medium",
+          "slug": "find-maximum-number-possible-by-doing-at-most-k-swaps",
+          "url": "https://practice.geeksforgeeks.org/problems/largest-number-in-k-swaps/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-267",
+          "title": "Print all permutations of a string",
+          "difficulty": "Easy",
+          "slug": "print-all-permutations-of-a-string",
+          "url": "https://practice.geeksforgeeks.org/problems/permutations-of-a-given-string/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-268",
+          "title": "Find if there is a path of more than k length from a source",
+          "difficulty": "Hard",
+          "slug": "find-if-there-is-a-path-of-more-than-k-length-from-a-source",
+          "url": "https://www.geeksforgeeks.org/find-if-there-is-a-path-of-more-than-k-length-from-a-source/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-269",
+          "title": "Longest Possible Route in a Matrix with Hurdles",
+          "difficulty": "Easy",
+          "slug": "longest-possible-route-in-a-matrix-with-hurdles",
+          "url": "https://www.geeksforgeeks.org/longest-possible-route-in-a-matrix-with-hurdles/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-270",
+          "title": "Print all possible paths from top left to bottom right of a mXn matrix",
+          "difficulty": "Medium",
+          "slug": "print-all-possible-paths-from-top-left-to-bottom-right-of-a-mxn-matrix",
+          "url": "https://www.geeksforgeeks.org/print-all-possible-paths-from-top-left-to-bottom-right-of-a-mxn-matrix/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-271",
+          "title": "Partition of a set intoK subsets with equal sum",
+          "difficulty": "Hard",
+          "slug": "partition-of-a-set-intok-subsets-with-equal-sum",
+          "url": "https://practice.geeksforgeeks.org/problems/partition-array-to-k-subsets/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-9-272",
+          "title": "Find the K-th Permutation Sequence of first N natural numbers",
+          "difficulty": "Hard",
+          "slug": "find-the-k-th-permutation-sequence-of-first-n-natural-numbers",
+          "url": "https://www.geeksforgeeks.org/find-the-k-th-permutation-sequence-of-first-n-natural-numbers/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-10",
+      "topicName": "Trie",
+      "problems": [
+        {
+          "id": "lb-10-273",
+          "title": "Construct a trie from scratch",
+          "difficulty": "Easy",
+          "slug": "construct-a-trie-from-scratch",
+          "url": "https://www.geeksforgeeks.org/trie-insert-and-search/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-10-274",
+          "title": "Find shortest unique prefix for every word in a given list",
+          "difficulty": "Hard",
+          "slug": "find-shortest-unique-prefix-for-every-word-in-a-given-list",
+          "url": "https://www.geeksforgeeks.org/find-all-shortest-unique-prefixes-to-represent-each-word-in-a-given-list/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-10-275",
+          "title": "Word Break Problem | (Trie solution)",
+          "difficulty": "Medium",
+          "slug": "word-break-problem-trie-solution",
+          "url": "https://www.geeksforgeeks.org/word-break-problem-trie-solution/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-10-276",
+          "title": "Given a sequence of words, print all anagrams together",
+          "difficulty": "Medium",
+          "slug": "given-a-sequence-of-words-print-all-anagrams-together",
+          "url": "https://practice.geeksforgeeks.org/problems/k-anagrams-1/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-10-277",
+          "title": "Implement a Phone Directory",
+          "difficulty": "Easy",
+          "slug": "implement-a-phone-directory",
+          "url": "https://practice.geeksforgeeks.org/problems/phone-directory/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-10-278",
+          "title": "Print unique rows in a given boolean matrix",
+          "difficulty": "Easy",
+          "slug": "print-unique-rows-in-a-given-boolean-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/unique-rows-in-boolean-matrix/1",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-11",
+      "topicName": "Stacks & Queues",
+      "problems": [
+        {
+          "id": "lb-11-279",
+          "title": "Implement Stack from Scratch",
+          "difficulty": "Easy",
+          "slug": "implement-stack-from-scratch",
+          "url": "https://www.geeksforgeeks.org/stack-data-structure-introduction-program/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-280",
+          "title": "Implement Queue from Scratch",
+          "difficulty": "Easy",
+          "slug": "implement-queue-from-scratch",
+          "url": "https://www.geeksforgeeks.org/queue-set-1introduction-and-array-implementation/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-281",
+          "title": "Implement 2 stack in an array",
+          "difficulty": "Easy",
+          "slug": "implement-2-stack-in-an-array",
+          "url": "https://practice.geeksforgeeks.org/problems/implement-two-stacks-in-an-array/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-282",
+          "title": "find the middle element of a stack",
+          "difficulty": "Medium",
+          "slug": "find-the-middle-element-of-a-stack",
+          "url": "https://www.geeksforgeeks.org/design-a-stack-with-find-middle-operation/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-283",
+          "title": "Implement \"N\" stacks in an Array",
+          "difficulty": "Hard",
+          "slug": "implement-n-stacks-in-an-array",
+          "url": "https://www.geeksforgeeks.org/efficiently-implement-k-stacks-single-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-284",
+          "title": "Check the expression has valid or Balanced parenthesis or not.",
+          "difficulty": "Easy",
+          "slug": "check-the-expression-has-valid-or-balanced-parenthesis-or-not",
+          "url": "https://practice.geeksforgeeks.org/problems/parenthesis-checker/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-285",
+          "title": "Reverse a String using Stack",
+          "difficulty": "Easy",
+          "slug": "reverse-a-string-using-stack",
+          "url": "https://practice.geeksforgeeks.org/problems/reverse-a-string-using-stack/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-286",
+          "title": "Design a Stack that supports getMin() in O(1) time and O(1) extra space.",
+          "difficulty": "Easy",
+          "slug": "design-a-stack-that-supports-getmin-in-o-1-time-and-o-1-extra-space",
+          "url": "https://practice.geeksforgeeks.org/problems/special-stack/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-287",
+          "title": "Find the next Greater element",
+          "difficulty": "Medium",
+          "slug": "find-the-next-greater-element",
+          "url": "https://practice.geeksforgeeks.org/problems/next-larger-element/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-288",
+          "title": "The celebrity Problem",
+          "difficulty": "Medium",
+          "slug": "the-celebrity-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/the-celebrity-problem/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-289",
+          "title": "Arithmetic Expression evaluation",
+          "difficulty": "Easy",
+          "slug": "arithmetic-expression-evaluation",
+          "url": "https://www.geeksforgeeks.org/arithmetic-expression-evalution/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-290",
+          "title": "Evaluation of Postfix expression",
+          "difficulty": "Easy",
+          "slug": "evaluation-of-postfix-expression",
+          "url": "https://practice.geeksforgeeks.org/problems/evaluation-of-postfix-expression/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-291",
+          "title": "Implement a method to insert an element at its bottom without using any other data structure.",
+          "difficulty": "Easy",
+          "slug": "implement-a-method-to-insert-an-element-at-its-bottom-without-using-any-other-data-structure",
+          "url": "https://www.geeksforgeeks.org/program-to-insert-an-element-at-the-bottom-of-a-stack/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-292",
+          "title": "Reverse a stack using recursion",
+          "difficulty": "Hard",
+          "slug": "reverse-a-stack-using-recursion",
+          "url": "https://www.geeksforgeeks.org/reverse-a-stack-using-recursion/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-293",
+          "title": "Sort a Stack using recursion",
+          "difficulty": "Easy",
+          "slug": "sort-a-stack-using-recursion",
+          "url": "https://practice.geeksforgeeks.org/problems/sort-a-stack/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-294",
+          "title": "Merge Overlapping Intervals",
+          "difficulty": "Medium",
+          "slug": "merge-overlapping-intervals",
+          "url": "https://leetcode.com/problems/merge-intervals/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-11-295",
+          "title": "Largest rectangular Area in Histogram",
+          "difficulty": "Hard",
+          "slug": "largest-rectangular-area-in-histogram",
+          "url": "https://practice.geeksforgeeks.org/problems/maximum-rectangular-area-in-a-histogram/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-296",
+          "title": "Length of the Longest Valid Substring",
+          "difficulty": "Easy",
+          "slug": "length-of-the-longest-valid-substring",
+          "url": "https://practice.geeksforgeeks.org/problems/valid-substring0624/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-297",
+          "title": "Expression contains redundant bracket or not",
+          "difficulty": "Easy",
+          "slug": "expression-contains-redundant-bracket-or-not",
+          "url": "https://www.geeksforgeeks.org/expression-contains-redundant-bracket-not/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-298",
+          "title": "Implement Stack using Queue",
+          "difficulty": "Easy",
+          "slug": "implement-stack-using-queue",
+          "url": "https://practice.geeksforgeeks.org/problems/stack-using-two-queues/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-299",
+          "title": "Implement Stack using Deque",
+          "difficulty": "Easy",
+          "slug": "implement-stack-using-deque",
+          "url": "https://www.geeksforgeeks.org/implement-stack-queue-using-deque/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-300",
+          "title": "Stack Permutations (Check if an array is stack permutation of other)",
+          "difficulty": "Medium",
+          "slug": "stack-permutations-check-if-an-array-is-stack-permutation-of-other",
+          "url": "https://www.geeksforgeeks.org/stack-permutations-check-if-an-array-is-stack-permutation-of-other/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-301",
+          "title": "Implement Queue using Stack",
+          "difficulty": "Easy",
+          "slug": "implement-queue-using-stack",
+          "url": "https://practice.geeksforgeeks.org/problems/queue-using-two-stacks/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-302",
+          "title": "Implement \"n\" queue in an array",
+          "difficulty": "Hard",
+          "slug": "implement-n-queue-in-an-array",
+          "url": "https://www.geeksforgeeks.org/efficiently-implement-k-queues-single-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-303",
+          "title": "Implement a Circular queue",
+          "difficulty": "Easy",
+          "slug": "implement-a-circular-queue",
+          "url": "https://www.geeksforgeeks.org/circular-queue-set-1-introduction-array-implementation/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-304",
+          "title": "LRU Cache Implementationa",
+          "difficulty": "Hard",
+          "slug": "lru-cache-implementationa",
+          "url": "https://practice.geeksforgeeks.org/problems/lru-cache/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-305",
+          "title": "Reverse a Queue using recursion",
+          "difficulty": "Easy",
+          "slug": "reverse-a-queue-using-recursion",
+          "url": "https://practice.geeksforgeeks.org/problems/queue-reversal/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-306",
+          "title": "Reverse the first �K� elements of a queue",
+          "difficulty": "Easy",
+          "slug": "reverse-the-first-k-elements-of-a-queue",
+          "url": "https://practice.geeksforgeeks.org/problems/reverse-first-k-elements-of-queue/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-307",
+          "title": "Interleave the first half of the queue with second half",
+          "difficulty": "Hard",
+          "slug": "interleave-the-first-half-of-the-queue-with-second-half",
+          "url": "https://www.geeksforgeeks.org/interleave-first-half-queue-second-half/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-308",
+          "title": "Find the first circular tour that visits all Petrol Pumps",
+          "difficulty": "Medium",
+          "slug": "find-the-first-circular-tour-that-visits-all-petrol-pumps",
+          "url": "https://practice.geeksforgeeks.org/problems/circular-tour/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-309",
+          "title": "Minimum time required to rot all oranges",
+          "difficulty": "Easy",
+          "slug": "minimum-time-required-to-rot-all-oranges",
+          "url": "https://practice.geeksforgeeks.org/problems/rotten-oranges/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-310",
+          "title": "Distance of nearest cell having 1 in a binary matrix",
+          "difficulty": "Hard",
+          "slug": "distance-of-nearest-cell-having-1-in-a-binary-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/distance-of-nearest-cell-having-1/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-311",
+          "title": "First negative integer in every window of size �k�",
+          "difficulty": "Easy",
+          "slug": "first-negative-integer-in-every-window-of-size-k",
+          "url": "https://practice.geeksforgeeks.org/problems/first-negative-integer-in-every-window-of-size-k/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-312",
+          "title": "Check if all levels of two trees are anagrams or not.",
+          "difficulty": "Medium",
+          "slug": "check-if-all-levels-of-two-trees-are-anagrams-or-not",
+          "url": "https://www.geeksforgeeks.org/check-if-all-levels-of-two-trees-are-anagrams-or-not/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-313",
+          "title": "Sum of minimum and maximum elements of all subarrays of size �k�.",
+          "difficulty": "Easy",
+          "slug": "sum-of-minimum-and-maximum-elements-of-all-subarrays-of-size-k",
+          "url": "https://www.geeksforgeeks.org/sum-minimum-maximum-elements-subarrays-size-k/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-314",
+          "title": "Minimum sum of squares of character counts in a given string after removing �k� characters.",
+          "difficulty": "Easy",
+          "slug": "minimum-sum-of-squares-of-character-counts-in-a-given-string-after-removing-k-characters",
+          "url": "https://practice.geeksforgeeks.org/problems/game-with-string/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-315",
+          "title": "Queue based approach or first non-repeating character in a stream.",
+          "difficulty": "Medium",
+          "slug": "queue-based-approach-or-first-non-repeating-character-in-a-stream",
+          "url": "https://practice.geeksforgeeks.org/problems/first-non-repeating-character-in-a-stream/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-11-316",
+          "title": "Next Smaller Element",
+          "difficulty": "Hard",
+          "slug": "next-smaller-element",
+          "url": "https://www.geeksforgeeks.org/next-smaller-element/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-12",
+      "topicName": "Heap",
+      "problems": [
+        {
+          "id": "lb-12-317",
+          "title": "Implement a Maxheap/MinHeap using arrays and recursion.",
+          "difficulty": "Easy",
+          "slug": "implement-a-maxheap-minheap-using-arrays-and-recursion",
+          "url": "https://www.geeksforgeeks.org/building-heap-from-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-318",
+          "title": "Sort an Array using heap. (HeapSort)",
+          "difficulty": "Medium",
+          "slug": "sort-an-array-using-heap-heapsort",
+          "url": "https://www.geeksforgeeks.org/heap-sort/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-319",
+          "title": "Maximum of all subarrays of size k.",
+          "difficulty": "Hard",
+          "slug": "maximum-of-all-subarrays-of-size-k",
+          "url": "https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-320",
+          "title": "�k� largest element in an array",
+          "difficulty": "Easy",
+          "slug": "k-largest-element-in-an-array",
+          "url": "https://practice.geeksforgeeks.org/problems/k-largest-elements4206/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-321",
+          "title": "Kth smallest and largest element in an unsorted array",
+          "difficulty": "Easy",
+          "slug": "kth-smallest-and-largest-element-in-an-unsorted-array",
+          "url": "https://www.geeksforgeeks.org/kth-smallestlargest-element-unsorted-array/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-322",
+          "title": "Merge �K� sorted arrays. [ IMP ]",
+          "difficulty": "Hard",
+          "slug": "merge-k-sorted-arrays-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/merge-k-sorted-arrays/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-323",
+          "title": "Merge 2 Binary Max Heaps",
+          "difficulty": "Easy",
+          "slug": "merge-2-binary-max-heaps",
+          "url": "https://practice.geeksforgeeks.org/problems/merge-two-binary-max-heap/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-324",
+          "title": "Kth largest sum continuous subarrays",
+          "difficulty": "Medium",
+          "slug": "kth-largest-sum-continuous-subarrays",
+          "url": "https://www.geeksforgeeks.org/k-th-largest-sum-contiguous-subarray/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-325",
+          "title": "Leetcode- reorganize strings",
+          "difficulty": "Easy",
+          "slug": "leetcode-reorganize-strings",
+          "url": "https://leetcode.com/problems/reorganize-string/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-12-326",
+          "title": "Merge �K� Sorted Linked Lists [V.IMP]",
+          "difficulty": "Medium",
+          "slug": "merge-k-sorted-linked-lists-v-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/merge-k-sorted-linked-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-327",
+          "title": "Smallest range in �K� Lists",
+          "difficulty": "Hard",
+          "slug": "smallest-range-in-k-lists",
+          "url": "https://practice.geeksforgeeks.org/problems/find-smallest-range-containing-elements-from-k-lists/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-328",
+          "title": "Median in a stream of Integers",
+          "difficulty": "Hard",
+          "slug": "median-in-a-stream-of-integers",
+          "url": "https://practice.geeksforgeeks.org/problems/find-median-in-a-stream/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-329",
+          "title": "Check if a Binary Tree is Heap",
+          "difficulty": "Easy",
+          "slug": "check-if-a-binary-tree-is-heap",
+          "url": "https://practice.geeksforgeeks.org/problems/is-binary-tree-heap/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-330",
+          "title": "Connect �n� ropes with minimum cost",
+          "difficulty": "Easy",
+          "slug": "connect-n-ropes-with-minimum-cost",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-cost-of-ropes/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-331",
+          "title": "Convert BST to Min Heap",
+          "difficulty": "Hard",
+          "slug": "convert-bst-to-min-heap",
+          "url": "https://www.geeksforgeeks.org/convert-bst-min-heap/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-332",
+          "title": "Convert min heap to max heap",
+          "difficulty": "Easy",
+          "slug": "convert-min-heap-to-max-heap",
+          "url": "https://www.geeksforgeeks.org/convert-min-heap-to-max-heap/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-333",
+          "title": "Rearrange characters in a string such that no two adjacent are same.",
+          "difficulty": "Easy",
+          "slug": "rearrange-characters-in-a-string-such-that-no-two-adjacent-are-same",
+          "url": "https://www.geeksforgeeks.org/rearrange-characters-string-no-two-adjacent/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-12-334",
+          "title": "Minimum sum of two numbers formed from digits of an array",
+          "difficulty": "Easy",
+          "slug": "minimum-sum-of-two-numbers-formed-from-digits-of-an-array",
+          "url": "https://www.geeksforgeeks.org/minimum-sum-two-numbers-formed-digits-array/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-13",
+      "topicName": "Graph",
+      "problems": [
+        {
+          "id": "lb-13-335",
+          "title": "Create a Graph, print it",
+          "difficulty": "Easy",
+          "slug": "create-a-graph-print-it",
+          "url": "https://1drv.ms/t/s!AqTOHFO77CqEiRua06v1PATyiFg5",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-336",
+          "title": "Implement BFS algorithm",
+          "difficulty": "Easy",
+          "slug": "implement-bfs-algorithm",
+          "url": "https://practice.geeksforgeeks.org/problems/bfs-traversal-of-graph/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-337",
+          "title": "Implement DFS Algo",
+          "difficulty": "Easy",
+          "slug": "implement-dfs-algo",
+          "url": "https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-338",
+          "title": "Detect Cycle in Directed Graph using BFS/DFS Algo",
+          "difficulty": "Medium",
+          "slug": "detect-cycle-in-directed-graph-using-bfs-dfs-algo",
+          "url": "https://www.geeksforgeeks.org/detect-cycle-in-a-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-339",
+          "title": "Detect Cycle in UnDirected Graph using BFS/DFS Algo",
+          "difficulty": "Medium",
+          "slug": "detect-cycle-in-undirected-graph-using-bfs-dfs-algo",
+          "url": "https://practice.geeksforgeeks.org/problems/detect-cycle-in-an-undirected-graph/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-340",
+          "title": "Search in a Maze",
+          "difficulty": "Hard",
+          "slug": "search-in-a-maze",
+          "url": "https://practice.geeksforgeeks.org/problems/rat-in-a-maze-problem/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-341",
+          "title": "Minimum Step by Knight",
+          "difficulty": "Easy",
+          "slug": "minimum-step-by-knight",
+          "url": "https://practice.geeksforgeeks.org/problems/steps-by-knight/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-342",
+          "title": "flood fill algo",
+          "difficulty": "Easy",
+          "slug": "flood-fill-algo",
+          "url": "https://leetcode.com/problems/flood-fill/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-13-343",
+          "title": "Clone a graph",
+          "difficulty": "Hard",
+          "slug": "clone-a-graph",
+          "url": "https://leetcode.com/problems/clone-graph/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-13-344",
+          "title": "Making wired Connections",
+          "difficulty": "Medium",
+          "slug": "making-wired-connections",
+          "url": "https://leetcode.com/problems/number-of-operations-to-make-network-connected/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-13-345",
+          "title": "word Ladder",
+          "difficulty": "Easy",
+          "slug": "word-ladder",
+          "url": "https://leetcode.com/problems/word-ladder/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-13-346",
+          "title": "Dijkstra algo",
+          "difficulty": "Hard",
+          "slug": "dijkstra-algo",
+          "url": "https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-347",
+          "title": "Implement Topological Sort",
+          "difficulty": "Medium",
+          "slug": "implement-topological-sort",
+          "url": "https://practice.geeksforgeeks.org/problems/topological-sort/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-348",
+          "title": "Minimum time taken by each job to be completed given by a Directed Acyclic Graph",
+          "difficulty": "Medium",
+          "slug": "minimum-time-taken-by-each-job-to-be-completed-given-by-a-directed-acyclic-graph",
+          "url": "https://www.geeksforgeeks.org/minimum-time-taken-by-each-job-to-be-completed-given-by-a-directed-acyclic-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-349",
+          "title": "Find whether it is possible to finish all tasks or not from given dependencies",
+          "difficulty": "Easy",
+          "slug": "find-whether-it-is-possible-to-finish-all-tasks-or-not-from-given-dependencies",
+          "url": "https://www.geeksforgeeks.org/find-whether-it-is-possible-to-finish-all-tasks-or-not-from-given-dependencies/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-350",
+          "title": "Find the no. of Isalnds",
+          "difficulty": "Medium",
+          "slug": "find-the-no-of-isalnds",
+          "url": "https://practice.geeksforgeeks.org/problems/find-the-number-of-islands/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-351",
+          "title": "Given a sorted Dictionary of an Alien Language, find order of characters",
+          "difficulty": "Hard",
+          "slug": "given-a-sorted-dictionary-of-an-alien-language-find-order-of-characters",
+          "url": "https://practice.geeksforgeeks.org/problems/alien-dictionary/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-352",
+          "title": "Implement Kruksal�sAlgorithm",
+          "difficulty": "Hard",
+          "slug": "implement-kruksal-salgorithm",
+          "url": "https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-353",
+          "title": "Implement Prim�s Algorithm",
+          "difficulty": "Easy",
+          "slug": "implement-prim-s-algorithm",
+          "url": "https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-354",
+          "title": "Total no. of Spanning tree in a graph",
+          "difficulty": "Hard",
+          "slug": "total-no-of-spanning-tree-in-a-graph",
+          "url": "https://www.geeksforgeeks.org/total-number-spanning-trees-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-355",
+          "title": "Implement Bellman Ford Algorithm",
+          "difficulty": "Hard",
+          "slug": "implement-bellman-ford-algorithm",
+          "url": "https://practice.geeksforgeeks.org/problems/negative-weight-cycle/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-356",
+          "title": "Implement Floyd warshallAlgorithm",
+          "difficulty": "Medium",
+          "slug": "implement-floyd-warshallalgorithm",
+          "url": "https://practice.geeksforgeeks.org/problems/implementing-floyd-warshall/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-357",
+          "title": "Travelling Salesman Problem",
+          "difficulty": "Easy",
+          "slug": "travelling-salesman-problem",
+          "url": "https://www.geeksforgeeks.org/travelling-salesman-problem-set-1/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-358",
+          "title": "Graph ColouringProblem",
+          "difficulty": "Hard",
+          "slug": "graph-colouringproblem",
+          "url": "https://www.geeksforgeeks.org/graph-coloring-applications/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-359",
+          "title": "Snake and Ladders Problem",
+          "difficulty": "Medium",
+          "slug": "snake-and-ladders-problem",
+          "url": "https://leetcode.com/problems/snakes-and-ladders/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-13-360",
+          "title": "Find bridge in a graph",
+          "difficulty": "Hard",
+          "slug": "find-bridge-in-a-graph",
+          "url": "https://www.geeksforgeeks.org/bridge-in-a-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-361",
+          "title": "Count Strongly connected Components(Kosaraju Algo)",
+          "difficulty": "Easy",
+          "slug": "count-strongly-connected-components-kosaraju-algo",
+          "url": "https://practice.geeksforgeeks.org/problems/strongly-connected-components-kosarajus-algo/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-362",
+          "title": "Check whether a graph is Bipartite or Not",
+          "difficulty": "Medium",
+          "slug": "check-whether-a-graph-is-bipartite-or-not",
+          "url": "https://www.geeksforgeeks.org/bipartite-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-363",
+          "title": "Detect Negative cycle in a graph",
+          "difficulty": "Medium",
+          "slug": "detect-negative-cycle-in-a-graph",
+          "url": "https://www.geeksforgeeks.org/detect-negative-cycle-graph-bellman-ford/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-364",
+          "title": "Longest path in a Directed Acyclic Graph",
+          "difficulty": "Hard",
+          "slug": "longest-path-in-a-directed-acyclic-graph",
+          "url": "https://www.geeksforgeeks.org/find-longest-path-directed-acyclic-graph/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-365",
+          "title": "Journey to the Moon",
+          "difficulty": "Easy",
+          "slug": "journey-to-the-moon",
+          "url": "https://www.hackerrank.com/challenges/journey-to-the-moon/problem",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-366",
+          "title": "Cheapest Flights Within K Stops",
+          "difficulty": "Medium",
+          "slug": "cheapest-flights-within-k-stops",
+          "url": "https://leetcode.com/problems/cheapest-flights-within-k-stops/description/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-13-367",
+          "title": "Oliver and the Game",
+          "difficulty": "Hard",
+          "slug": "oliver-and-the-game",
+          "url": "https://www.hackerearth.com/practice/algorithms/graphs/topological-sort/practice-problems/algorithm/oliver-and-the-game-3/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-368",
+          "title": "Water Jug problem using BFS",
+          "difficulty": "Hard",
+          "slug": "water-jug-problem-using-bfs",
+          "url": "https://www.geeksforgeeks.org/water-jug-problem-using-bfs/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-369",
+          "title": "Water Jug problem using BFS",
+          "difficulty": "Easy",
+          "slug": "water-jug-problem-using-bfs",
+          "url": "https://www.geeksforgeeks.org/water-jug-problem-using-bfs/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-370",
+          "title": "Find if there is a path of more thank length from a source",
+          "difficulty": "Hard",
+          "slug": "find-if-there-is-a-path-of-more-thank-length-from-a-source",
+          "url": "https://www.geeksforgeeks.org/find-if-there-is-a-path-of-more-than-k-length-from-a-source/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-371",
+          "title": "M-ColouringProblem",
+          "difficulty": "Medium",
+          "slug": "m-colouringproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/m-coloring-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-372",
+          "title": "Minimum edges to reverse o make path from source to destination",
+          "difficulty": "Hard",
+          "slug": "minimum-edges-to-reverse-o-make-path-from-source-to-destination",
+          "url": "https://www.geeksforgeeks.org/minimum-edges-reverse-make-path-source-destination/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-373",
+          "title": "Paths to travel each nodes using each edge(Seven Bridges)",
+          "difficulty": "Easy",
+          "slug": "paths-to-travel-each-nodes-using-each-edge-seven-bridges",
+          "url": "https://www.geeksforgeeks.org/paths-travel-nodes-using-edgeseven-bridges-konigsberg/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-374",
+          "title": "Vertex Cover Problem",
+          "difficulty": "Medium",
+          "slug": "vertex-cover-problem",
+          "url": "https://www.geeksforgeeks.org/vertex-cover-problem-set-1-introduction-approximate-algorithm-2/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-375",
+          "title": "Chinese Postman or Route Inspection",
+          "difficulty": "Hard",
+          "slug": "chinese-postman-or-route-inspection",
+          "url": "https://www.geeksforgeeks.org/chinese-postman-route-inspection-set-1-introduction/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-376",
+          "title": "Number of Triangles in a Directed and Undirected Graph",
+          "difficulty": "Easy",
+          "slug": "number-of-triangles-in-a-directed-and-undirected-graph",
+          "url": "https://www.geeksforgeeks.org/number-of-triangles-in-directed-and-undirected-graphs/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-377",
+          "title": "Minimise the cashflow among a given set of friends who have borrowed money from each other",
+          "difficulty": "Easy",
+          "slug": "minimise-the-cashflow-among-a-given-set-of-friends-who-have-borrowed-money-from-each-other",
+          "url": "https://www.geeksforgeeks.org/minimize-cash-flow-among-given-set-friends-borrowed-money/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-13-378",
+          "title": "Two Clique Problem",
+          "difficulty": "Hard",
+          "slug": "two-clique-problem",
+          "url": "https://www.geeksforgeeks.org/two-clique-problem-check-graph-can-divided-two-cliques/",
+          "platform": "GFG"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-14",
+      "topicName": "Dynamic Programming",
+      "problems": [
+        {
+          "id": "lb-14-379",
+          "title": "Coin ChangeProblem",
+          "difficulty": "Hard",
+          "slug": "coin-changeproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/coin-change2448/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-380",
+          "title": "Knapsack Problem",
+          "difficulty": "Medium",
+          "slug": "knapsack-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/0-1-knapsack-problem/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-381",
+          "title": "Binomial CoefficientProblem",
+          "difficulty": "Easy",
+          "slug": "binomial-coefficientproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/ncr1019/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-382",
+          "title": "Permutation CoefficientProblem",
+          "difficulty": "Easy",
+          "slug": "permutation-coefficientproblem",
+          "url": "https://www.geeksforgeeks.org/permutation-coefficient/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-383",
+          "title": "Program for nth Catalan Number",
+          "difficulty": "Medium",
+          "slug": "program-for-nth-catalan-number",
+          "url": "https://www.geeksforgeeks.org/program-nth-catalan-number/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-384",
+          "title": "Matrix Chain Multiplication�",
+          "difficulty": "Hard",
+          "slug": "matrix-chain-multiplication",
+          "url": "https://www.geeksforgeeks.org/matrix-chain-multiplication-dp-8/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-385",
+          "title": "Edit Distance",
+          "difficulty": "Easy",
+          "slug": "edit-distance",
+          "url": "https://practice.geeksforgeeks.org/problems/edit-distance3702/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-386",
+          "title": "Subset Sum Problem",
+          "difficulty": "Medium",
+          "slug": "subset-sum-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/subset-sum-problem2014/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-387",
+          "title": "Friends Pairing Problem",
+          "difficulty": "Easy",
+          "slug": "friends-pairing-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/friends-pairing-problem5425/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-388",
+          "title": "Gold Mine Problem",
+          "difficulty": "Hard",
+          "slug": "gold-mine-problem",
+          "url": "https://www.geeksforgeeks.org/gold-mine-problem/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-389",
+          "title": "Assembly Line SchedulingProblem",
+          "difficulty": "Easy",
+          "slug": "assembly-line-schedulingproblem",
+          "url": "https://www.geeksforgeeks.org/assembly-line-scheduling-dp-34/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-390",
+          "title": "Painting the Fenceproblem",
+          "difficulty": "Medium",
+          "slug": "painting-the-fenceproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/painting-the-fence3727/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-391",
+          "title": "Maximize The Cut Segments",
+          "difficulty": "Hard",
+          "slug": "maximize-the-cut-segments",
+          "url": "https://practice.geeksforgeeks.org/problems/cutted-segments/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-392",
+          "title": "Longest Common Subsequence",
+          "difficulty": "Medium",
+          "slug": "longest-common-subsequence",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-common-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-393",
+          "title": "Longest Repeated Subsequence",
+          "difficulty": "Easy",
+          "slug": "longest-repeated-subsequence",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-repeating-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-394",
+          "title": "Longest Increasing Subsequence",
+          "difficulty": "Hard",
+          "slug": "longest-increasing-subsequence",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-increasing-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-395",
+          "title": "Space Optimized Solution of LCS",
+          "difficulty": "Medium",
+          "slug": "space-optimized-solution-of-lcs",
+          "url": "https://www.geeksforgeeks.org/space-optimized-solution-lcs/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-396",
+          "title": "LCS (Longest Common Subsequence) of three strings",
+          "difficulty": "Medium",
+          "slug": "lcs-longest-common-subsequence-of-three-strings",
+          "url": "https://practice.geeksforgeeks.org/problems/lcs-of-three-strings/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-397",
+          "title": "Maximum Sum Increasing Subsequence",
+          "difficulty": "Easy",
+          "slug": "maximum-sum-increasing-subsequence",
+          "url": "https://practice.geeksforgeeks.org/problems/maximum-sum-increasing-subsequence4749/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-398",
+          "title": "Count all subsequences having product less than K",
+          "difficulty": "Medium",
+          "slug": "count-all-subsequences-having-product-less-than-k",
+          "url": "https://www.geeksforgeeks.org/count-subsequences-product-less-k/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-399",
+          "title": "Longest subsequence such that difference between adjacent is one",
+          "difficulty": "Easy",
+          "slug": "longest-subsequence-such-that-difference-between-adjacent-is-one",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-subsequence-such-that-difference-between-adjacents-is-one4724/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-400",
+          "title": "Maximum subsequence sum such that no three are consecutive",
+          "difficulty": "Hard",
+          "slug": "maximum-subsequence-sum-such-that-no-three-are-consecutive",
+          "url": "https://www.geeksforgeeks.org/maximum-subsequence-sum-such-that-no-three-are-consecutive/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-401",
+          "title": "Egg Dropping Problem",
+          "difficulty": "Easy",
+          "slug": "egg-dropping-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/egg-dropping-puzzle/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-402",
+          "title": "Maximum Length Chain of Pairs",
+          "difficulty": "Medium",
+          "slug": "maximum-length-chain-of-pairs",
+          "url": "https://practice.geeksforgeeks.org/problems/max-length-chain/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-403",
+          "title": "Maximum size square sub-matrix with all 1s",
+          "difficulty": "Hard",
+          "slug": "maximum-size-square-sub-matrix-with-all-1s",
+          "url": "https://practice.geeksforgeeks.org/problems/largest-square-formed-in-a-matrix/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-404",
+          "title": "Maximum sum of pairs with specific difference",
+          "difficulty": "Easy",
+          "slug": "maximum-sum-of-pairs-with-specific-difference",
+          "url": "https://practice.geeksforgeeks.org/problems/pairs-with-specific-difference/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-405",
+          "title": "Min Cost PathProblem",
+          "difficulty": "Easy",
+          "slug": "min-cost-pathproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/path-in-matrix3805/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-406",
+          "title": "Maximum difference of zeros and ones in binary string",
+          "difficulty": "Easy",
+          "slug": "maximum-difference-of-zeros-and-ones-in-binary-string",
+          "url": "https://practice.geeksforgeeks.org/problems/maximum-difference-of-zeros-and-ones-in-binary-string4111/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-407",
+          "title": "Minimum number of jumps to reach end",
+          "difficulty": "Medium",
+          "slug": "minimum-number-of-jumps-to-reach-end",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-number-of-jumps/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-408",
+          "title": "Minimum cost to fill given weight in a bag",
+          "difficulty": "Medium",
+          "slug": "minimum-cost-to-fill-given-weight-in-a-bag",
+          "url": "https://practice.geeksforgeeks.org/problems/minimum-cost-to-fill-given-weight-in-a-bag1956/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-409",
+          "title": "Minimum removals from array to make max �min <= K",
+          "difficulty": "Easy",
+          "slug": "minimum-removals-from-array-to-make-max-min-k",
+          "url": "https://www.geeksforgeeks.org/minimum-removals-array-make-max-min-k/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-410",
+          "title": "Longest Common Substring",
+          "difficulty": "Medium",
+          "slug": "longest-common-substring",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-common-substring/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-411",
+          "title": "Count number of ways to reacha given score in a game",
+          "difficulty": "Easy",
+          "slug": "count-number-of-ways-to-reacha-given-score-in-a-game",
+          "url": "https://practice.geeksforgeeks.org/problems/reach-a-given-score/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-412",
+          "title": "Count Balanced Binary Trees of Height h",
+          "difficulty": "Easy",
+          "slug": "count-balanced-binary-trees-of-height-h",
+          "url": "https://practice.geeksforgeeks.org/problems/bbt-counter/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-413",
+          "title": "LargestSum Contiguous Subarray [V>V>V>V IMP ]",
+          "difficulty": "Easy",
+          "slug": "largestsum-contiguous-subarray-v-v-v-v-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/kadanes-algorithm/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-414",
+          "title": "Smallest sum contiguous subarray",
+          "difficulty": "Easy",
+          "slug": "smallest-sum-contiguous-subarray",
+          "url": "https://www.geeksforgeeks.org/smallest-sum-contiguous-subarray/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-415",
+          "title": "Unbounded Knapsack (Repetition of items allowed)",
+          "difficulty": "Easy",
+          "slug": "unbounded-knapsack-repetition-of-items-allowed",
+          "url": "https://practice.geeksforgeeks.org/problems/knapsack-with-duplicate-items4201/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-416",
+          "title": "Word Break Problem",
+          "difficulty": "Medium",
+          "slug": "word-break-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/word-break/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-417",
+          "title": "Largest Independent Set Problem",
+          "difficulty": "Easy",
+          "slug": "largest-independent-set-problem",
+          "url": "https://www.geeksforgeeks.org/largest-independent-set-problem-dp-26/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-418",
+          "title": "Partition problem",
+          "difficulty": "Hard",
+          "slug": "partition-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/subset-sum-problem2014/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-419",
+          "title": "Longest Palindromic Subsequence",
+          "difficulty": "Medium",
+          "slug": "longest-palindromic-subsequence",
+          "url": "https://www.geeksforgeeks.org/longest-palindromic-subsequence-dp-12/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-420",
+          "title": "Count All Palindromic Subsequence in a given String",
+          "difficulty": "Medium",
+          "slug": "count-all-palindromic-subsequence-in-a-given-string",
+          "url": "https://practice.geeksforgeeks.org/problems/count-palindromic-subsequences/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-421",
+          "title": "Longest Palindromic Substring",
+          "difficulty": "Easy",
+          "slug": "longest-palindromic-substring",
+          "url": "https://leetcode.com/problems/longest-palindromic-substring/",
+          "platform": "LeetCode"
+        },
+        {
+          "id": "lb-14-422",
+          "title": "Longest alternating subsequence",
+          "difficulty": "Medium",
+          "slug": "longest-alternating-subsequence",
+          "url": "https://practice.geeksforgeeks.org/problems/longest-alternating-subsequence/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-423",
+          "title": "Weighted Job Scheduling",
+          "difficulty": "Medium",
+          "slug": "weighted-job-scheduling",
+          "url": "https://www.geeksforgeeks.org/weighted-job-scheduling/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-424",
+          "title": "Coin game winner where every player has three choices",
+          "difficulty": "Hard",
+          "slug": "coin-game-winner-where-every-player-has-three-choices",
+          "url": "https://www.geeksforgeeks.org/coin-game-winner-every-player-three-choices/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-425",
+          "title": "Count Derangements (Permutation such that no element appears in its original position) [ IMPORTANT ]",
+          "difficulty": "Easy",
+          "slug": "count-derangements-permutation-such-that-no-element-appears-in-its-original-position-important",
+          "url": "https://www.geeksforgeeks.org/count-derangements-permutation-such-that-no-element-appears-in-its-original-position/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-426",
+          "title": "Maximum profit by buying and selling a share at most twice [ IMP ]",
+          "difficulty": "Hard",
+          "slug": "maximum-profit-by-buying-and-selling-a-share-at-most-twice-imp",
+          "url": "https://www.geeksforgeeks.org/maximum-profit-by-buying-and-selling-a-share-at-most-twice/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-427",
+          "title": "Optimal Strategy for a Game",
+          "difficulty": "Hard",
+          "slug": "optimal-strategy-for-a-game",
+          "url": "https://practice.geeksforgeeks.org/problems/optimal-strategy-for-a-game/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-428",
+          "title": "Optimal Binary Search Tree",
+          "difficulty": "Hard",
+          "slug": "optimal-binary-search-tree",
+          "url": "https://www.geeksforgeeks.org/optimal-binary-search-tree-dp-24/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-429",
+          "title": "Palindrome PartitioningProblem",
+          "difficulty": "Easy",
+          "slug": "palindrome-partitioningproblem",
+          "url": "https://practice.geeksforgeeks.org/problems/palindromic-patitioning4845/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-430",
+          "title": "Word Wrap Problem",
+          "difficulty": "Hard",
+          "slug": "word-wrap-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/word-wrap/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-431",
+          "title": "Mobile Numeric Keypad Problem [ IMP ]",
+          "difficulty": "Medium",
+          "slug": "mobile-numeric-keypad-problem-imp",
+          "url": "https://practice.geeksforgeeks.org/problems/mobile-numeric-keypad5456/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-432",
+          "title": "Boolean Parenthesization Problem",
+          "difficulty": "Hard",
+          "slug": "boolean-parenthesization-problem",
+          "url": "https://practice.geeksforgeeks.org/problems/boolean-parenthesization/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-433",
+          "title": "Largest rectangular sub-matrix whose sum is 0",
+          "difficulty": "Easy",
+          "slug": "largest-rectangular-sub-matrix-whose-sum-is-0",
+          "url": "https://www.geeksforgeeks.org/largest-rectangular-sub-matrix-whose-sum-0/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-434",
+          "title": "Largest area rectangular sub-matrix with equal number of 1�s and 0�s [ IMP ]",
+          "difficulty": "Hard",
+          "slug": "largest-area-rectangular-sub-matrix-with-equal-number-of-1-s-and-0-s-imp",
+          "url": "https://www.geeksforgeeks.org/largest-area-rectangular-sub-matrix-equal-number-1s-0s/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-435",
+          "title": "Maximum sum rectangle in a 2D matrix",
+          "difficulty": "Medium",
+          "slug": "maximum-sum-rectangle-in-a-2d-matrix",
+          "url": "https://practice.geeksforgeeks.org/problems/maximum-sum-rectangle/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-436",
+          "title": "Maximum profit by buying and selling a share at most k times",
+          "difficulty": "Hard",
+          "slug": "maximum-profit-by-buying-and-selling-a-share-at-most-k-times",
+          "url": "https://practice.geeksforgeeks.org/problems/maximum-profit4657/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-437",
+          "title": "Find if a string is interleaved of two other strings",
+          "difficulty": "Easy",
+          "slug": "find-if-a-string-is-interleaved-of-two-other-strings",
+          "url": "https://practice.geeksforgeeks.org/problems/interleaved-strings/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-14-438",
+          "title": "Maximum Length of Pair Chain",
+          "difficulty": "Medium",
+          "slug": "maximum-length-of-pair-chain",
+          "url": "https://leetcode.com/problems/maximum-length-of-pair-chain/",
+          "platform": "LeetCode"
+        }
+      ]
+    },
+    {
+      "topicId": "lb-topic-15",
+      "topicName": "Bit Manipulation",
+      "problems": [
+        {
+          "id": "lb-15-439",
+          "title": "Count set bits in an integer",
+          "difficulty": "Easy",
+          "slug": "count-set-bits-in-an-integer",
+          "url": "https://practice.geeksforgeeks.org/problems/set-bits0143/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-440",
+          "title": "Find the two non-repeating elements in an array of repeating elements",
+          "difficulty": "Easy",
+          "slug": "find-the-two-non-repeating-elements-in-an-array-of-repeating-elements",
+          "url": "https://practice.geeksforgeeks.org/problems/finding-the-numbers0215/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-441",
+          "title": "Count number of bits to be flipped to convert A to B",
+          "difficulty": "Easy",
+          "slug": "count-number-of-bits-to-be-flipped-to-convert-a-to-b",
+          "url": "https://practice.geeksforgeeks.org/problems/bit-difference/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-442",
+          "title": "Count total set bits in all numbers from 1 to n",
+          "difficulty": "Hard",
+          "slug": "count-total-set-bits-in-all-numbers-from-1-to-n",
+          "url": "https://practice.geeksforgeeks.org/problems/count-total-set-bits/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-443",
+          "title": "Program to find whether a no is power of two",
+          "difficulty": "Easy",
+          "slug": "program-to-find-whether-a-no-is-power-of-two",
+          "url": "https://practice.geeksforgeeks.org/problems/power-of-2/0",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-444",
+          "title": "Find position of the only set bit",
+          "difficulty": "Easy",
+          "slug": "find-position-of-the-only-set-bit",
+          "url": "https://practice.geeksforgeeks.org/problems/find-position-of-set-bit3706/1",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-445",
+          "title": "Copy set bits in a range",
+          "difficulty": "Easy",
+          "slug": "copy-set-bits-in-a-range",
+          "url": "https://www.geeksforgeeks.org/copy-set-bits-in-a-range/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-446",
+          "title": "Divide two integers without using multiplication, division and mod operator",
+          "difficulty": "Medium",
+          "slug": "divide-two-integers-without-using-multiplication-division-and-mod-operator",
+          "url": "https://www.geeksforgeeks.org/divide-two-integers-without-using-multiplication-division-mod-operator/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-447",
+          "title": "Calculate square of a number without using *, / and pow()",
+          "difficulty": "Medium",
+          "slug": "calculate-square-of-a-number-without-using-and-pow",
+          "url": "https://www.geeksforgeeks.org/calculate-square-of-a-number-without-using-and-pow/",
+          "platform": "GFG"
+        },
+        {
+          "id": "lb-15-448",
+          "title": "Power Set",
+          "difficulty": "Easy",
+          "slug": "power-set",
+          "url": "https://practice.geeksforgeeks.org/problems/power-set4302/1",
+          "platform": "GFG"
+        }
+      ]
+    }
+  ]
+}

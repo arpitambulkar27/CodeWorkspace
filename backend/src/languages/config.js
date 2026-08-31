@@ -2,25 +2,27 @@
 // - which Docker image to use
 // - what filename to write the user's code to
 // - the shell command to compile+run it inside the container
-//
-// Everything runs as: sh -c "<cmd>" inside /sandbox (working dir in container)
 
 const LANGUAGES = {
   python: {
-    image: "codeforge-python",
+    image: process.env.DOCKER_IMAGE_PYTHON || "python:3.10-slim",
     filename: "main.py",
     cmd: "python3 main.py",
   },
   javascript: {
-    image: "codeforge-node",
+    image: process.env.DOCKER_IMAGE_JS || "node:18-alpine",
     filename: "main.js",
     cmd: "node main.js",
   },
   java: {
-    image: "codeforge-java",
+    image: process.env.DOCKER_IMAGE_JAVA || "amazoncorretto:21-alpine",
     filename: "Main.java",
-    // Java needs a compile step before running
     cmd: "javac Main.java && java Main",
+  },
+  cpp: {
+    image: process.env.DOCKER_IMAGE_CPP || "gcc:latest",
+    filename: "main.cpp",
+    cmd: "g++ main.cpp -o main && ./main",
   },
 };
 

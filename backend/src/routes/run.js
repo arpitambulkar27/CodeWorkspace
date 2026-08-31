@@ -1,10 +1,15 @@
-// backend/routes/run.js
+// backend/src/routes/run.js
 const express = require("express");
 const router = express.Router();
-const { executionQueue } = require("../../queue");
+const { runCode } = require("../services/dockerService");
+const { runRateLimiter } = require("../middleware/rateLimiter");
 
-router.post("/run", async (req, res) => {
-  const { language, code, stdin, roomId } = req.body;
+// Apply Redis Sliding-Window Rate Limiter (Max 10 runs per minute)
+router.post("/run", runRateLimiter, async (req, res) => {
+  const { language, code, stdin, stdinInput, roomId, roomCode } = req.body;
+
+  const targetStdin = stdinInput !== undefined ? stdinInput : stdin;
+  const targetRoom = roomCode || roomId;
 
   // Validation checks
   if (!language || typeof code !== "string") {
@@ -20,24 +25,27 @@ router.post("/run", async (req, res) => {
   }
 
   try {
-    // Add job to BullMQ Queue (Producer)
-    const job = await executionQueue.add("execute-script", {
-      language,
-      code,
-      stdin,
-      roomId,
-      timestamp: Date.now(),
-    });
+    // Execute code safely inside sandboxed Docker container
+    const result = await runCode({ language, code, stdin: targetStdin });
 
-    // Return non-blocking 202 Accepted response immediately (<5ms)
-    res.status(202).json({
-      status: "queued",
-      jobId: job.id,
-      message: "Code execution job queued successfully.",
+    // Emit Socket.io result if room exists
+    const io = req.app.get("io");
+    if (io && targetRoom) {
+      io.to(targetRoom).emit("execution-result", {
+        output: result.output || result.stdout,
+        error: result.error || result.stderr,
+      });
+    }
+
+    return res.status(200).json({
+      status: "completed",
+      stdout: result.stdout || "",
+      stderr: result.stderr || result.error || "",
+      output: result.output || result.stdout || result.stderr || result.error || "Program executed with no stdout output.",
     });
   } catch (err) {
-    console.error("Queue Push Error:", err.message);
-    res.status(500).json({ error: "Failed to queue code execution task." });
+    console.error("Direct Docker Execution Error:", err);
+    return res.status(500).json({ error: "Failed to execute code in Docker container." });
   }
 });
 
