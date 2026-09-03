@@ -26,7 +26,6 @@ router.get("/:slug", async (req, res) => {
       return res.status(404).json({ error: "Problem not found." });
     }
 
-    // Return problem with public test cases only (filter out isHidden for security)
     const publicProblem = {
       _id: problem._id,
       title: problem.title,

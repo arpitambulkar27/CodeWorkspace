@@ -3,51 +3,27 @@ const router = express.Router();
 const Workspace = require("../models/Workspace");
 const { protect } = require("../middleware/authMiddleware");
 
-// Default starter boilerplate per language
-const DEFAULT_BOILERPLATES = {
-  javascript:
-    '// Write your JavaScript code here\nconsole.log("Hello, CodeForge!");',
-  python: '# Write your Python code here\nprint("Hello, CodeForge!")',
-  java: '// Write your Java code here\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, CodeForge!");\n    }\n}',
-  cpp: '// Write your C++ code here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello, CodeForge!" << endl;\n    return 0;\n}',
-};
-
-// Default file extension per language
-const DEFAULT_MAIN_FILES = {
-  javascript: "main.js",
-  python: "main.py",
-  java: "Main.java",
-  cpp: "main.cpp",
-};
-
 // @route   POST /api/workspaces
-// @desc    Create a new workspace
+// @desc    Create a new workspace (Strictly 1 root folder only, no files by default)
 router.post("/", protect, async (req, res) => {
   try {
-    const { title, language = "javascript", code, files, customInput } = req.body;
-    const initialCode =
-      code || DEFAULT_BOILERPLATES[language] || DEFAULT_BOILERPLATES.javascript;
+    const { title, language = "python", customInput } = req.body;
+    const folderName = title?.trim() || "src";
 
-    const mainFileName = DEFAULT_MAIN_FILES[language] || "main.txt";
-
-    const initialFiles = Array.isArray(files) && files.length > 0
-      ? files
-      : [
-          {
-            id: `file-main-${Date.now()}`,
-            name: mainFileName,
-            type: "file",
-            parentId: null,
-            content: initialCode,
-            language,
-          },
-        ];
+    const initialFiles = [
+      {
+        id: `folder-root-${Date.now()}`,
+        name: folderName,
+        type: "folder",
+        parentId: null,
+      },
+    ];
 
     const workspace = await Workspace.create({
       userId: req.user._id,
       title: title?.trim() || "Untitled Workspace",
       language,
-      code: initialCode,
+      code: "",
       files: initialFiles,
       customInput: customInput || "",
     });

@@ -48,6 +48,7 @@ RULES:
 1. Do NOT use multi-step pointwise structures, headers, or long templates.
 2. Do NOT provide solution source code or code snippets.
 3. Keep it brief (2-3 sentences max) like GeeksforGeeks AI Hint: give a subtle nudge on the key intuition, data structure choice, or loop logic they should think about.
+4. Do NOT use dollar signs ($) or LaTeX math syntax.
 `;
     } else {
       // Mode: "analysis" - Complexity & Code Evaluation ONLY on written code (NO solution code!)
@@ -60,14 +61,15 @@ USER'S WRITTEN CODE (${language || "code"}):
 ${code}
 \`\`\`
 
-CRITICAL RULE:
+CRITICAL RULES:
 - DO NOT provide any rewritten code, alternative code, or solution snippets!
 - ONLY evaluate the user's existing written code snippet above.
+- DO NOT use LaTeX dollar signs ($ or $$) or \\mathcal math formatting. Write Big-O notation strictly as plain text like O(N), O(1), O(N log N).
 
 Format your analysis clearly in Markdown using these 3 exact sections:
 
-⏱️ **Time Complexity**: State the Big-O bound (e.g. O(N)) with a 1-sentence justification of the user's loops/operations.
-💾 **Space Complexity**: State the Big-O auxiliary space (e.g. O(1)) with a 1-sentence explanation of allocated memory.
+⏱️ **Time Complexity**: State the plain text Big-O bound (e.g. O(N)) with a 1-sentence justification of the user's loops/operations.
+💾 **Space Complexity**: State the plain text Big-O auxiliary space (e.g. O(1)) with a 1-sentence explanation of allocated memory.
 ⚠️ **Edge Cases & Code Notes**: Point out 1-2 potential bugs, unhandled input edge cases, or logic flaws in their written code.
 `;
     }
@@ -77,7 +79,11 @@ Format your analysis clearly in Markdown using these 3 exact sections:
       contents: prompt,
     });
 
-    res.json({ review: response.text, analysis: response.text });
+    let cleanText = response.text || "";
+    // Clean any LaTeX $ math formatting
+    cleanText = cleanText.replace(/\$|\\mathcal|\{|\}/g, "");
+
+    res.json({ review: cleanText, analysis: cleanText });
   } catch (error) {
     const errStr = JSON.stringify(error) || error.message || "";
     console.error("Gemini API Error:", error.message || error);

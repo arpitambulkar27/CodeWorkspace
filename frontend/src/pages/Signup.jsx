@@ -6,6 +6,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
+// Strict RFC 5322 Email Regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export default function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -14,8 +17,19 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth();
+  const { register, socialLogin } = useAuth();
   const navigate = useNavigate();
+
+  const validateEmail = (val) => {
+    const trimmed = (val || "").trim();
+    if (!trimmed) {
+      return "Email address is required.";
+    }
+    if (!EMAIL_REGEX.test(trimmed)) {
+      return "Please enter a valid email address with a recognized domain (e.g. developer@example.com).";
+    }
+    return "";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,8 +40,9 @@ export default function Signup() {
       return;
     }
 
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      setError("Please enter a valid email address.");
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setError(emailErr);
       return;
     }
 
@@ -39,12 +54,35 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      await register(username.trim(), email, password);
+      await register(username.trim(), email.trim().toLowerCase(), password);
       navigate("/");
     } catch (err) {
       setError(
         err.response?.data?.error || "Registration failed. Please try again."
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialAuth = async (provider) => {
+    setError("");
+    const inputEmail = window.prompt(`Enter your ${provider === "google" ? "Google Account" : "GitHub"} Email address:`);
+    if (!inputEmail) return;
+
+    const emailErr = validateEmail(inputEmail);
+    if (emailErr) {
+      setError(emailErr);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const defaultUsername = inputEmail.split("@")[0] || `${provider}_user`;
+      await socialLogin(provider, inputEmail.trim().toLowerCase(), defaultUsername);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.error || `${provider} sign-up failed.`);
     } finally {
       setLoading(false);
     }
@@ -64,7 +102,6 @@ export default function Signup() {
           position: relative;
         }
 
-        /* Ambient Glow Background Orbs */
         .cf-ambient-orb-1 {
           position: absolute;
           top: -150px;
@@ -84,7 +121,6 @@ export default function Signup() {
           pointer-events: none;
         }
 
-        /* Grid Background Pattern */
         .cf-bg-grid {
           position: absolute;
           inset: 0;
@@ -94,7 +130,6 @@ export default function Signup() {
           pointer-events: none;
         }
 
-        /* Left SaaS Showcase Panel */
         .cf-auth-left {
           flex: 1.1;
           background: linear-gradient(135deg, #0b0f19 0%, #080c14 100%);
@@ -135,7 +170,6 @@ export default function Signup() {
           color: #6e7681;
         }
 
-        /* Vibrant Focus & Hover Input Effect */
         .cf-input-field:hover {
           border-color: #a371f7;
           background-color: #111622;
@@ -187,13 +221,26 @@ export default function Signup() {
           filter: brightness(1.1);
         }
 
-        .cf-btn-submit:active:not(:disabled) {
-          transform: translateY(0);
+        .cf-social-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px 16px;
+          background-color: #0d1117;
+          border: 1px solid #30363d;
+          border-radius: 12px;
+          color: #f0f6fc;
+          font-size: 13.5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
         }
-
-        .cf-btn-submit:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
+        .cf-social-btn:hover {
+          background-color: #161b22;
+          border-color: #a371f7;
+          transform: translateY(-1px);
         }
 
         .cf-auth-card {
@@ -220,7 +267,6 @@ export default function Signup() {
 
       {/* 🟢 LEFT SHOWCASE PANEL */}
       <div className="cf-auth-left">
-        {/* Brand Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{ padding: "10px", backgroundColor: "rgba(163, 113, 247, 0.15)", borderRadius: "12px", border: "1px solid rgba(163, 113, 247, 0.3)" }}>
             <Code2 size={26} color="#a371f7" />
@@ -231,7 +277,6 @@ export default function Signup() {
           </div>
         </div>
 
-        {/* Feature Showcase Hero */}
         <div style={{ margin: "auto 0", maxWidth: "520px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", borderRadius: "20px", backgroundColor: "rgba(163, 113, 247, 0.12)", border: "1px solid rgba(163, 113, 247, 0.25)", color: "#a371f7", fontSize: "12px", fontWeight: "bold", marginBottom: "20px" }}>
             <Sparkles size={14} /> Instant Developer Onboarding
@@ -244,7 +289,6 @@ export default function Signup() {
             Get instant access to multi-language sandboxes, multiplayer room collaboration, and AI-powered static analysis.
           </p>
 
-          {/* Feature Cards Grid */}
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <div style={{ backgroundColor: "#0d1117", border: "1px solid #21262d", borderRadius: "14px", padding: "16px 20px", display: "flex", alignItems: "center", gap: "14px" }}>
               <div style={{ width: "36px", height: "36px", borderRadius: "10px", backgroundColor: "rgba(63, 185, 80, 0.15)", border: "1px solid rgba(63, 185, 80, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -268,7 +312,6 @@ export default function Signup() {
           </div>
         </div>
 
-        {/* Bottom Highlights */}
         <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <ShieldCheck size={16} color="#3fb950" /> Secure JWT Auth
@@ -282,16 +325,16 @@ export default function Signup() {
         </div>
       </div>
 
-      {/* 🔵 RIGHT AUTH FORM PANEL */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyCenter: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
+      {/* 🔵 RIGHT AUTH FORM PANEL (INPUT FIELDS AT TOP, GOOGLE & GITHUB AT BOTTOM) */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
         
         <div className="cf-auth-card">
-          <div style={{ marginBottom: "26px" }}>
+          <div style={{ marginBottom: "24px" }}>
             <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
               Create Account
             </h2>
             <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-              Start building inside your isolated cloud workspace
+              Fill in your details to launch your isolated cloud sandbox
             </p>
           </div>
 
@@ -302,6 +345,7 @@ export default function Signup() {
             </div>
           )}
 
+          {/* 1. INPUT FIELDS & SUBMIT BUTTON AT THE TOP OF CARD */}
           <form onSubmit={handleSubmit}>
             <div className="cf-input-wrapper">
               <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "6px", letterSpacing: "0.5px" }}>
@@ -313,7 +357,7 @@ export default function Signup() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Arpit"
+                placeholder="Developer"
                 className="cf-input-field"
               />
             </div>
@@ -328,7 +372,7 @@ export default function Signup() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="developer@codeforge.io"
+                placeholder="developer@example.com"
                 className="cf-input-field"
               />
             </div>
@@ -370,7 +414,45 @@ export default function Signup() {
             </button>
           </form>
 
-          <div style={{ textAlign: "center", marginTop: "24px", paddingTop: "18px", borderTop: "1px solid #21262d" }}>
+          {/* 2. OR DIVIDER AND GOOGLE & GITHUB SOCIAL BUTTONS AT BOTTOM OF CARD */}
+          <div style={{ display: "flex", alignItems: "center", margin: "22px 0 16px 0" }}>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+            <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+            {/* GOOGLE SIGN UP BUTTON */}
+            <button
+              type="button"
+              onClick={() => handleSocialAuth("google")}
+              disabled={loading}
+              className="cf-social-btn"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z" />
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z" />
+                <path fill="#FBBC05" d="M5.6 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z" />
+                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z" />
+              </svg>
+              <span>Google</span>
+            </button>
+
+            {/* GITHUB SIGN UP BUTTON */}
+            <button
+              type="button"
+              onClick={() => handleSocialAuth("github")}
+              disabled={loading}
+              className="cf-social-btn"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              <span>GitHub</span>
+            </button>
+          </div>
+
+          <div style={{ textAlign: "center", paddingTop: "16px", borderTop: "1px solid #21262d" }}>
             <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
               Already registered?{" "}
               <Link to="/login" style={{ color: "#a371f7", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>

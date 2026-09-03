@@ -6,6 +6,9 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
+// Strict RFC 5322 Email Regex
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,15 +16,27 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, socialLogin } = useAuth();
   const navigate = useNavigate();
+
+  const validateEmail = (val) => {
+    const trimmed = (val || "").trim();
+    if (!trimmed) {
+      return "Email address is required.";
+    }
+    if (!EMAIL_REGEX.test(trimmed)) {
+      return "Please enter a valid email address with a recognized domain (e.g. developer@example.com).";
+    }
+    return "";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      setError("Please enter a valid email address.");
+    const emailErr = validateEmail(email);
+    if (emailErr) {
+      setError(emailErr);
       return;
     }
 
@@ -33,12 +48,35 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(email, password);
+      await login(email.trim().toLowerCase(), password);
       navigate("/");
     } catch (err) {
       setError(
         err.response?.data?.error || "Invalid credentials. Please verify your email and password."
       );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialAuth = async (provider) => {
+    setError("");
+    const inputEmail = window.prompt(`Enter your ${provider === "google" ? "Google Account" : "GitHub"} Email address:`);
+    if (!inputEmail) return;
+
+    const emailErr = validateEmail(inputEmail);
+    if (emailErr) {
+      setError(emailErr);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const defaultUsername = inputEmail.split("@")[0] || `${provider}_user`;
+      await socialLogin(provider, inputEmail.trim().toLowerCase(), defaultUsername);
+      navigate("/");
+    } catch (err) {
+      setError(err.response?.data?.error || `${provider} sign-in failed.`);
     } finally {
       setLoading(false);
     }
@@ -58,7 +96,6 @@ export default function Login() {
           position: relative;
         }
 
-        /* Ambient Glow Background Orbs */
         .cf-ambient-orb-1 {
           position: absolute;
           top: -150px;
@@ -78,7 +115,6 @@ export default function Login() {
           pointer-events: none;
         }
 
-        /* Grid Background Pattern */
         .cf-bg-grid {
           position: absolute;
           inset: 0;
@@ -88,7 +124,6 @@ export default function Login() {
           pointer-events: none;
         }
 
-        /* Left SaaS Showcase Panel */
         .cf-auth-left {
           flex: 1.1;
           background: linear-gradient(135deg, #0b0f19 0%, #080c14 100%);
@@ -129,7 +164,6 @@ export default function Login() {
           color: #6e7681;
         }
 
-        /* Vibrant Focus & Hover Input Effect */
         .cf-input-field:hover {
           border-color: #388bfd;
           background-color: #111622;
@@ -181,13 +215,26 @@ export default function Login() {
           filter: brightness(1.1);
         }
 
-        .cf-btn-submit:active:not(:disabled) {
-          transform: translateY(0);
+        .cf-social-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px 16px;
+          background-color: #0d1117;
+          border: 1px solid #30363d;
+          border-radius: 12px;
+          color: #f0f6fc;
+          font-size: 13.5px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
         }
-
-        .cf-btn-submit:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
+        .cf-social-btn:hover {
+          background-color: #161b22;
+          border-color: #58a6ff;
+          transform: translateY(-1px);
         }
 
         .cf-auth-card {
@@ -214,7 +261,6 @@ export default function Login() {
 
       {/* 🟢 LEFT SHOWCASE PANEL */}
       <div className="cf-auth-left">
-        {/* Brand Header */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{ padding: "10px", backgroundColor: "rgba(56, 139, 253, 0.15)", borderRadius: "12px", border: "1px solid rgba(56, 139, 253, 0.3)" }}>
             <Code2 size={26} color="#58a6ff" />
@@ -225,7 +271,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Feature Showcase Hero */}
         <div style={{ margin: "auto 0", maxWidth: "520px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", borderRadius: "20px", backgroundColor: "rgba(56, 139, 253, 0.12)", border: "1px solid rgba(56, 139, 253, 0.25)", color: "#58a6ff", fontSize: "12px", fontWeight: "bold", marginBottom: "20px" }}>
             <Sparkles size={14} /> Next-Gen Developer Workspaces
@@ -238,7 +283,6 @@ export default function Login() {
             Experience zero-latency real-time pair programming, sandboxed Docker code execution, and Gemini AI-powered automated code reviews.
           </p>
 
-          {/* Micro Terminal Window */}
           <div style={{ backgroundColor: "#0d1117", border: "1px solid #21262d", borderRadius: "14px", overflow: "hidden", boxShadow: "0 16px 36px rgba(0, 0, 0, 0.5)" }}>
             <div style={{ backgroundColor: "#161b22", padding: "10px 16px", borderBottom: "1px solid #21262d", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div style={{ display: "flex", gap: "6px" }}>
@@ -259,7 +303,6 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Bottom Highlights */}
         <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <ShieldCheck size={16} color="#3fb950" /> Ephemeral Isolation
@@ -273,16 +316,16 @@ export default function Login() {
         </div>
       </div>
 
-      {/* 🔵 RIGHT AUTH FORM PANEL */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyCenter: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
+      {/* 🔵 RIGHT AUTH FORM PANEL (EMAIL & PASSWORD AT TOP, GOOGLE & GITHUB AT BOTTOM) */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
         
         <div className="cf-auth-card">
-          <div style={{ marginBottom: "30px" }}>
+          <div style={{ marginBottom: "26px" }}>
             <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
               Sign in to CodeForge
             </h2>
             <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-              Enter your registered credentials to launch your cloud IDE
+              Enter your validated email and password to launch your cloud IDE
             </p>
           </div>
 
@@ -293,6 +336,7 @@ export default function Login() {
             </div>
           )}
 
+          {/* 1. EMAIL & PASSWORD FORM AT THE TOP OF CARD */}
           <form onSubmit={handleSubmit}>
             <div className="cf-input-wrapper">
               <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
@@ -304,7 +348,7 @@ export default function Login() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="developer@codeforge.io"
+                placeholder="developer@example.com"
                 className="cf-input-field"
               />
             </div>
@@ -346,7 +390,45 @@ export default function Login() {
             </button>
           </form>
 
-          <div style={{ textAlign: "center", marginTop: "28px", paddingTop: "20px", borderTop: "1px solid #21262d" }}>
+          {/* 2. OR DIVIDER AND GOOGLE & GITHUB SOCIAL BUTTONS AT BOTTOM OF CARD */}
+          <div style={{ display: "flex", alignItems: "center", margin: "24px 0 18px 0" }}>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+            <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
+            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
+            {/* GOOGLE SIGN IN BUTTON */}
+            <button
+              type="button"
+              onClick={() => handleSocialAuth("google")}
+              disabled={loading}
+              className="cf-social-btn"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z" />
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z" />
+                <path fill="#FBBC05" d="M5.6 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z" />
+                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z" />
+              </svg>
+              <span>Google</span>
+            </button>
+
+            {/* GITHUB SIGN IN BUTTON */}
+            <button
+              type="button"
+              onClick={() => handleSocialAuth("github")}
+              disabled={loading}
+              className="cf-social-btn"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+              </svg>
+              <span>GitHub</span>
+            </button>
+          </div>
+
+          <div style={{ textAlign: "center", paddingTop: "18px", borderTop: "1px solid #21262d" }}>
             <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
               Don't have an account yet?{" "}
               <Link to="/signup" style={{ color: "#58a6ff", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>

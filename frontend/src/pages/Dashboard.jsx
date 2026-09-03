@@ -272,6 +272,7 @@ const Dashboard = () => {
     }
   };
 
+  // Live Real-Time Search Filter
   const filteredWorkspaces = workspaces.filter(
     (w) =>
       (w.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -304,6 +305,21 @@ const Dashboard = () => {
         .cd-scrollable::-webkit-scrollbar-thumb {
           background: #27272a;
           border-radius: 4px;
+        }
+
+        /* Smooth Page Fade-In Transition */
+        @keyframes pageFadeIn {
+          0% {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .cd-page-fade {
+          animation: pageFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         /* Smooth Card Pop Animations */
@@ -431,7 +447,7 @@ const Dashboard = () => {
         }
       `}</style>
 
-      {/* 1. TOPBAR (EXACT MATCH TO LANDING PAGE DESIGN) */}
+      {/* 1. TOPBAR */}
       <header className="cd-topbar">
         <div 
           onClick={() => navigate("/")} 
@@ -446,12 +462,12 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Live Search Input */}
+        {/* Live Working Search Input */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "8px", padding: "8px 14px", width: "340px" }}>
           <Search size={16} color="#71717a" />
           <input 
             type="text" 
-            placeholder="Search workspaces..." 
+            placeholder="Search workspaces by title or language..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: "13px", width: "100%" }}
@@ -460,13 +476,6 @@ const Dashboard = () => {
 
         {/* Topbar Action Controls */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button 
-            className="cd-btn-outline" 
-            onClick={() => navigate("/sheets")}
-          >
-            <BookOpen size={15} color="#ffffff" /> DSA Sheets
-          </button>
-
           <button className="cd-btn-bw" onClick={() => setIsNewWorkspaceModalOpen(true)}>
             <Plus size={15} /> New Workspace
           </button>
@@ -489,8 +498,8 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* 2. MAIN DASHBOARD CONTENT AREA */}
-      <main className="cd-scrollable" style={{ flex: 1, padding: "32px 28px", zIndex: 10 }}>
+      {/* 2. MAIN DASHBOARD CONTENT AREA WITH SMOOTH FADE-IN */}
+      <main className="cd-scrollable cd-page-fade" style={{ flex: 1, padding: "32px 28px", zIndex: 10 }}>
         <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
           
           {/* PAGE TITLE */}
@@ -503,11 +512,11 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* TOP 3 HERO CARDS MATCHING LANDING PAGE AESTHETIC */}
+          {/* HERO CARDS */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "18px", marginBottom: "32px" }}>
             
             {/* Card 1: My Workspace */}
-            <div className="cd-hero-card cd-animate-pop">
+            <div className="cd-hero-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                 <span style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em" }}>ACTIVE WORKSPACES</span>
                 <Folder size={18} color="#ffffff" />
@@ -521,21 +530,21 @@ const Dashboard = () => {
             </div>
 
             {/* Card 2: Live Collaboration */}
-            <div className="cd-hero-card cd-animate-pop" style={{ animationDelay: "0.05s" }} onClick={() => setIsCollabModalOpen(true)}>
+            <div className="cd-hero-card" onClick={() => setIsCollabModalOpen(true)}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                 <span style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em" }}>LIVE COLLABORATION</span>
                 <Users size={18} color="#ffffff" />
               </div>
               <div style={{ fontSize: "20px", fontWeight: "700", color: "#ffffff" }}>
-                3 Room Options
+                Room Options
               </div>
               <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "12px", fontWeight: "500" }}>
-                Create, join, or re-join room →
+                Create or join room →
               </div>
             </div>
 
             {/* Card 3: DSA Practice Sheets */}
-            <div className="cd-hero-card cd-animate-pop" style={{ animationDelay: "0.1s" }} onClick={() => navigate("/sheets")}>
+            <div className="cd-hero-card" onClick={() => navigate("/sheets")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
                 <span style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em" }}>DSA PRACTICE SHEETS</span>
                 <Target size={18} color="#ffffff" />
@@ -550,8 +559,8 @@ const Dashboard = () => {
 
           </div>
 
-          {/* RECENT WORKSPACES LIST GRID (MATCHING LANDING PAGE METALLIC CARDS) */}
-          <div className="cd-card cd-animate-pop" style={{ animationDelay: "0.15s" }}>
+          {/* RECENT WORKSPACES LIST GRID */}
+          <div className="cd-card">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "700", color: "#ffffff" }}>Recent Workspaces</h3>
               <span style={{ fontSize: "12px", color: "#a1a1aa", background: "#18181b", border: "1px solid #27272a", padding: "4px 10px", borderRadius: "6px", fontWeight: "600" }}>
@@ -648,50 +657,45 @@ const Dashboard = () => {
       {isNewWorkspaceModalOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.82)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
           <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "420px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: "#ffffff" }}>New Workspace</h3>
-              <button onClick={() => setIsNewWorkspaceModalOpen(false)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "800", color: "#ffffff" }}>Create Cloud Workspace</h3>
+              <button onClick={() => setIsNewWorkspaceModalOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
                 <X size={18} />
               </button>
             </div>
 
-            <form onSubmit={handleCreateWorkspace} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#a1a1aa", marginBottom: "8px" }}>
-                  Workspace Title
-                </label>
+            <form onSubmit={(e) => handleCreateWorkspace(e)}>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Workspace Title</label>
                 <input 
-                  type="text" 
-                  required
-                  placeholder="e.g. Binary Search Tree Solver"
+                  type="text"
+                  placeholder="e.g. Binary Search Tree Sandbox"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", color: "#ffffff", outline: "none", fontSize: "13.5px" }}
+                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
+                  required
                 />
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#a1a1aa", marginBottom: "8px" }}>
-                  Runtime Language Selection
-                </label>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Default Language</label>
                 <select
                   value={newLang}
                   onChange={(e) => setNewLang(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", padding: "10px 14px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", color: "#ffffff", outline: "none", fontSize: "13.5px" }}
+                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
                 >
-                  <option value="python">Python 3 (3.10-slim)</option>
-                  <option value="javascript">JavaScript (Node.js 18)</option>
-                  <option value="java">Java (Corretto 21)</option>
-                  <option value="cpp">C++ (GCC/G++ 20)</option>
+                  <option value="python">Python 3</option>
+                  <option value="javascript">JavaScript</option>
+                  <option value="java">Java 21</option>
+                  <option value="cpp">C++ 20</option>
                 </select>
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "12px", paddingTop: "14px", borderTop: "1px solid #27272a" }}>
-                <button type="button" onClick={() => setIsNewWorkspaceModalOpen(false)} style={{ padding: "9px 16px", background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: "13px" }}>
-                  Cancel
-                </button>
-                <button type="submit" disabled={creating} className="cd-btn-bw" style={{ padding: "9px 20px" }}>
-                  {creating ? "Launching..." : "Create & Launch"}
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button type="button" onClick={() => setIsNewWorkspaceModalOpen(false)} className="cd-btn-outline">Cancel</button>
+                <button type="submit" disabled={creating} className="cd-btn-bw">
+                  {creating ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+                  <span>Create</span>
                 </button>
               </div>
             </form>
@@ -699,148 +703,94 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* 2. LIVE COLLABORATION CARD MODAL (3 ROOM OPTIONS) */}
+      {/* 2. COLLABORATION ROOM MODAL */}
       {isCollabModalOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.82)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
           <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "440px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: "#ffffff" }}>Live Collaboration</h3>
-              <button onClick={() => setIsCollabModalOpen(false)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
+                <Users size={18} /> Live Pair Programming
+              </h3>
+              <button onClick={() => setIsCollabModalOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
                 <X size={18} />
               </button>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              {/* Option 1 */}
-              <div style={{ padding: "12px", background: "#09090b", border: "1px solid #27272a", borderRadius: "10px" }}>
-                <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff", marginBottom: "4px" }}>Option 1: Create Instant Room</div>
-                <div style={{ fontSize: "11px", color: "#a1a1aa", marginBottom: "10px" }}>Host a new synchronized multiplayer room.</div>
-                <button 
-                  onClick={handleCreateRoom}
-                  className="cd-btn-bw"
-                  style={{ width: "100%", justifyContent: "center", padding: "9px" }}
-                >
-                  Create New Room
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <div style={{ padding: "16px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "12px" }}>
+                <h4 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Create New Room</h4>
+                <p style={{ margin: "0 0 12px 0", fontSize: "12px", color: "#a1a1aa" }}>Generate a random room code and share it with peers for live code syncing.</p>
+                <button onClick={handleCreateRoom} className="cd-btn-bw" style={{ width: "100%", justifyContent: "center" }}>
+                  <Plus size={15} /> Create Host Room
                 </button>
               </div>
 
-              {/* Option 2 */}
-              <div style={{ padding: "12px", background: "#09090b", border: "1px solid #27272a", borderRadius: "10px" }}>
-                <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff", marginBottom: "4px" }}>Option 2: Join via Room Code</div>
-                <div style={{ fontSize: "11px", color: "#a1a1aa", marginBottom: "8px" }}>Enter room code to sync live code editing.</div>
-                <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ padding: "16px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "12px" }}>
+                <h4 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Join Existing Room</h4>
+                <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
                   <input 
                     type="text" 
-                    placeholder="e.g. CF-4821" 
+                    placeholder="Enter room code (e.g. CF-4829)"
                     value={roomCodeInput}
                     onChange={(e) => setRoomCodeInput(e.target.value)}
                     style={{ flex: 1, backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "8px", padding: "8px 12px", color: "#ffffff", fontSize: "13px", outline: "none" }}
                   />
-                  <button 
-                    onClick={handleJoinRoom}
-                    style={{ background: "#18181b", border: "1px solid #3f3f46", color: "#ffffff", borderRadius: "8px", padding: "8px 16px", fontSize: "13px", fontWeight: "600", cursor: "pointer" }}
-                  >
-                    Join
-                  </button>
+                  <button onClick={handleJoinRoom} className="cd-btn-outline">Join</button>
                 </div>
-              </div>
-
-              {/* Option 3 */}
-              <div style={{ padding: "12px", background: "#09090b", border: "1px solid #27272a", borderRadius: "10px" }}>
-                <div style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff", marginBottom: "4px" }}>Option 3: Quick Re-join Session</div>
-                <div style={{ fontSize: "11px", color: "#a1a1aa", marginBottom: "8px" }}>Re-connect to active shared session room.</div>
-                <button 
-                  onClick={() => handleRejoinSession("CF-DEFAULT")}
-                  className="cd-btn-outline"
-                  style={{ width: "100%", justifyContent: "center", padding: "8px" }}
-                >
-                  Re-join Shared Room (CF-DEFAULT)
-                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* 3. EDIT PROFILE CARD MODAL */}
+      {/* 3. EDIT PROFILE MODAL */}
       {isProfileModalOpen && (
         <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.82)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-          <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "420px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: "#ffffff" }}>Personal Information</h3>
-              <button onClick={() => setIsProfileModalOpen(false)} style={{ background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
+          <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "400px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
+                <User size={18} /> Edit User Profile
+              </h3>
+              <button onClick={() => setIsProfileModalOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
                 <X size={18} />
               </button>
             </div>
 
             {profileMsg && (
-              <div style={{ marginBottom: "14px", padding: "10px 14px", borderRadius: "8px", backgroundColor: profileMsg.includes("successfully") ? "rgba(255, 255, 255, 0.1)" : "rgba(239, 68, 68, 0.12)", border: profileMsg.includes("successfully") ? "1px solid #52525b" : "1px solid rgba(239, 68, 68, 0.3)", color: profileMsg.includes("successfully") ? "#ffffff" : "#f87171", fontSize: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
-                {profileMsg.includes("successfully") ? <Check size={16} /> : <AlertCircle size={16} />}
-                <span>{profileMsg}</span>
+              <div style={{ padding: "10px 14px", borderRadius: "8px", fontSize: "12.5px", marginBottom: "14px", backgroundColor: profileMsg.includes("successfully") ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", border: profileMsg.includes("successfully") ? "1px solid rgba(16, 185, 129, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", color: profileMsg.includes("successfully") ? "#34d399" : "#f87171" }}>
+                {profileMsg}
               </div>
             )}
 
-            <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "14px", padding: "12px", background: "#09090b", borderRadius: "10px", border: "1px solid #27272a" }}>
-                <div style={{ width: "42px", height: "42px", borderRadius: "50%", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", color: "#ffffff", fontWeight: "bold" }}>
-                  {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
-                </div>
-                <div>
-                  <div style={{ fontSize: "14px", fontWeight: "600", color: "#ffffff" }}>{user?.username || "Developer"}</div>
-                  <div style={{ fontSize: "11px", color: "#71717a" }}>{user?.email || "user@codeforge.io"}</div>
-                </div>
+            <form onSubmit={handleUpdateProfile}>
+              <div style={{ marginBottom: "14px" }}>
+                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Username</label>
+                <input 
+                  type="text"
+                  value={editUsername}
+                  onChange={(e) => setEditUsername(e.target.value)}
+                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
+                  required
+                />
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#a1a1aa", marginBottom: "8px" }}>
-                  Username
-                </label>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px" }}>
-                  <User size={16} color="#71717a" />
-                  <input 
-                    type="text" 
-                    required
-                    value={editUsername}
-                    onChange={(e) => setEditUsername(e.target.value)}
-                    style={{ background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: "13px", width: "100%" }}
-                  />
-                </div>
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Email Address</label>
+                <input 
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
+                  required
+                />
               </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#a1a1aa", marginBottom: "8px" }}>
-                  Email Address
-                </label>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px" }}>
-                  <Mail size={16} color="#71717a" />
-                  <input 
-                    type="email" 
-                    required
-                    value={editEmail}
-                    onChange={(e) => setEditEmail(e.target.value)}
-                    style={{ background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: "13px", width: "100%" }}
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "12px", paddingTop: "14px", borderTop: "1px solid #27272a" }}>
-                <button 
-                  type="button" 
-                  onClick={handleLogout} 
-                  style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#f87171", borderRadius: "8px", padding: "9px 14px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-                >
-                  <LogOut size={14} />
-                  <span>Log Out</span>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button type="button" onClick={() => setIsProfileModalOpen(false)} className="cd-btn-outline">Cancel</button>
+                <button type="submit" disabled={profileSaving} className="cd-btn-bw">
+                  {profileSaving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+                  <span>Save Changes</span>
                 </button>
-
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button type="button" onClick={() => setIsProfileModalOpen(false)} style={{ padding: "9px 14px", background: "transparent", border: "none", color: "#a1a1aa", cursor: "pointer", fontSize: "13px" }}>
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={profileSaving} className="cd-btn-bw" style={{ padding: "9px 18px" }}>
-                    {profileSaving ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
               </div>
             </form>
           </div>

@@ -61,6 +61,21 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
+  // Google & GitHub Social OAuth Login / Signup
+  const socialLogin = async (provider, email, username, avatar) => {
+    const res = await axios.post("http://localhost:5000/api/auth/social", {
+      provider,
+      email,
+      username,
+      avatar,
+    });
+    const { token: newToken, ...userData } = res.data;
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+    setUser(userData);
+    return res.data;
+  };
+
   // Logout User
   const logout = () => {
     localStorage.removeItem("token");
@@ -70,7 +85,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, login, register, logout }}
+      value={{ user, token, loading, login, register, socialLogin, logout }}
     >
       {children}
     </AuthContext.Provider>

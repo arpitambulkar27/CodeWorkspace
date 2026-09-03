@@ -35,13 +35,14 @@ import {
 
 import striverA2ZData from "../data/striverA2Z.json";
 import loveBabbar450Data from "../data/loveBabbar450.json";
+import { getFormattedProblemMarkdown } from "../data/dsaProblemDetails";
 
-// Starter boilerplates for supported languages
+// Default clean starter code templates (Scratch code from user)
 const LANGUAGE_BOILERPLATE = {
-  python: '# Write your Python solution here\ndef main():\n    pass\n\nif __name__ == "__main__":\n    main()',
-  javascript: '// Write your JavaScript solution here\nfunction main() {\n  \n}\n\nmain();',
-  java: '// Write your Java solution here\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        \n    }\n}',
-  cpp: '// Write your C++ solution here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    return 0;\n}',
+  python: '# Write your Python solution here\ndef main():\n    # write your code here\n    pass\n\nif __name__ == "__main__":\n    main()',
+  javascript: '// Write your JavaScript solution here\nfunction main() {\n  // write your code here\n}\n\nmain();',
+  java: '// Write your Java solution here\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // write your code here\n    }\n}',
+  cpp: '// Write your C++ solution here\n#include <iostream>\nusing namespace std;\n\nint main() {\n    // write your code here\n    return 0;\n}',
 };
 
 const DEFAULT_FILE_NAMES = {
@@ -65,7 +66,6 @@ export default function Workspace() {
   const roomParam = searchParams.get("room") || (id ? `CF-${id.slice(-6)}` : "default-room");
   const langParam = searchParams.get("lang") || "python";
   const problemSlug = searchParams.get("problem");
-  const sheetParam = searchParams.get("sheet");
 
   // Workspace & Code State
   const [workspaceTitle, setWorkspaceTitle] = useState("Untitled Workspace");
@@ -78,24 +78,22 @@ export default function Workspace() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState(1);
-  const [participantList, setParticipantList] = useState([]);
   const [activeTab, setActiveTab] = useState("output"); // 'output' | 'stdin'
   const [copied, setCopied] = useState(false);
 
-  // File & Folder Tree State
+  // File & Folder Tree State (Starts Folder Only, No Files by Default)
   const [files, setFiles] = useState([]);
   const [activeFileId, setActiveFileId] = useState(null);
   const [selectedFolderId, setSelectedFolderId] = useState(null);
   const [expandedFolders, setExpandedFolders] = useState({});
-  const [explorerOpen, setExplorerOpen] = useState(false);
+  const [explorerOpen, setExplorerOpen] = useState(true);
 
   // Problem State (LeetCode View)
   const [problem, setProblem] = useState(null);
   const [problemLeftPanelOpen, setProblemLeftPanelOpen] = useState(!!problemSlug);
-  const [submittingSolution, setSubmittingSolution] = useState(false);
   const [scorecard, setScorecard] = useState(null);
 
-  // Gemini AI Drawer State (2 Options: 'hints' | 'analysis')
+  // Gemini AI Drawer State (Manual triggering on button click)
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiMode, setAiMode] = useState("hints"); // 'hints' | 'analysis'
   const [aiLoading, setAiLoading] = useState(false);
@@ -110,17 +108,18 @@ export default function Workspace() {
     if (id) {
       fetchWorkspaceData(id);
     } else if (!problemSlug) {
-      const defaultFileName = DEFAULT_FILE_NAMES[langParam] || "main.txt";
-      const initialFile = {
-        id: `file-${Date.now()}`,
-        name: defaultFileName,
-        type: "file",
+      const rootFolder = {
+        id: `folder-root-${Date.now()}`,
+        name: "src",
+        type: "folder",
         parentId: null,
-        content: LANGUAGE_BOILERPLATE[langParam] || LANGUAGE_BOILERPLATE.python,
-        language: langParam,
       };
-      setFiles([initialFile]);
-      setActiveFileId(initialFile.id);
+      setFiles([rootFolder]);
+      setSelectedFolderId(rootFolder.id);
+      setExpandedFolders({ [rootFolder.id]: true });
+      setExplorerOpen(true);
+      setActiveFileId(null);
+      setCode("");
     }
   }, [id]);
 
@@ -147,28 +146,35 @@ export default function Workspace() {
 
         if (Array.isArray(res.data.files) && res.data.files.length > 0) {
           setFiles(res.data.files);
-          const firstFile = res.data.files.find((f) => f.type === "file") || res.data.files[0];
+          const firstFile = res.data.files.find((f) => f.type === "file");
+          const firstFolder = res.data.files.find((f) => f.type === "folder");
+
+          if (firstFolder) {
+            setSelectedFolderId(firstFolder.id);
+            setExpandedFolders({ [firstFolder.id]: true });
+            setExplorerOpen(true);
+          }
+
           if (firstFile) {
             setActiveFileId(firstFile.id);
             setCode(firstFile.content || "");
+          } else {
+            setActiveFileId(null);
+            setCode("");
           }
         } else {
-          const defaultFileName = DEFAULT_FILE_NAMES[loadedLang] || "main.txt";
-          const loadedCode = res.data.code && res.data.code.trim() !== "" 
-            ? res.data.code 
-            : (LANGUAGE_BOILERPLATE[loadedLang] || LANGUAGE_BOILERPLATE.python);
-
-          const defaultFile = {
-            id: `file-main-${Date.now()}`,
-            name: defaultFileName,
-            type: "file",
+          const rootFolder = {
+            id: `folder-root-${Date.now()}`,
+            name: res.data.title || "src",
+            type: "folder",
             parentId: null,
-            content: loadedCode,
-            language: loadedLang,
           };
-          setFiles([defaultFile]);
-          setActiveFileId(defaultFile.id);
-          setCode(loadedCode);
+          setFiles([rootFolder]);
+          setSelectedFolderId(rootFolder.id);
+          setExpandedFolders({ [rootFolder.id]: true });
+          setExplorerOpen(true);
+          setActiveFileId(null);
+          setCode("");
         }
       }
     } catch (err) {
@@ -194,6 +200,14 @@ export default function Workspace() {
     }
 
     if (foundStaticProb) {
+      const fullMarkdown = getFormattedProblemMarkdown(
+        foundStaticProb.title,
+        foundStaticProb.slug || slug,
+        foundStaticProb.difficulty || "Easy",
+        foundStaticProb.platform || "LeetCode/GFG",
+        foundStaticProb.url || "https://leetcode.com/"
+      );
+
       const formattedProb = {
         title: foundStaticProb.title,
         slug: foundStaticProb.slug || slug,
@@ -201,8 +215,8 @@ export default function Workspace() {
         difficulty: foundStaticProb.difficulty || "Easy",
         externalUrl: foundStaticProb.url || "https://leetcode.com/",
         platform: foundStaticProb.platform || "LeetCode/GFG",
-        description: `### ${foundStaticProb.title}\n\n**Difficulty**: ${foundStaticProb.difficulty} | **Source Platform**: ${foundStaticProb.platform || "LeetCode/GFG"}\n\nSolve the problem directly in Monaco editor using the starter code below or visit the official source problem page: [${foundStaticProb.title}](${foundStaticProb.url})\n\nSelect your preferred language (Python, JavaScript, C++, Java) from the top bar to auto-load starter code templates!`,
-        starterCode: foundStaticProb.starterCode || {},
+        description: fullMarkdown,
+        starterCode: {},
         testCases: []
       };
 
@@ -210,7 +224,7 @@ export default function Workspace() {
       setProblemLeftPanelOpen(true);
       setExplorerOpen(false);
 
-      const starter = formattedProb.starterCode[language] || LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
+      const starter = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
       setCode(starter);
       return;
     }
@@ -218,14 +232,22 @@ export default function Workspace() {
     try {
       const res = await axios.get(`http://localhost:5000/api/problems/${slug}`);
       if (res.data) {
-        setProblem(res.data);
+        const fullMarkdown = getFormattedProblemMarkdown(
+          res.data.title || "DSA Problem",
+          slug,
+          res.data.difficulty || "Medium",
+          res.data.platform || "LeetCode/GFG",
+          res.data.url || "https://leetcode.com/"
+        );
+
+        setProblem({
+          ...res.data,
+          description: fullMarkdown
+        });
         setProblemLeftPanelOpen(true);
         setExplorerOpen(false);
 
-        let starter = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
-        if (res.data.starterCode && res.data.starterCode[language]) {
-          starter = res.data.starterCode[language];
-        }
+        const starter = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
         setCode(starter);
       }
     } catch (err) {
@@ -262,7 +284,6 @@ export default function Workspace() {
 
     socket.on("room-participants", (data) => {
       if (data.count) setConnectedUsers(data.count);
-      if (data.participants) setParticipantList(data.participants);
     });
 
     socket.on("execution-result", (data) => {
@@ -293,9 +314,6 @@ export default function Workspace() {
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
     let targetCode = LANGUAGE_BOILERPLATE[newLang] || LANGUAGE_BOILERPLATE.python;
-    if (problem && problem.starterCode && problem.starterCode[newLang]) {
-      targetCode = problem.starterCode[newLang];
-    }
     setCode(targetCode);
     if (activeFileId) {
       setFiles((prev) =>
@@ -323,22 +341,25 @@ export default function Workspace() {
 
   // File & Folder Operations
   const handleCreateFile = (targetParentId = null) => {
-    const parent = targetParentId !== null ? targetParentId : selectedFolderId;
-    const name = window.prompt("Enter new file name (e.g. utils.py, index.js):");
+    const parent = targetParentId !== null ? targetParentId : (selectedFolderId || files.find(f => f.type === "folder")?.id || null);
+    const defaultExt = DEFAULT_FILE_NAMES[language] || "main.txt";
+    const name = window.prompt(`Enter new file name (e.g. ${defaultExt}, utils.py):`);
     if (!name || !name.trim()) return;
+
+    const initialContent = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
 
     const newFile = {
       id: `file-${Date.now()}`,
       name: name.trim(),
       type: "file",
       parentId: parent,
-      content: "",
+      content: initialContent,
       language,
     };
 
     setFiles((prev) => [...prev, newFile]);
     setActiveFileId(newFile.id);
-    setCode("");
+    setCode(initialContent);
   };
 
   const handleCreateFolder = (targetParentId = null) => {
@@ -466,36 +487,9 @@ export default function Workspace() {
     }
   };
 
-  // Submit DSA Solution against Test Cases
-  const handleSubmitSolution = async () => {
-    if (!problemSlug) return;
-    setSubmittingSolution(true);
-    setScorecard(null);
-    setActiveTab("output");
-    setOutput("⏳ Running solution evaluation against test cases...");
-
-    try {
-      const res = await axios.post(`http://localhost:5000/api/problems/${problemSlug}/submit`, {
-        code,
-        language,
-      });
-      setScorecard(res.data);
-      
-      const summaryText = res.data.passed 
-        ? `✓ ACCEPTED! All ${res.data.passedCount}/${res.data.totalTestCases} test cases passed.`
-        : `❌ REJECTED! Passed ${res.data.passedCount}/${res.data.totalTestCases} test cases.`;
-
-      const detailsText = (res.data.scoreCard || []).map((tc) => 
-        `Test Case #${tc.testCaseIndex}: ${tc.passed ? "PASSED ✓" : "FAILED ❌"}\nInput: ${tc.input}\nExpected: ${tc.expectedOutput}\nActual: ${tc.actualOutput || tc.error || "N/A"}`
-      ).join("\n\n");
-
-      setOutput(`${summaryText}\n\n${detailsText}`);
-    } catch (err) {
-      console.error("Submit Solution Error:", err);
-      setOutput(`Submission Error:\n${err.response?.data?.error || err.message}`);
-    } finally {
-      setSubmittingSolution(false);
-    }
+  // Toggle AI Drawer without auto-running AI request
+  const toggleAIDrawer = () => {
+    setAiDrawerOpen((prev) => !prev);
   };
 
   // Gemini AI Code Review / Hints / Analysis Handler
@@ -513,7 +507,10 @@ export default function Workspace() {
         problemTitle: problem ? problem.title : undefined,
         problemDescription: problem ? problem.description : undefined,
       });
-      setAiAnalysis(response.data.review || response.data.analysis || "No AI output returned.");
+
+      let rawOutput = response.data.review || response.data.analysis || "No AI output returned.";
+      const cleanOutput = rawOutput.replace(/\$|\\mathcal|\{|\}/g, "");
+      setAiAnalysis(cleanOutput);
     } catch (error) {
       setAiAnalysis(`⚠️ Gemini AI Request Failed:\n${error.response?.data?.error || error.message}`);
     } finally {
@@ -598,7 +595,7 @@ export default function Workspace() {
   return (
     <div style={{ display: "flex", height: "100vh", backgroundColor: "#09090b", color: "#ffffff", fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif", overflow: "hidden" }}>
       
-      {/* 1. Left Activity Icon Bar */}
+      {/* 1. Left Vertical Activity Bar (File Explorer, Live Collab, AI Help) */}
       <div style={{ width: "52px", borderRight: "1px solid #27272a", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "16px", gap: "18px", backgroundColor: "#0c0c0e", zIndex: 20 }}>
         <button onClick={() => navigate("/dashboard")} title="Back to Dashboard" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <ArrowLeft size={18} />
@@ -614,11 +611,11 @@ export default function Workspace() {
           <Folder size={18} />
         </button>
 
-        <button onClick={() => handleAIReview("hints")} title="Gemini AI Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
+        <button onClick={toggleAIDrawer} title="Gemini AI Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <Bot size={18} color="#ffffff" />
         </button>
 
-        <button onClick={copyRoomCode} title="Share Room Code" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
+        <button onClick={copyRoomCode} title="Live Collab / Share Room Code" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           {copied ? <Check size={18} color="#ffffff" /> : <Users size={18} />}
         </button>
       </div>
@@ -645,31 +642,6 @@ export default function Workspace() {
             <div style={{ margin: "18px 0", fontSize: "13px", color: "#a1a1aa", lineHeight: "1.6" }}>
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{problem.description}</ReactMarkdown>
             </div>
-
-            {/* Test Case Scorecard */}
-            {scorecard && (
-              <div style={{ marginTop: "20px", padding: "14px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "10px" }}>
-                <h4 style={{ margin: "0 0 8px 0", fontSize: "13px", color: scorecard.passed ? "#ffffff" : "#f87171", display: "flex", alignItems: "center", gap: "6px" }}>
-                  {scorecard.passed ? <CheckCircle size={16} /> : <XCircle size={16} />}
-                  <span>{scorecard.passed ? "Accepted (All Test Cases Passed!)" : "Test Case Failure"}</span>
-                </h4>
-                <p style={{ margin: 0, fontSize: "12px", color: "#a1a1aa" }}>
-                  Passed {scorecard.passedCount} / {scorecard.totalTestCases} test cases.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Submit Solution Button inside Left Panel */}
-          <div style={{ padding: "14px 18px", borderTop: "1px solid #18181b", backgroundColor: "#0c0c0e" }}>
-            <button
-              onClick={handleSubmitSolution}
-              disabled={submittingSolution}
-              style={{ width: "100%", backgroundColor: "#ffffff", color: "#09090b", border: "none", padding: "10px", borderRadius: "8px", fontWeight: "700", fontSize: "13px", cursor: "pointer", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}
-            >
-              {submittingSolution ? <Loader2 size={16} className="animate-spin" /> : <Send size={15} />}
-              <span>Submit Solution</span>
-            </button>
           </div>
         </div>
       )}
@@ -681,10 +653,10 @@ export default function Workspace() {
             <span style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.08em", color: "#a1a1aa", textTransform: "uppercase" }}>EXPLORER</span>
             
             <div style={{ display: "flex", gap: "6px" }}>
-              <button onClick={() => handleCreateFile(null)} title="New File at Root" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
+              <button onClick={() => handleCreateFile(null)} title="New File in Folder" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
                 <FilePlus size={15} />
               </button>
-              <button onClick={() => handleCreateFolder(null)} title="New Folder at Root" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
+              <button onClick={() => handleCreateFolder(null)} title="New Folder" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
                 <FolderPlus size={15} />
               </button>
             </div>
@@ -693,7 +665,7 @@ export default function Workspace() {
           <div style={{ flex: 1, padding: "10px 8px", overflowY: "auto" }}>
             {files.length === 0 ? (
               <div style={{ fontSize: "12px", color: "#71717a", padding: "12px 8px" }}>
-                No files created. Click + File above.
+                No folder created.
               </div>
             ) : (
               renderTree(null, 0)
@@ -780,35 +752,24 @@ export default function Workspace() {
               </button>
             )}
 
-            {/* Submit Solution Button if Problem */}
-            {problem ? (
-              <button
-                onClick={handleSubmitSolution}
-                disabled={submittingSolution}
-                style={{ backgroundColor: "#ffffff", color: "#09090b", border: "none", padding: "7px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-              >
-                {submittingSolution ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
-                <span>Submit Solution</span>
-              </button>
-            ) : (
-              <button
-                onClick={handleRunCode}
-                disabled={isLoading}
-                style={{ backgroundColor: "#ffffff", color: "#09090b", border: "none", padding: "7px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 size={14} className="animate-spin" />
-                    <span>Running...</span>
-                  </>
-                ) : (
-                  <>
-                    <Play size={14} />
-                    <span>Run Code</span>
-                  </>
-                )}
-              </button>
-            )}
+            {/* Run Code Button */}
+            <button
+              onClick={handleRunCode}
+              disabled={isLoading}
+              style={{ backgroundColor: "#ffffff", color: "#09090b", border: "none", padding: "7px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 size={14} className="animate-spin" />
+                  <span>Running...</span>
+                </>
+              ) : (
+                <>
+                  <Play size={14} />
+                  <span>Run Code</span>
+                </>
+              )}
+            </button>
 
           </div>
         </div>
@@ -816,73 +777,69 @@ export default function Workspace() {
         {/* MONACO EDITOR & BOTTOM TERMINAL */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
           
-          {/* Monaco Editor */}
+          {/* Monaco Editor Canvas or Folder Placeholder */}
           <div style={{ flex: 1, position: "relative" }}>
-            <Editor
-              height="100%"
-              language={language === "cpp" ? "cpp" : language}
-              theme="vs-dark"
-              value={code}
-              onChange={handleEditorChange}
-              onMount={(editor, monaco) => {
-                editorRef.current = editor;
+            {!activeFileId && !problem ? (
+              <div style={{ width: "100%", height: "100%", backgroundColor: "#09090b", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", boxSizing: "border-box" }}>
+                <div style={{ width: "54px", height: "54px", borderRadius: "14px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}>
+                  <Folder size={26} color="#ffffff" />
+                </div>
+                <h3 style={{ margin: "0 0 6px 0", fontSize: "17px", fontWeight: "800", color: "#ffffff" }}>Root Folder Initialized</h3>
+                <p style={{ margin: "0 0 20px 0", fontSize: "13px", color: "#a1a1aa", maxWidth: "380px", textAlign: "center" }}>
+                  This workspace starts with a root folder. Create a file inside this folder to start writing your code!
+                </p>
+                <button 
+                  onClick={() => handleCreateFile(selectedFolderId || files.find(f => f.type === "folder")?.id || null)}
+                  style={{ backgroundColor: "#ffffff", color: "#09090b", border: "none", padding: "10px 20px", borderRadius: "8px", fontWeight: "bold", fontSize: "13px", cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}
+                >
+                  <FilePlus size={15} /> Create File in Folder
+                </button>
+              </div>
+            ) : (
+              <Editor
+                height="100%"
+                language={language === "cpp" ? "cpp" : language}
+                theme="vs-dark"
+                value={code}
+                onChange={handleEditorChange}
+                onMount={(editor, monaco) => {
+                  editorRef.current = editor;
 
-                const remeasure = () => {
-                  if (monaco && monaco.editor && typeof monaco.editor.remeasureFonts === "function") {
-                    monaco.editor.remeasureFonts();
+                  const remeasure = () => {
+                    if (monaco && monaco.editor && typeof monaco.editor.remeasureFonts === "function") {
+                      monaco.editor.remeasureFonts();
+                    }
+                    if (editor && typeof editor.layout === "function") {
+                      editor.layout();
+                    }
+                  };
+
+                  remeasure();
+                  setTimeout(remeasure, 100);
+
+                  if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(remeasure);
                   }
-                  if (editor && typeof editor.layout === "function") {
-                    editor.layout();
-                  }
-                };
-
-                remeasure();
-                setTimeout(remeasure, 100);
-                setTimeout(remeasure, 300);
-
-                if (document.fonts && document.fonts.ready) {
-                  document.fonts.ready.then(remeasure);
-                }
-
-                // Kills lag & bracket match box artifacts
-                editor.updateOptions({
-                  matchBrackets: "never",
-                  renderControlCharacters: false,
-                  renderLineHighlight: "line",
-                  selectionHighlight: false,
-                  occurrencesHighlight: "off",
-                  overviewRulerLanes: 0,
-                  hideCursorInOverviewRuler: true,
-                  letterSpacing: 0,
-                  fontLigatures: false,
-                  cursorSmoothCaretAnimation: "off",
-                });
-              }}
-              options={{
-                fontSize: 14,
-                fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
-                letterSpacing: 0,
-                fontLigatures: false,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-                padding: { top: 12, bottom: 12 },
-                readOnly: false,
-                domReadOnly: false,
-                cursorStyle: "line",
-                cursorBlinking: "blink",
-                cursorSmoothCaretAnimation: "off",
-                matchBrackets: "never",
-                renderControlCharacters: false,
-                renderLineHighlight: "line",
-                selectionHighlight: false,
-                occurrencesHighlight: "off",
-                overviewRulerLanes: 0,
-                hideCursorInOverviewRuler: true,
-                renderWhitespace: "none",
-                bracketPairColorization: { enabled: false },
-              }}
-            />
+                }}
+                options={{
+                  fontSize: 14,
+                  fontFamily: "'JetBrains Mono', Consolas, 'Courier New', monospace",
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  automaticLayout: true,
+                  padding: { top: 12, bottom: 12 },
+                  readOnly: false,
+                  cursorStyle: "line",
+                  cursorBlinking: "smooth",
+                  cursorSmoothCaretAnimation: "on",
+                  matchBrackets: "always",
+                  renderLineHighlight: "all",
+                  selectionHighlight: true,
+                  occurrencesHighlight: "on",
+                  bracketPairColorization: { enabled: true },
+                }}
+              />
+            )}
           </div>
 
           {/* DUAL TERMINAL */}
@@ -894,7 +851,7 @@ export default function Workspace() {
                   onClick={() => setActiveTab("output")}
                   style={{ backgroundColor: activeTab === "output" ? "#121215" : "transparent", border: "1px solid", borderColor: activeTab === "output" ? "#27272a" : "transparent", borderBottom: activeTab === "output" ? "none" : "transparent", color: activeTab === "output" ? "#ffffff" : "#a1a1aa", padding: "4px 12px", borderRadius: "6px 6px 0 0", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
                 >
-                  <TerminalIcon size={14} color="#ffffff" /> Output Terminal & Scorecard
+                  <TerminalIcon size={14} color="#ffffff" /> Output Terminal
                 </button>
 
                 <button
@@ -906,24 +863,24 @@ export default function Workspace() {
               </div>
 
               <div style={{ fontSize: "11px", color: "#a1a1aa" }}>
-                {problem ? "LeetCode Execution Engine" : "Docker Execution Console"}
+                Docker Sandbox Console
               </div>
             </div>
 
             <div style={{ flex: 1, padding: "14px 18px", overflowY: "auto", fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", lineHeight: "1.6", color: "#ffffff" }}>
               {activeTab === "output" ? (
                 <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
-                  {output || "Output will appear here after clicking Run Code or Submit Solution..."}
+                  {output || "Output will appear here after clicking Run Code..."}
                 </pre>
               ) : (
                 <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
                   <label style={{ display: "block", fontSize: "11px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "bold" }}>
-                    ENTER CUSTOM STDIN PROGRAM INPUT (ONE INPUT PER LINE):
+                    ENTER PROGRAM INPUT (ENTER INPUT VALUES HERE BEFORE CLICKING RUN CODE):
                   </label>
                   <textarea
                     value={stdinInput}
                     onChange={(e) => setStdinInput(e.target.value)}
-                    placeholder="e.g. 5 10&#10;hello world"
+                    placeholder="Type custom program input values here (one per line)...&#10;e.g.&#10;5&#10;10 20 30 40 50"
                     style={{ flex: 1, width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px", color: "#ffffff", fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", outline: "none", resize: "none" }}
                   />
                 </div>
@@ -940,14 +897,13 @@ export default function Workspace() {
         <div style={{ width: "420px", backgroundColor: "#121215", borderLeft: "1px solid #27272a", display: "flex", flexDirection: "column", zIndex: 30 }}>
           <div style={{ padding: "14px 18px", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Bot size={18} color="#ffffff" /> Gemini AI Tutor
+              <Bot size={18} color="#ffffff" /> Gemini AI Assistant
             </h3>
             <button onClick={() => setAiDrawerOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
               ✕
             </button>
           </div>
 
-          {/* 2-Option Tabs: Hints & Complexity Analysis */}
           <div style={{ padding: "10px 18px", borderBottom: "1px solid #27272a", display: "flex", gap: "10px", backgroundColor: "#0c0c0e" }}>
             <button
               onClick={() => handleAIReview("hints")}
@@ -958,9 +914,9 @@ export default function Workspace() {
                 fontSize: "12.5px",
                 fontWeight: "700",
                 cursor: "pointer",
-                backgroundColor: aiMode === "hints" ? "#ffffff" : "#121215",
-                color: aiMode === "hints" ? "#09090b" : "#a1a1aa",
-                border: aiMode === "hints" ? "none" : "1px solid #27272a",
+                backgroundColor: aiMode === "hints" && aiAnalysis ? "#ffffff" : "#121215",
+                color: aiMode === "hints" && aiAnalysis ? "#09090b" : "#a1a1aa",
+                border: aiMode === "hints" && aiAnalysis ? "none" : "1px solid #27272a",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -980,9 +936,9 @@ export default function Workspace() {
                 fontSize: "12.5px",
                 fontWeight: "700",
                 cursor: "pointer",
-                backgroundColor: aiMode === "analysis" ? "#ffffff" : "#121215",
-                color: aiMode === "analysis" ? "#09090b" : "#a1a1aa",
-                border: aiMode === "analysis" ? "none" : "1px solid #27272a",
+                backgroundColor: aiMode === "analysis" && aiAnalysis ? "#ffffff" : "#121215",
+                color: aiMode === "analysis" && aiAnalysis ? "#09090b" : "#a1a1aa",
+                border: aiMode === "analysis" && aiAnalysis ? "none" : "1px solid #27272a",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -998,11 +954,21 @@ export default function Workspace() {
             {aiLoading ? (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: "12px", color: "#a1a1aa" }}>
                 <Loader2 size={28} className="animate-spin" color="#ffffff" />
-                <span>{aiMode === "hints" ? "Analyzing problem & formulating hints..." : "Evaluating Big-O time & space complexity of your code..."}</span>
+                <span>{aiMode === "hints" ? "Formulating GFG-style hint..." : "Evaluating Big-O complexity of your code..."}</span>
               </div>
-            ) : (
+            ) : aiAnalysis ? (
               <div className="markdown-body" style={{ color: "#ffffff" }}>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiAnalysis}</ReactMarkdown>
+              </div>
+            ) : (
+              <div style={{ padding: "40px 16px", textAlign: "center", color: "#a1a1aa", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
+                <Bot size={32} color="#52525b" />
+                <div>
+                  <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Gemini AI Assistant</h4>
+                  <p style={{ margin: 0, fontSize: "12.5px", color: "#a1a1aa" }}>
+                    Select an option above to generate a short GFG-style hint or analyze your code's Big-O complexity.
+                  </p>
+                </div>
               </div>
             )}
           </div>

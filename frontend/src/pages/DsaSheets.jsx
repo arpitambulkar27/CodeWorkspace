@@ -190,26 +190,15 @@ export default function DsaSheets() {
     return groups;
   }, [rawTopics]);
 
-  // Accordion state
+  // Accordion state - ALL DROPDOWNS CLOSED BY DEFAULT ON MOUNT
   const [expandedGroups, setExpandedGroups] = useState({});
   const [expandedSubcategories, setExpandedSubcategories] = useState({});
 
   useEffect(() => {
-    if (groupedData.length > 0) {
-      const initialGroups = {};
-      const initialSub = {};
-
-      groupedData.slice(0, 3).forEach((g) => {
-        initialGroups[g.groupKey] = true;
-        g.subcategories.forEach((sub) => {
-          initialSub[sub.topicId] = true;
-        });
-      });
-
-      setExpandedGroups(initialGroups);
-      setExpandedSubcategories(initialSub);
-    }
-  }, [activeSheetId, groupedData]);
+    // Keep all accordions closed by default on page load or sheet switch
+    setExpandedGroups({});
+    setExpandedSubcategories({});
+  }, [activeSheetId]);
 
   const isFiltering = searchQuery.trim() !== "" || difficultyFilter.toLowerCase() !== "all";
 
@@ -429,7 +418,7 @@ export default function DsaSheets() {
             </div>
             <div>
               <span style={{ fontSize: "15px", fontWeight: "800", color: "#ffffff", display: "block" }}>DSA Practice Sheets</span>
-              <span style={{ fontSize: "10px", color: "#a1a1aa", display: "block" }}>Curated interview roadmaps with direct platform redirection</span>
+              <span style={{ fontSize: "10px", color: "#a1a1aa", display: "block" }}>Curated roadmaps with Solve in IDE & platform redirection</span>
             </div>
           </div>
         </div>
@@ -462,7 +451,7 @@ export default function DsaSheets() {
                 Structured DSA Practice Sheets
               </h1>
               <p style={{ margin: "4px 0 0 0", fontSize: "13.5px", color: "#a1a1aa" }}>
-                Select a sheet to view topic modules, problem lists, and direct platform links.
+                Select a sheet to view topic modules, problem lists, Solve in IDE, and direct platform links.
               </p>
             </div>
 
@@ -678,7 +667,7 @@ export default function DsaSheets() {
                                   </span>
                                 </div>
 
-                                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                   <span style={{ 
                                     fontSize: "10.5px", 
                                     fontWeight: "700", 
@@ -691,6 +680,19 @@ export default function DsaSheets() {
                                   }}>
                                     {prob.difficulty || "Medium"}
                                   </span>
+
+                                  {/* SOLVE IN IDE BUTTON */}
+                                  <button
+                                    onClick={() => {
+                                      const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
+                                      navigate(`/workspace?problem=${encodeURIComponent(prob.slug || prob.id)}&room=${randomRoom}&sheet=${activeSheetId}`);
+                                    }}
+                                    className="cd-btn-outline"
+                                    style={{ padding: "6px 12px", fontSize: "12px", display: "flex", alignItems: "center", gap: "6px" }}
+                                    title="Solve inside CodeForge IDE"
+                                  >
+                                    <Code2 size={13} /> Solve in IDE
+                                  </button>
 
                                   <a
                                     href={prob.url || "https://leetcode.com/"}
@@ -819,7 +821,7 @@ export default function DsaSheets() {
                                           </span>
                                         </div>
 
-                                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                                           <span style={{ 
                                             fontSize: "10.5px", 
                                             fontWeight: "700", 
@@ -832,6 +834,19 @@ export default function DsaSheets() {
                                           }}>
                                             {prob.difficulty || "Medium"}
                                           </span>
+
+                                          {/* SOLVE IN IDE BUTTON */}
+                                          <button
+                                            onClick={() => {
+                                              const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
+                                              navigate(`/workspace?problem=${encodeURIComponent(prob.slug || prob.id)}&room=${randomRoom}&sheet=${activeSheetId}`);
+                                            }}
+                                            className="cd-btn-outline"
+                                            style={{ padding: "6px 12px", fontSize: "12px", display: "flex", alignItems: "center", gap: "6px" }}
+                                            title="Solve inside CodeForge IDE"
+                                          >
+                                            <Code2 size={13} /> Solve in IDE
+                                          </button>
 
                                           <a
                                             href={prob.url || "https://leetcode.com/"}
