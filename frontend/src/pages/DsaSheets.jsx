@@ -124,7 +124,18 @@ export default function DsaSheets() {
   const navigate = useNavigate();
   const { user, logout } = useAuth() || {};
 
-  const [activeSheetId, setActiveSheetId] = useState("striver-a2z");
+  // Sheet ID persistence (sessionStorage + URL query params)
+  const [activeSheetId, setActiveSheetId] = useState(() => {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSheet = urlParams.get("sheet");
+      if (urlSheet) return urlSheet;
+      return sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
+    } catch {
+      return "striver-a2z";
+    }
+  });
+
   const [searchQuery, setSearchQuery] = useState("");
   const [difficultyFilter, setDifficultyFilter] = useState("All");
 
@@ -190,24 +201,85 @@ export default function DsaSheets() {
     return groups;
   }, [rawTopics]);
 
-  // Accordion state - ALL DROPDOWNS CLOSED BY DEFAULT ON MOUNT
-  const [expandedGroups, setExpandedGroups] = useState({});
-  const [expandedSubcategories, setExpandedSubcategories] = useState({});
+  // Accordion state persistence per sheet
+  const [expandedGroups, setExpandedGroups] = useState(() => {
+    try {
+      const initialSheet = new URLSearchParams(window.location.search).get("sheet") || sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
+      const saved = sessionStorage.getItem(`codeforge_expanded_groups_${initialSheet}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
 
+  const [expandedSubcategories, setExpandedSubcategories] = useState(() => {
+    try {
+      const initialSheet = new URLSearchParams(window.location.search).get("sheet") || sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
+      const saved = sessionStorage.getItem(`codeforge_expanded_subcategories_${initialSheet}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
+  // Sync activeSheetId to sessionStorage
   useEffect(() => {
-    // Keep all accordions closed by default on page load or sheet switch
-    setExpandedGroups({});
-    setExpandedSubcategories({});
+    try {
+      sessionStorage.setItem("codeforge_active_sheet", activeSheetId);
+      const savedG = sessionStorage.getItem(`codeforge_expanded_groups_${activeSheetId}`);
+      if (savedG) setExpandedGroups(JSON.parse(savedG));
+      const savedS = sessionStorage.getItem(`codeforge_expanded_subcategories_${activeSheetId}`);
+      if (savedS) setExpandedSubcategories(JSON.parse(savedS));
+    } catch (e) {
+      // ignore
+    }
   }, [activeSheetId]);
+
+  // Restore scroll position on mount
+  useEffect(() => {
+    try {
+      const savedScroll = sessionStorage.getItem("codeforge_scroll_y");
+      if (savedScroll) {
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(savedScroll, 10));
+        }, 120);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  // Save scroll position on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      try {
+        sessionStorage.setItem("codeforge_scroll_y", String(window.scrollY));
+      } catch (e) {}
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const isFiltering = searchQuery.trim() !== "" || difficultyFilter.toLowerCase() !== "all";
 
   const toggleGroup = (groupKey) => {
-    setExpandedGroups((prev) => ({ ...prev, [groupKey]: !prev[groupKey] }));
+    setExpandedGroups((prev) => {
+      const next = { ...prev, [groupKey]: !prev[groupKey] };
+      try {
+        sessionStorage.setItem(`codeforge_expanded_groups_${activeSheetId}`, JSON.stringify(next));
+      } catch (e) {}
+      return next;
+    });
   };
 
   const toggleSubcategory = (topicId) => {
-    setExpandedSubcategories((prev) => ({ ...prev, [topicId]: !prev[topicId] }));
+    setExpandedSubcategories((prev) => {
+      const next = { ...prev, [topicId]: !prev[topicId] };
+      try {
+        sessionStorage.setItem(`codeforge_expanded_subcategories_${activeSheetId}`, JSON.stringify(next));
+      } catch (e) {}
+      return next;
+    });
   };
 
   const toggleSolved = (probId, slug) => {
@@ -649,10 +721,10 @@ export default function DsaSheets() {
                                 className="cd-list-item"
                                 style={{ opacity: isSolved ? 0.75 : 1 }}
                               >
-                                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "14px", flex: 1, minWidth: 0 }}>
                                   <button
                                     onClick={() => toggleSolved(prob.id, prob.slug)}
-                                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                                    style={{ background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
                                     title={isSolved ? "Mark Unsolved" : "Mark Solved"}
                                   >
                                     {isSolved ? (
@@ -662,47 +734,94 @@ export default function DsaSheets() {
                                     )}
                                   </button>
 
-                                  <span style={{ fontSize: "13.5px", fontWeight: "600", color: "#ffffff", textDecoration: isSolved ? "line-through" : "none" }}>
+                                  <span 
+                                    style={{ 
+                                      fontSize: "13.5px", 
+                                      fontWeight: "600", 
+                                      color: "#ffffff", 
+                                      textDecoration: isSolved ? "line-through" : "none",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      whiteSpace: "nowrap"
+                                    }}
+                                    title={prob.title}
+                                  >
                                     {prob.title}
                                   </span>
                                 </div>
 
-                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+                                  {/* Difficulty Pill */}
                                   <span style={{ 
                                     fontSize: "10.5px", 
                                     fontWeight: "700", 
                                     textTransform: "uppercase",
+                                    width: "62px",
+                                    textAlign: "center",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
                                     color: probDiff === "easy" ? "#34d399" : probDiff === "medium" ? "#fbbf24" : "#f87171", 
                                     background: probDiff === "easy" ? "rgba(16, 185, 129, 0.1)" : probDiff === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(239, 68, 68, 0.1)", 
                                     border: probDiff === "easy" ? "1px solid rgba(16, 185, 129, 0.25)" : probDiff === "medium" ? "1px solid rgba(245, 158, 11, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", 
-                                    padding: "2px 8px", 
-                                    borderRadius: "5px" 
+                                    padding: "3px 0", 
+                                    borderRadius: "5px",
+                                    flexShrink: 0
                                   }}>
                                     {prob.difficulty || "Medium"}
                                   </span>
 
-                                  {/* SOLVE IN IDE BUTTON */}
-                                  <button
-                                    onClick={() => {
-                                      const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
-                                      navigate(`/workspace?problem=${encodeURIComponent(prob.slug || prob.id)}&room=${randomRoom}&sheet=${activeSheetId}`);
-                                    }}
-                                    className="cd-btn-outline"
-                                    style={{ padding: "6px 12px", fontSize: "12px", display: "flex", alignItems: "center", gap: "6px" }}
-                                    title="Solve inside CodeForge IDE"
-                                  >
-                                    <Code2 size={13} /> Solve in IDE
-                                  </button>
+                                  {/* ACTION BUTTONS */}
+                                  {(() => {
+                                    const url = prob.url || prob.externalUrl || "";
+                                    const isGfg = (prob.platform || "").toUpperCase() === "GFG" || url.includes("geeksforgeeks.org");
+                                    const isArticle = (prob.platform || "").toLowerCase() === "article" || 
+                                                      ((prob.url || "").includes("takeuforward.org") && !(prob.url || "").includes("leetcode.com"));
 
-                                  <a
-                                    href={prob.url || "https://leetcode.com/"}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="cd-btn-bw"
-                                    style={{ textDecoration: "none", fontSize: "12px", padding: "6px 12px" }}
-                                  >
-                                    <span>Solve on {prob.platform || "Platform"}</span> <ExternalLink size={12} />
-                                  </a>
+                                    return (
+                                      <>
+                                        {!isGfg && (
+                                          <button
+                                            onClick={() => {
+                                              const platformParam = "LeetCode";
+                                              let cleanSlug = "";
+                                              if (url.includes("leetcode.com/problems/")) {
+                                                const match = url.match(/leetcode\.com\/problems\/([^/#?]+)/);
+                                                if (match && match[1]) cleanSlug = match[1].toLowerCase().trim();
+                                              }
+
+                                              if (!cleanSlug) {
+                                                cleanSlug = prob.slug || prob.id || "";
+                                                if (cleanSlug.includes("leetcode.com")) {
+                                                  const match = cleanSlug.match(/leetcode\.com\/problems\/([^/#?]+)/);
+                                                  if (match && match[1]) cleanSlug = match[1].toLowerCase().trim();
+                                                }
+                                                cleanSlug = cleanSlug.split("#")[0].split("?")[0].replace(/\/$/, "").split("/").pop().trim();
+                                              }
+                                              const probTitle = prob.title || "";
+                                              const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
+                                              navigate(`/workspace?problem=${encodeURIComponent(cleanSlug)}&platform=${encodeURIComponent(platformParam)}&url=${encodeURIComponent(url)}&title=${encodeURIComponent(probTitle)}&room=${randomRoom}&sheet=${activeSheetId}`);
+                                            }}
+                                            className="cd-btn-outline"
+                                            style={{ width: "120px", padding: "6px 0", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", flexShrink: 0 }}
+                                            title="Solve inside CodeForge IDE"
+                                          >
+                                            <Code2 size={13} /> Solve in IDE
+                                          </button>
+                                        )}
+
+                                        <a
+                                          href={prob.url || "https://leetcode.com/"}
+                                          target="_blank"
+                                          rel="noreferrer"
+                                          className="cd-btn-bw"
+                                          style={{ width: "155px", padding: "6px 0", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", textDecoration: "none", flexShrink: 0 }}
+                                        >
+                                          <span>{isArticle ? "Read Article" : `Solve on ${prob.platform || "Platform"}`}</span> <ExternalLink size={12} />
+                                        </a>
+                                      </>
+                                    );
+                                  })()}
                                 </div>
                               </div>
                             );
@@ -803,10 +922,10 @@ export default function DsaSheets() {
                                         className="cd-list-item"
                                         style={{ opacity: isSolved ? 0.75 : 1 }}
                                       >
-                                        <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "14px", flex: 1, minWidth: 0 }}>
                                           <button
                                             onClick={() => toggleSolved(prob.id, prob.slug)}
-                                            style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                                            style={{ background: "none", border: "none", cursor: "pointer", padding: 0, flexShrink: 0 }}
                                             title={isSolved ? "Mark Unsolved" : "Mark Solved"}
                                           >
                                             {isSolved ? (
@@ -816,47 +935,94 @@ export default function DsaSheets() {
                                             )}
                                           </button>
 
-                                          <span style={{ fontSize: "13.5px", fontWeight: "600", color: "#ffffff", textDecoration: isSolved ? "line-through" : "none" }}>
+                                          <span 
+                                            style={{ 
+                                              fontSize: "13.5px", 
+                                              fontWeight: "600", 
+                                              color: "#ffffff", 
+                                              textDecoration: isSolved ? "line-through" : "none",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis",
+                                              whiteSpace: "nowrap"
+                                            }}
+                                            title={prob.title}
+                                          >
                                             {prob.title}
                                           </span>
                                         </div>
 
-                                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                        <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>
+                                          {/* Difficulty Pill */}
                                           <span style={{ 
                                             fontSize: "10.5px", 
                                             fontWeight: "700", 
                                             textTransform: "uppercase",
+                                            width: "62px",
+                                            textAlign: "center",
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
                                             color: probDiff === "easy" ? "#34d399" : probDiff === "medium" ? "#fbbf24" : "#f87171", 
                                             background: probDiff === "easy" ? "rgba(16, 185, 129, 0.1)" : probDiff === "medium" ? "rgba(245, 158, 11, 0.1)" : "rgba(239, 68, 68, 0.1)", 
                                             border: probDiff === "easy" ? "1px solid rgba(16, 185, 129, 0.25)" : probDiff === "medium" ? "1px solid rgba(245, 158, 11, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", 
-                                            padding: "2px 8px", 
-                                            borderRadius: "5px" 
+                                            padding: "3px 0", 
+                                            borderRadius: "5px",
+                                            flexShrink: 0
                                           }}>
                                             {prob.difficulty || "Medium"}
                                           </span>
 
-                                          {/* SOLVE IN IDE BUTTON */}
-                                          <button
-                                            onClick={() => {
-                                              const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
-                                              navigate(`/workspace?problem=${encodeURIComponent(prob.slug || prob.id)}&room=${randomRoom}&sheet=${activeSheetId}`);
-                                            }}
-                                            className="cd-btn-outline"
-                                            style={{ padding: "6px 12px", fontSize: "12px", display: "flex", alignItems: "center", gap: "6px" }}
-                                            title="Solve inside CodeForge IDE"
-                                          >
-                                            <Code2 size={13} /> Solve in IDE
-                                          </button>
+                                          {/* ACTION BUTTONS */}
+                                          {(() => {
+                                            const url = prob.url || prob.externalUrl || "";
+                                            const isGfg = (prob.platform || "").toUpperCase() === "GFG" || url.includes("geeksforgeeks.org");
+                                            const isArticle = (prob.platform || "").toLowerCase() === "article" || 
+                                                              ((prob.url || "").includes("takeuforward.org") && !(prob.url || "").includes("leetcode.com"));
 
-                                          <a
-                                            href={prob.url || "https://leetcode.com/"}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            className="cd-btn-bw"
-                                            style={{ textDecoration: "none", fontSize: "12px", padding: "6px 12px" }}
-                                          >
-                                            <span>Solve on {prob.platform || "Platform"}</span> <ExternalLink size={12} />
-                                          </a>
+                                            return (
+                                              <>
+                                                {!isGfg && (
+                                                  <button
+                                                    onClick={() => {
+                                                      const platformParam = "LeetCode";
+                                                      let cleanSlug = "";
+                                                      if (url.includes("leetcode.com/problems/")) {
+                                                        const match = url.match(/leetcode\.com\/problems\/([^/#?]+)/);
+                                                        if (match && match[1]) cleanSlug = match[1].toLowerCase().trim();
+                                                      }
+
+                                                      if (!cleanSlug) {
+                                                        cleanSlug = prob.slug || prob.id || "";
+                                                        if (cleanSlug.includes("leetcode.com")) {
+                                                          const match = cleanSlug.match(/leetcode\.com\/problems\/([^/#?]+)/);
+                                                          if (match && match[1]) cleanSlug = match[1].toLowerCase().trim();
+                                                        }
+                                                        cleanSlug = cleanSlug.split("#")[0].split("?")[0].replace(/\/$/, "").split("/").pop().trim();
+                                                      }
+                                                      const probTitle = prob.title || "";
+                                                      const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
+                                                      navigate(`/workspace?problem=${encodeURIComponent(cleanSlug)}&platform=${encodeURIComponent(platformParam)}&url=${encodeURIComponent(url)}&title=${encodeURIComponent(probTitle)}&room=${randomRoom}&sheet=${activeSheetId}`);
+                                                    }}
+                                                    className="cd-btn-outline"
+                                                    style={{ width: "120px", padding: "6px 0", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", flexShrink: 0 }}
+                                                    title="Solve inside CodeForge IDE"
+                                                  >
+                                                    <Code2 size={13} /> Solve in IDE
+                                                  </button>
+                                                )}
+
+                                                <a
+                                                  href={prob.url || "https://leetcode.com/"}
+                                                  target="_blank"
+                                                  rel="noreferrer"
+                                                  className="cd-btn-bw"
+                                                  style={{ width: "155px", padding: "6px 0", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", textDecoration: "none", flexShrink: 0 }}
+                                                >
+                                                  <span>{isArticle ? "Read Article" : `Solve on ${prob.platform || "Platform"}`}</span> <ExternalLink size={12} />
+                                                </a>
+                                              </>
+                                            );
+                                          })()}
                                         </div>
                                       </div>
                                     );

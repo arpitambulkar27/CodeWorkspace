@@ -30,7 +30,9 @@ import {
   FileCode,
   ChevronRight,
   ChevronDown,
-  FileText
+  FileText,
+  GripVertical,
+  GripHorizontal
 } from "lucide-react";
 
 import striverA2ZData from "../data/striverA2Z.json";
@@ -52,6 +54,19 @@ const DEFAULT_FILE_NAMES = {
   cpp: "main.cpp",
 };
 
+// Helper to extract clean slug from URLs or strings
+const extractCleanSlug = (val) => {
+  if (!val) return "";
+  let str = String(val).trim();
+  if (str.includes("leetcode.com/problems/")) {
+    const match = str.match(/leetcode\.com\/problems\/([^/]+)/);
+    if (match && match[1]) return match[1];
+  }
+  str = str.replace(/\/$/, "");
+  const parts = str.split("/");
+  return parts[parts.length - 1] || str;
+};
+
 // Initialize Socket connection
 const socket = io("http://localhost:5000", {
   autoConnect: true,
@@ -65,7 +80,8 @@ export default function Workspace() {
   // Query Params
   const roomParam = searchParams.get("room") || (id ? `CF-${id.slice(-6)}` : "default-room");
   const langParam = searchParams.get("lang") || "python";
-  const problemSlug = searchParams.get("problem");
+  const rawProblemSlug = searchParams.get("problem");
+  const problemSlug = extractCleanSlug(rawProblemSlug);
 
   // Workspace & Code State
   const [workspaceTitle, setWorkspaceTitle] = useState("Untitled Workspace");
@@ -88,12 +104,19 @@ export default function Workspace() {
   const [expandedFolders, setExpandedFolders] = useState({});
   const [explorerOpen, setExplorerOpen] = useState(true);
 
-  // Problem State (LeetCode View)
+  // Problem State (LeetCode Live View)
   const [problem, setProblem] = useState(null);
+  const [problemLoading, setProblemLoading] = useState(false);
   const [problemLeftPanelOpen, setProblemLeftPanelOpen] = useState(!!problemSlug);
-  const [scorecard, setScorecard] = useState(null);
+  const [codeSnippets, setCodeSnippets] = useState([]);
 
-  // Gemini AI Drawer State (Manual triggering on button click)
+  // Panel Resizing States (Horizontal Width & Vertical Height)
+  const [problemPanelWidth, setProblemPanelWidth] = useState(480);
+  const [isResizingProblem, setIsResizingProblem] = useState(false);
+  const [terminalHeight, setTerminalHeight] = useState(230);
+  const [isResizingTerminal, setIsResizingTerminal] = useState(false);
+
+  // Gemini AI Drawer State
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiMode, setAiMode] = useState("hints"); // 'hints' | 'analysis'
   const [aiLoading, setAiLoading] = useState(false);
@@ -102,6 +125,78 @@ export default function Workspace() {
   const editorRef = useRef(null);
   const isRemoteChange = useRef(false);
   const token = localStorage.getItem("token");
+
+  // Handle Problem Panel Resizing (Horizontal Width)
+  const handleMouseDownProblemResize = (e) => {
+    e.preventDefault();
+    setIsResizingProblem(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizingProblem) return;
+      // Reserve at least 450px for Code Editor & Header Bar
+      const maxAllowedWidth = Math.max(250, window.innerWidth - 450);
+      const newWidth = Math.max(250, Math.min(e.clientX - 52, maxAllowedWidth));
+      setProblemPanelWidth(newWidth);
+      if (editorRef.current && typeof editorRef.current.layout === "function") {
+        editorRef.current.layout();
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isResizingProblem) setIsResizingProblem(false);
+    };
+
+    if (isResizingProblem) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizingProblem]);
+
+  // Handle Bottom Terminal Resizing (Vertical Height)
+  const handleMouseDownTerminalResize = (e) => {
+    e.preventDefault();
+    setIsResizingTerminal(true);
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizingTerminal) return;
+      const calculatedHeight = window.innerHeight - e.clientY;
+      // Reserve at least 200px for Monaco Editor & Header Bar
+      const maxAllowedHeight = Math.max(60, window.innerHeight - 200);
+      const newHeight = Math.max(60, Math.min(calculatedHeight, maxAllowedHeight));
+      setTerminalHeight(newHeight);
+      if (editorRef.current && typeof editorRef.current.layout === "function") {
+        editorRef.current.layout();
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isResizingTerminal) setIsResizingTerminal(false);
+    };
+
+    if (isResizingTerminal) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isResizingTerminal]);
+
+  // Trigger Monaco Editor relayout on panel resize
+  useEffect(() => {
+    if (editorRef.current && typeof editorRef.current.layout === "function") {
+      editorRef.current.layout();
+    }
+  }, [problemPanelWidth, terminalHeight, problemLeftPanelOpen, explorerOpen]);
 
   // 1. Fetch Saved Workspace Data if ID exists
   useEffect(() => {
@@ -123,12 +218,25 @@ export default function Workspace() {
     }
   }, [id]);
 
-  // 2. Fetch DSA Problem Data if problem slug exists
+  // 2. Fetch Official Problem Data (LeetCode or GFG) if problem slug exists
   useEffect(() => {
     if (problemSlug) {
-      fetchProblemData(problemSlug);
+      fetchOfficialProblem(problemSlug);
     }
-  }, [problemSlug, language]);
+  }, [problemSlug]);
+
+  // Update starter code whenever selected language or code snippets change
+  useEffect(() => {
+    if (codeSnippets && codeSnippets.length > 0) {
+      const targetLang = language === "python" ? "python3" : language;
+      const snippet = codeSnippets.find(
+        (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
+      );
+      if (snippet && snippet.code) {
+        setCode(snippet.code);
+      }
+    }
+  }, [language, codeSnippets]);
 
   const fetchWorkspaceData = async (wsId) => {
     try {
@@ -182,7 +290,65 @@ export default function Workspace() {
     }
   };
 
-  const fetchProblemData = async (slug) => {
+  // Fetch official question from backend unified problem details endpoint (/api/problems/details)
+  const fetchOfficialProblem = async (slug) => {
+    setProblemLoading(true);
+    setProblemLeftPanelOpen(true);
+    setExplorerOpen(false);
+
+    const platformParam = searchParams.get("platform") || "LeetCode";
+    const titleParam = searchParams.get("title") || "";
+    const externalUrlParam = searchParams.get("url") || "";
+    const isGfg = platformParam === "GFG" || (rawProblemSlug && rawProblemSlug.includes("geeksforgeeks"));
+
+    try {
+      const res = await axios.get("http://localhost:5000/api/problems/details", {
+        params: {
+          slug,
+          platform: platformParam,
+          url: externalUrlParam,
+          title: titleParam,
+        },
+      });
+      const data = res.data;
+
+      if (data && data.title) {
+        setProblem({
+          title: data.title,
+          slug: data.titleSlug || slug,
+          difficulty: data.difficulty || "Medium",
+          descriptionHtml: data.content,
+          externalUrl: externalUrlParam || (isGfg
+            ? `https://www.geeksforgeeks.org/problems/${slug}/1`
+            : `https://leetcode.com/problems/${slug}/`),
+          platform: data.platform || (isGfg ? "GeeksforGeeks" : "LeetCode"),
+        });
+
+        if (Array.isArray(data.codeSnippets) && data.codeSnippets.length > 0) {
+          setCodeSnippets(data.codeSnippets);
+          const targetLang = language === "python" ? "python3" : language;
+          const snippet = data.codeSnippets.find(
+            (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
+          );
+          if (snippet && snippet.code) {
+            setCode(snippet.code);
+          } else {
+            setCode(LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
+          }
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn("Unified API fetch failed, trying fallback:", err.message);
+    } finally {
+      setProblemLoading(false);
+    }
+
+    // Fallback to static datasets if live fetch fails
+    fetchFallbackProblemData(slug);
+  };
+
+  const fetchFallbackProblemData = async (slug) => {
     let foundStaticProb = null;
     const allSheets = [striverA2ZData, loveBabbar450Data];
     
@@ -216,42 +382,11 @@ export default function Workspace() {
         externalUrl: foundStaticProb.url || "https://leetcode.com/",
         platform: foundStaticProb.platform || "LeetCode/GFG",
         description: fullMarkdown,
-        starterCode: {},
-        testCases: []
       };
 
       setProblem(formattedProb);
-      setProblemLeftPanelOpen(true);
-      setExplorerOpen(false);
-
-      const starter = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
-      setCode(starter);
-      return;
-    }
-
-    try {
-      const res = await axios.get(`http://localhost:5000/api/problems/${slug}`);
-      if (res.data) {
-        const fullMarkdown = getFormattedProblemMarkdown(
-          res.data.title || "DSA Problem",
-          slug,
-          res.data.difficulty || "Medium",
-          res.data.platform || "LeetCode/GFG",
-          res.data.url || "https://leetcode.com/"
-        );
-
-        setProblem({
-          ...res.data,
-          description: fullMarkdown
-        });
-        setProblemLeftPanelOpen(true);
-        setExplorerOpen(false);
-
-        const starter = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
-        setCode(starter);
-      }
-    } catch (err) {
-      console.error("Failed to load DSA problem:", err);
+      setCode(LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
+      setProblemLoading(false);
     }
   };
 
@@ -313,6 +448,20 @@ export default function Workspace() {
   // Language Change Handler
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
+    
+    // Check if we have an official LeetCode snippet for this language
+    if (codeSnippets && codeSnippets.length > 0) {
+      const targetLang = newLang === "python" ? "python3" : newLang;
+      const snippet = codeSnippets.find(
+        (s) => s.langSlug === newLang || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === newLang.toLowerCase())
+      );
+      if (snippet && snippet.code) {
+        setCode(snippet.code);
+        socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: snippet.code });
+        return;
+      }
+    }
+
     let targetCode = LANGUAGE_BOILERPLATE[newLang] || LANGUAGE_BOILERPLATE.python;
     setCode(targetCode);
     if (activeFileId) {
@@ -505,7 +654,7 @@ export default function Workspace() {
         language,
         type: mode,
         problemTitle: problem ? problem.title : undefined,
-        problemDescription: problem ? problem.description : undefined,
+        problemDescription: problem ? (problem.descriptionHtml || problem.description) : undefined,
       });
 
       let rawOutput = response.data.review || response.data.analysis || "No AI output returned.";
@@ -593,10 +742,23 @@ export default function Workspace() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", backgroundColor: "#09090b", color: "#ffffff", fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif", overflow: "hidden" }}>
+    <div style={{ display: "flex", height: "100vh", backgroundColor: "#09090b", color: "#ffffff", fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif", overflow: "hidden", position: "relative" }}>
+      
+      {/* DRAG OVERLAY TO PREVENT MOUSE EVENT LOSS OVER MONACO / HTML PANELS */}
+      {(isResizingProblem || isResizingTerminal) && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
+            cursor: isResizingProblem ? "col-resize" : "row-resize",
+            userSelect: "none",
+          }}
+        />
+      )}
       
       {/* 1. Left Vertical Activity Bar (File Explorer, Live Collab, AI Help) */}
-      <div style={{ width: "52px", borderRight: "1px solid #27272a", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "16px", gap: "18px", backgroundColor: "#0c0c0e", zIndex: 20 }}>
+      <div style={{ width: "52px", minWidth: "52px", borderRight: "1px solid #27272a", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "12px", paddingBottom: "12px", gap: "12px", backgroundColor: "#0c0c0e", zIndex: 25, flexShrink: 0, overflowY: "auto", overflowX: "hidden" }}>
         <button onClick={() => navigate("/dashboard")} title="Back to Dashboard" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <ArrowLeft size={18} />
         </button>
@@ -620,30 +782,76 @@ export default function Workspace() {
         </button>
       </div>
 
-      {/* 2. LEETCODE-STYLE LEFT PROBLEM PANEL */}
-      {problemLeftPanelOpen && problem && (
-        <div style={{ width: "420px", backgroundColor: "#0c0c0e", borderRight: "1px solid #27272a", display: "flex", flexDirection: "column", flexShrink: 0, zIndex: 15 }}>
-          <div style={{ padding: "14px 18px", borderBottom: "1px solid #18181b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <BookOpen size={17} color="#ffffff" />
-              <span style={{ fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Problem Statement</span>
+      {/* 2. LEETCODE-STYLE LEFT PROBLEM PANEL (RENDERS LIVE GRAPHQL HTML) */}
+      {problemLeftPanelOpen && (problem || problemLoading) && (
+        <>
+          <div style={{ width: `${problemPanelWidth}px`, backgroundColor: "#0c0c0e", display: "flex", flexDirection: "column", flexShrink: 0, zIndex: 15, position: "relative" }}>
+            <div style={{ padding: "14px 18px", borderBottom: "1px solid #18181b", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <BookOpen size={17} color="#ffffff" />
+                <span style={{ fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>
+                  Official {problem?.platform || ((searchParams.get("platform") === "GFG" || (rawProblemSlug && rawProblemSlug.includes("geeksforgeeks"))) ? "GeeksforGeeks" : "LeetCode")} Statement
+                </span>
+              </div>
+              <button onClick={() => setProblemLeftPanelOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
+                ✕
+              </button>
             </div>
-            <button onClick={() => setProblemLeftPanelOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
-              ✕
-            </button>
+
+            <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+              {problemLoading ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 0", gap: "12px", color: "#a1a1aa" }}>
+                  <Loader2 size={26} className="animate-spin" color="#3b82f6" />
+                  <span style={{ fontSize: "13px", fontWeight: "600" }}>
+                    Fetching official {(searchParams.get("platform") === "GFG" || (rawProblemSlug && rawProblemSlug.includes("geeksforgeeks"))) ? "GeeksforGeeks" : "LeetCode"} statement...
+                  </span>
+                </div>
+              ) : problem ? (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "12px" }}>
+                    <h2 style={{ margin: 0, fontSize: "18px", fontWeight: "700", color: "#ffffff" }}>{problem.title}</h2>
+                    <span style={{ fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#18181b", border: "1px solid #3f3f46", padding: "3px 8px", borderRadius: "6px" }}>
+                      {problem.difficulty}
+                    </span>
+                  </div>
+
+                  {/* Render Official LeetCode HTML content or Markdown fallback */}
+                  {problem.descriptionHtml ? (
+                    <div
+                      className="text-sm text-slate-300 leading-relaxed [&_pre]:bg-[#161b22] [&_pre]:p-3.5 [&_pre]:rounded-lg [&_pre]:border [&_pre]:border-[#30363d] [&_pre]:overflow-x-auto [&_code]:text-blue-400 [&_code]:font-mono [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mb-3 [&_strong]:text-white [&_table]:w-full [&_table]:border-collapse [&_th]:border [&_th]:border-[#30363d] [&_th]:p-2 [&_td]:border [&_td]:border-[#30363d] [&_td]:p-2"
+                      dangerouslySetInnerHTML={{ __html: problem.descriptionHtml }}
+                    />
+                  ) : (
+                    <div style={{ margin: "18px 0", fontSize: "13px", color: "#a1a1aa", lineHeight: "1.6" }}>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{problem.description}</ReactMarkdown>
+                    </div>
+                  )}
+                </>
+              ) : null}
+            </div>
           </div>
 
-          <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
-            <h2 style={{ margin: "0 0 10px 0", fontSize: "18px", fontWeight: "700", color: "#ffffff" }}>{problem.title}</h2>
-            <span style={{ fontSize: "11px", fontWeight: "700", color: "#ffffff", backgroundColor: "#18181b", border: "1px solid #3f3f46", padding: "3px 8px", borderRadius: "6px" }}>
-              {problem.difficulty}
-            </span>
-
-            <div style={{ margin: "18px 0", fontSize: "13px", color: "#a1a1aa", lineHeight: "1.6" }}>
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{problem.description}</ReactMarkdown>
-            </div>
+          {/* PROBLEM PANEL HORIZONTAL RESIZER (DOUBLE-ARROW ADJUSTMENT) */}
+          <div
+            onMouseDown={handleMouseDownProblemResize}
+            title="Drag left/right to adjust question screen size"
+            style={{
+              width: "6px",
+              cursor: "col-resize",
+              backgroundColor: isResizingProblem ? "#ffffff" : "#18181b",
+              borderLeft: "1px solid #27272a",
+              borderRight: "1px solid #27272a",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 20,
+              userSelect: "none",
+              transition: isResizingProblem ? "none" : "background-color 0.15s ease",
+            }}
+          >
+            <GripVertical size={12} color={isResizingProblem ? "#ffffff" : "#71717a"} />
           </div>
-        </div>
+        </>
       )}
 
       {/* 3. File Explorer Sidebar */}
@@ -675,18 +883,18 @@ export default function Workspace() {
       )}
 
       {/* 4. MAIN IDE AREA */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         
         {/* TOP HEADER BAR */}
         <div style={{ height: "54px", backgroundColor: "#121215", borderBottom: "1px solid #27272a", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 20px" }}>
           
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-            <div style={{ padding: "6px", backgroundColor: "#18181b", borderRadius: "8px", border: "1px solid #3f3f46" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0, overflow: "hidden" }}>
+            <div style={{ padding: "6px", backgroundColor: "#18181b", borderRadius: "8px", border: "1px solid #3f3f46", flexShrink: 0 }}>
               <Code2 size={18} color="#ffffff" />
             </div>
 
             {problem ? (
-              <div style={{ fontWeight: "700", fontSize: "15px", color: "#ffffff" }}>
+              <div style={{ fontWeight: "700", fontSize: "14px", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 Problem: {problem.title}
               </div>
             ) : editingTitle ? (
@@ -700,15 +908,15 @@ export default function Workspace() {
                 style={{ backgroundColor: "#09090b", border: "1px solid #3f3f46", borderRadius: "6px", color: "#ffffff", padding: "4px 8px", fontSize: "14px", fontWeight: "bold", outline: "none" }}
               />
             ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }} onClick={() => setEditingTitle(true)}>
-                <span style={{ fontWeight: "700", fontSize: "15px", color: "#ffffff" }}>{workspaceTitle}</span>
-                <Edit2 size={13} color="#a1a1aa" />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", overflow: "hidden" }} onClick={() => setEditingTitle(true)}>
+                <span style={{ fontWeight: "700", fontSize: "14px", color: "#ffffff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{workspaceTitle}</span>
+                <Edit2 size={13} color="#a1a1aa" style={{ flexShrink: 0 }} />
               </div>
             )}
 
             {/* Auto-Save Indicator */}
             {id && !problem && (
-              <span style={{ fontSize: "11px", color: saveSuccess ? "#ffffff" : "#a1a1aa", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#18181b", padding: "3px 8px", borderRadius: "6px", border: "1px solid #27272a" }}>
+              <span style={{ fontSize: "11px", color: saveSuccess ? "#ffffff" : "#a1a1aa", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#18181b", padding: "3px 8px", borderRadius: "6px", border: "1px solid #27272a", flexShrink: 0 }}>
                 {saveSuccess ? <Check size={12} color="#ffffff" /> : null}
                 {saving ? "Saving..." : saveSuccess ? "Saved" : "Ctrl+S to save"}
               </span>
@@ -716,7 +924,7 @@ export default function Workspace() {
           </div>
 
           {/* Action Button Controls */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", flexShrink: 0 }}>
             
             {/* Language Selector */}
             <select
@@ -775,10 +983,10 @@ export default function Workspace() {
         </div>
 
         {/* MONACO EDITOR & BOTTOM TERMINAL */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
+        <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden", position: "relative" }}>
           
           {/* Monaco Editor Canvas or Folder Placeholder */}
-          <div style={{ flex: 1, position: "relative" }}>
+          <div style={{ flex: 1, minWidth: 0, minHeight: 0, position: "relative" }}>
             {!activeFileId && !problem ? (
               <div style={{ width: "100%", height: "100%", backgroundColor: "#09090b", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", boxSizing: "border-box" }}>
                 <div style={{ width: "54px", height: "54px", borderRadius: "14px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}>
@@ -842,8 +1050,29 @@ export default function Workspace() {
             )}
           </div>
 
+          {/* TERMINAL VERTICAL RESIZER (DOUBLE-ARROW ADJUSTMENT) */}
+          <div
+            onMouseDown={handleMouseDownTerminalResize}
+            title="Drag up/down to adjust terminal height"
+            style={{
+              height: "6px",
+              cursor: "row-resize",
+              backgroundColor: isResizingTerminal ? "#ffffff" : "#18181b",
+              borderTop: "1px solid #27272a",
+              borderBottom: "1px solid #27272a",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 20,
+              userSelect: "none",
+              transition: isResizingTerminal ? "none" : "background-color 0.15s ease",
+            }}
+          >
+            <GripHorizontal size={12} color={isResizingTerminal ? "#ffffff" : "#71717a"} />
+          </div>
+
           {/* DUAL TERMINAL */}
-          <div style={{ height: "230px", backgroundColor: "#121215", borderTop: "1px solid #27272a", display: "flex", flexDirection: "column" }}>
+          <div style={{ height: `${terminalHeight}px`, minHeight: "60px", flexShrink: 0, backgroundColor: "#121215", display: "flex", flexDirection: "column" }}>
             
             <div style={{ height: "36px", backgroundColor: "#18181b", borderBottom: "1px solid #27272a", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px" }}>
               <div style={{ display: "flex", gap: "4px" }}>
@@ -892,7 +1121,7 @@ export default function Workspace() {
         </div>
       </div>
 
-      {/* GEMINI AI ASSISTANCE DRAWER (2 OPTIONS: HINTS & ANALYSIS) */}
+      {/* GEMINI AI ASSISTANCE DRAWER */}
       {aiDrawerOpen && (
         <div style={{ width: "420px", backgroundColor: "#121215", borderLeft: "1px solid #27272a", display: "flex", flexDirection: "column", zIndex: 30 }}>
           <div style={{ padding: "14px 18px", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
