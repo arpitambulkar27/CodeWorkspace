@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { 
   Code2, User, Mail, Lock, ArrowRight, ShieldCheck, Cpu, 
-  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, CheckCircle2
+  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, KeyRound, RefreshCw, CheckCircle2
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -17,8 +18,42 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { register, socialLogin } = useAuth();
+  // OTP Verification View State
+  const [showOtpView, setShowOtpView] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSuccessMsg, setOtpSuccessMsg] = useState("");
+
+  const { register, sendOtp, verifyOtp, loginWithGoogle, socialLogin } = useAuth();
   const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    setLoading(true);
+    try {
+      if (credentialResponse.credential) {
+        await loginWithGoogle(credentialResponse.credential);
+        navigate("/");
+      }
+    } catch (err) {
+      console.error("Google Auth Error:", err);
+      setError(
+        err.response?.data?.error || "Google sign-up failed. Token validation error."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGithubLogin = () => {
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "";
+    const redirectUri = "http://localhost:5173/auth/github/callback";
+    const scope = "read:user user:email";
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
+  };
+
+  const handleGoogleError = () => {
+    setError("Google Sign-Up failed or was cancelled.");
+  };
 
   const validateEmail = (val) => {
     const trimmed = (val || "").trim();
@@ -34,9 +69,10 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setOtpSuccessMsg("");
 
-    if (!username || username.trim().length < 3 || username.trim().length > 20) {
-      setError("Username must be between 3 and 20 characters.");
+    if (!username || username.trim().length < 2 || username.trim().length > 50) {
+      setError("Username must be between 2 and 50 characters.");
       return;
     }
 
@@ -54,8 +90,13 @@ export default function Signup() {
     setLoading(true);
 
     try {
-      await register(username.trim(), email.trim().toLowerCase(), password);
-      navigate("/");
+      const res = await register(username.trim(), email.trim().toLowerCase(), password);
+      if (res && res.requiresOtp) {
+        setShowOtpView(true);
+        setOtpSuccessMsg(`A 6-digit verification code was sent to ${email.trim().toLowerCase()}.`);
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(
         err.response?.data?.error || "Registration failed. Please try again."
@@ -65,24 +106,39 @@ export default function Signup() {
     }
   };
 
-  const handleSocialAuth = async (provider) => {
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
     setError("");
-    const inputEmail = window.prompt(`Enter your ${provider === "google" ? "Google Account" : "GitHub"} Email address:`);
-    if (!inputEmail) return;
+    setOtpSuccessMsg("");
 
-    const emailErr = validateEmail(inputEmail);
-    if (emailErr) {
-      setError(emailErr);
+    const cleanOtp = (otpCode || "").trim();
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      setError("Please enter the 6-digit verification code.");
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-      const defaultUsername = inputEmail.split("@")[0] || `${provider}_user`;
-      await socialLogin(provider, inputEmail.trim().toLowerCase(), defaultUsername);
+      await verifyOtp(email.trim().toLowerCase(), cleanOtp);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.error || `${provider} sign-up failed.`);
+      setError(
+        err.response?.data?.error || "Invalid or expired verification OTP code."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setError("");
+    setOtpSuccessMsg("");
+    setLoading(true);
+    try {
+      await sendOtp(email.trim().toLowerCase());
+      setOtpSuccessMsg("A new 6-digit OTP code has been sent to your email.");
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to resend OTP code.");
     } finally {
       setLoading(false);
     }
@@ -105,7 +161,7 @@ export default function Signup() {
         .cf-ambient-orb-1 {
           position: absolute;
           top: -150px;
-          right: -100px;
+          left: -100px;
           width: 600px;
           height: 600px;
           background: radial-gradient(circle, rgba(147, 51, 234, 0.18) 0%, rgba(7, 9, 14, 0) 70%);
@@ -114,7 +170,7 @@ export default function Signup() {
         .cf-ambient-orb-2 {
           position: absolute;
           bottom: -150px;
-          left: -100px;
+          right: -100px;
           width: 600px;
           height: 600px;
           background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(7, 9, 14, 0) 70%);
@@ -137,7 +193,7 @@ export default function Signup() {
           padding: 50px 60px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          justify-space-between;
           position: relative;
           z-index: 10;
         }
@@ -155,7 +211,7 @@ export default function Signup() {
         .cf-input-field {
           width: 100%;
           box-sizing: border-box;
-          padding: 14px 16px 14px 44px;
+          padding: 13px 16px 13px 44px;
           background-color: #0d1117;
           border: 1px solid #21262d;
           border-radius: 12px;
@@ -173,13 +229,13 @@ export default function Signup() {
         .cf-input-field:hover {
           border-color: #a371f7;
           background-color: #111622;
-          box-shadow: 0 0 16px rgba(163, 113, 247, 0.25), inset 0 2px 4px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 0 16px rgba(163, 113, 247, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .cf-input-field:focus {
           border-color: #bc8cff;
           background-color: #111622;
-          box-shadow: 0 0 0 3px rgba(188, 140, 255, 0.25), 0 0 20px rgba(163, 113, 247, 0.35);
+          box-shadow: 0 0 0 3px rgba(188, 140, 255, 0.25), 0 0 20px rgba(163, 113, 247, 0.3);
         }
 
         .cf-input-icon {
@@ -199,7 +255,7 @@ export default function Signup() {
         .cf-btn-submit {
           width: 100%;
           padding: 14px 24px;
-          background: linear-gradient(135deg, #9333ea 0%, #a855f7 50%, #7e22ce 100%);
+          background: linear-gradient(135deg, #8957e5 0%, #a371f7 50%, #6e40c9 100%);
           border: 1px solid rgba(255, 255, 255, 0.2);
           border-radius: 12px;
           color: #ffffff;
@@ -207,7 +263,7 @@ export default function Signup() {
           font-size: 15px;
           cursor: pointer;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 8px 24px -4px rgba(147, 51, 234, 0.4);
+          box-shadow: 0 8px 24px -4px rgba(137, 87, 229, 0.4);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -217,12 +273,12 @@ export default function Signup() {
 
         .cf-btn-submit:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 12px 30px -4px rgba(147, 51, 234, 0.6);
+          box-shadow: 0 12px 30px -4px rgba(137, 87, 229, 0.6);
           filter: brightness(1.1);
         }
 
         .cf-social-btn {
-          flex: 1;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -239,7 +295,7 @@ export default function Signup() {
         }
         .cf-social-btn:hover {
           background-color: #161b22;
-          border-color: #a371f7;
+          border-color: #bc8cff;
           transform: translateY(-1px);
         }
 
@@ -250,7 +306,7 @@ export default function Signup() {
           padding: 40px;
           width: 100%;
           max-width: 440px;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(147, 51, 234, 0.08);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(163, 113, 247, 0.08);
           backdrop-filter: blur(16px);
           position: relative;
           z-index: 20;
@@ -265,7 +321,7 @@ export default function Signup() {
       <div className="cf-ambient-orb-1" />
       <div className="cf-ambient-orb-2" />
 
-      {/* 🟢 LEFT SHOWCASE PANEL */}
+      {/* LEFT SHOWCASE PANEL */}
       <div className="cf-auth-left">
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{ padding: "10px", backgroundColor: "rgba(163, 113, 247, 0.15)", borderRadius: "12px", border: "1px solid rgba(163, 113, 247, 0.3)" }}>
@@ -279,187 +335,248 @@ export default function Signup() {
 
         <div style={{ margin: "auto 0", maxWidth: "520px" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", borderRadius: "20px", backgroundColor: "rgba(163, 113, 247, 0.12)", border: "1px solid rgba(163, 113, 247, 0.25)", color: "#a371f7", fontSize: "12px", fontWeight: "bold", marginBottom: "20px" }}>
-            <Sparkles size={14} /> Instant Developer Onboarding
+            <Sparkles size={14} /> Verified Developer Accounts
           </div>
 
-          <h2 style={{ fontSize: "36px", fontWeight: "900", color: "#ffffff", lineHeight: "1.25", letterSpacing: "-0.8px", margin: "0 0 16px 0" }}>
-            Build, Execute & Review Code in Seconds
+          <h2 style={{ fontSize: "34px", fontWeight: "900", color: "#ffffff", lineHeight: "1.25", letterSpacing: "-0.8px", margin: "0 0 16px 0" }}>
+            Build & Test Code in Ephemeral Containers
           </h2>
           <p style={{ fontSize: "14px", color: "#8b949e", lineHeight: "1.6", margin: "0 0 28px 0" }}>
-            Get instant access to multi-language sandboxes, multiplayer room collaboration, and AI-powered static analysis.
+            Create your account to unlock isolated Docker code execution, multi-language sandboxes, and AI automated code reviews.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-            <div style={{ backgroundColor: "#0d1117", border: "1px solid #21262d", borderRadius: "14px", padding: "16px 20px", display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "10px", backgroundColor: "rgba(63, 185, 80, 0.15)", border: "1px solid rgba(63, 185, 80, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <CheckCircle2 size={18} color="#3fb950" />
-              </div>
-              <div>
-                <h4 style={{ margin: "0 0 2px 0", fontSize: "14px", fontWeight: "bold", color: "#ffffff" }}>Isolated Docker Containers</h4>
-                <p style={{ margin: 0, fontSize: "12px", color: "#8b949e" }}>Python, JavaScript, Java, and C++ runtimes</p>
-              </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "#c9d1d9" }}>
+              <ShieldCheck size={18} color="#3fb950" /> <span>OTP-backed email verification to stop spam</span>
             </div>
-
-            <div style={{ backgroundColor: "#0d1117", border: "1px solid #21262d", borderRadius: "14px", padding: "16px 20px", display: "flex", alignItems: "center", gap: "14px" }}>
-              <div style={{ width: "36px", height: "36px", borderRadius: "10px", backgroundColor: "rgba(163, 113, 247, 0.15)", border: "1px solid rgba(163, 113, 247, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Sparkles size={18} color="#a371f7" />
-              </div>
-              <div>
-                <h4 style={{ margin: "0 0 2px 0", fontSize: "14px", fontWeight: "bold", color: "#ffffff" }}>Gemini AI Code Reviewer</h4>
-                <p style={{ margin: 0, fontSize: "12px", color: "#8b949e" }}>Automated bug detection and Big-O complexity analysis</p>
-              </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "#c9d1d9" }}>
+              <Cpu size={18} color="#58a6ff" /> <span>Isolated Docker micro-containers for code execution</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", fontSize: "13px", color: "#c9d1d9" }}>
+              <Zap size={18} color="#d29922" /> <span>Real-time Socket.io collaborative pair programming</span>
             </div>
           </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <ShieldCheck size={16} color="#3fb950" /> Secure JWT Auth
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Cpu size={16} color="#a371f7" /> Asynchronous BullMQ
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Zap size={16} color="#d29922" /> Socket.io WebSockets
-          </div>
+        <div style={{ paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
+          © 2026 CodeForge Inc. All rights reserved.
         </div>
       </div>
 
-      {/* 🔵 RIGHT AUTH FORM PANEL (INPUT FIELDS AT TOP, GOOGLE & GITHUB AT BOTTOM) */}
+      {/* RIGHT FORM PANEL */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
         
         <div className="cf-auth-card">
-          <div style={{ marginBottom: "24px" }}>
-            <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
-              Create Account
-            </h2>
-            <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-              Fill in your details to launch your isolated cloud sandbox
-            </p>
-          </div>
 
-          {error && (
-            <div style={{ padding: "14px 16px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-              <AlertCircle size={18} />
-              <span>{error}</span>
+          {/* 🟢 STEP 2: OTP VERIFICATION VIEW */}
+          {showOtpView ? (
+            <div>
+              <div style={{ textAlign: "center", marginBottom: "24px" }}>
+                <div style={{ width: "52px", height: "52px", borderRadius: "14px", backgroundColor: "rgba(163, 113, 247, 0.15)", border: "1px solid rgba(163, 113, 247, 0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px auto" }}>
+                  <KeyRound size={26} color="#a371f7" />
+                </div>
+                <h2 style={{ margin: "0 0 8px 0", fontSize: "24px", fontWeight: "900", color: "#ffffff" }}>
+                  Verify Your Email
+                </h2>
+                <p style={{ margin: 0, fontSize: "13px", color: "#8b949e", lineHeight: "1.5" }}>
+                  Enter the 6-digit verification code sent to <br />
+                  <strong style={{ color: "#ffffff" }}>{email}</strong>
+                </p>
+              </div>
+
+              {error && (
+                <div style={{ padding: "12px 14px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <AlertCircle size={18} />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {otpSuccessMsg && (
+                <div style={{ padding: "12px 14px", backgroundColor: "rgba(46, 160, 67, 0.15)", border: "1px solid rgba(46, 160, 67, 0.4)", borderRadius: "12px", color: "#3fb950", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <CheckCircle2 size={18} />
+                  <span>{otpSuccessMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleVerifyOtp}>
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    6-Digit OTP Code
+                  </label>
+                  <KeyRound className="cf-input-icon" size={18} />
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                    placeholder="123456"
+                    className="cf-input-field"
+                    style={{ letterSpacing: "6px", fontSize: "18px", fontWeight: "bold", textAlign: "center", paddingLeft: "16px" }}
+                  />
+                </div>
+
+                <button type="submit" disabled={loading} className="cf-btn-submit">
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Verifying OTP...
+                    </>
+                  ) : (
+                    <>
+                      <span>Verify & Launch Workspace</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #21262d", fontSize: "13px" }}>
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={loading}
+                  style={{ background: "none", border: "none", color: "#a371f7", fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                >
+                  <RefreshCw size={14} /> Resend OTP Code
+                </button>
+
+                <span 
+                  onClick={() => setShowOtpView(false)} 
+                  style={{ color: "#8b949e", cursor: "pointer", textDecoration: "underline" }}
+                >
+                  Change Email
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* 🔵 STEP 1: INITIAL SIGNUP FORM */
+            <div>
+              <div style={{ marginBottom: "22px" }}>
+                <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
+                  Create an Account
+                </h2>
+                <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+                  Enter your details to receive your 6-digit email verification code
+                </p>
+              </div>
+
+              {error && (
+                <div style={{ padding: "12px 14px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <AlertCircle size={18} />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    Username
+                  </label>
+                  <User className="cf-input-icon" size={18} />
+                  <input
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Arpit"
+                    className="cf-input-field"
+                  />
+                </div>
+
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    Work Email
+                  </label>
+                  <Mail className="cf-input-icon" size={18} />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="developer@example.com"
+                    className="cf-input-field"
+                  />
+                </div>
+
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    Password
+                  </label>
+                  <Lock className="cf-input-icon" size={18} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="cf-input-field"
+                    style={{ paddingRight: "44px" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: "absolute", right: "14px", top: "38px", background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: 0 }}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                <button type="submit" disabled={loading} className="cf-btn-submit">
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Sending OTP Code...
+                    </>
+                  ) : (
+                    <>
+                      <span>Send Verification Code</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div style={{ display: "flex", alignItems: "center", margin: "22px 0 16px 0" }}>
+                <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+                <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
+                <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
+                <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme="filled_black"
+                    shape="rectangular"
+                    size="large"
+                    width="360"
+                    text="signup_with"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGithubLogin}
+                  disabled={loading}
+                  className="cf-social-btn"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>GitHub</span>
+                </button>
+              </div>
+
+              <div style={{ textAlign: "center", paddingTop: "16px", borderTop: "1px solid #21262d" }}>
+                <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+                  Already registered?{" "}
+                  <Link to="/login" style={{ color: "#a371f7", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>
+                    Sign In
+                  </Link>
+                </p>
+              </div>
             </div>
           )}
-
-          {/* 1. INPUT FIELDS & SUBMIT BUTTON AT THE TOP OF CARD */}
-          <form onSubmit={handleSubmit}>
-            <div className="cf-input-wrapper">
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "6px", letterSpacing: "0.5px" }}>
-                Username
-              </label>
-              <User className="cf-input-icon" size={18} />
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Developer"
-                className="cf-input-field"
-              />
-            </div>
-
-            <div className="cf-input-wrapper">
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "6px", letterSpacing: "0.5px" }}>
-                Work Email
-              </label>
-              <Mail className="cf-input-icon" size={18} />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="developer@example.com"
-                className="cf-input-field"
-              />
-            </div>
-
-            <div className="cf-input-wrapper">
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "6px", letterSpacing: "0.5px" }}>
-                Password
-              </label>
-              <Lock className="cf-input-icon" size={18} />
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="cf-input-field"
-                style={{ paddingRight: "44px" }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ position: "absolute", right: "14px", top: "38px", background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: 0 }}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-
-            <button type="submit" disabled={loading} className="cf-btn-submit">
-              {loading ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" /> Creating Account...
-                </>
-              ) : (
-                <>
-                  <span>Get Started for Free</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* 2. OR DIVIDER AND GOOGLE & GITHUB SOCIAL BUTTONS AT BOTTOM OF CARD */}
-          <div style={{ display: "flex", alignItems: "center", margin: "22px 0 16px 0" }}>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
-            <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
-            {/* GOOGLE SIGN UP BUTTON */}
-            <button
-              type="button"
-              onClick={() => handleSocialAuth("google")}
-              disabled={loading}
-              className="cf-social-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z" />
-                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z" />
-                <path fill="#FBBC05" d="M5.6 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z" />
-                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z" />
-              </svg>
-              <span>Google</span>
-            </button>
-
-            {/* GITHUB SIGN UP BUTTON */}
-            <button
-              type="button"
-              onClick={() => handleSocialAuth("github")}
-              disabled={loading}
-              className="cf-social-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
-                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-              </svg>
-              <span>GitHub</span>
-            </button>
-          </div>
-
-          <div style={{ textAlign: "center", paddingTop: "16px", borderTop: "1px solid #21262d" }}>
-            <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-              Already registered?{" "}
-              <Link to="/login" style={{ color: "#a371f7", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>
-                Sign In
-              </Link>
-            </p>
-          </div>
 
         </div>
       </div>

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import { 
   Code2, Mail, Lock, ArrowRight, ShieldCheck, Cpu, 
-  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, Terminal
+  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, KeyRound, RefreshCw, CheckCircle2
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -16,8 +17,42 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { login, socialLogin } = useAuth();
+  // OTP Verification View State
+  const [showOtpView, setShowOtpView] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSuccessMsg, setOtpSuccessMsg] = useState("");
+
+  const { login, sendOtp, verifyOtp, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setError("");
+    setLoading(true);
+    try {
+      if (credentialResponse.credential) {
+        await loginWithGoogle(credentialResponse.credential);
+        navigate("/");
+      }
+    } catch (err) {
+      console.error("Google Auth Error:", err);
+      setError(
+        err.response?.data?.error || "Google sign-in failed. Token validation error."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGithubLogin = () => {
+    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "";
+    const redirectUri = "http://localhost:5173/auth/github/callback";
+    const scope = "read:user user:email";
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
+  };
+
+  const handleGoogleError = () => {
+    setError("Google Sign-In failed or was cancelled.");
+  };
 
   const validateEmail = (val) => {
     const trimmed = (val || "").trim();
@@ -33,6 +68,7 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setOtpSuccessMsg("");
 
     const emailErr = validateEmail(email);
     if (emailErr) {
@@ -51,32 +87,53 @@ export default function Login() {
       await login(email.trim().toLowerCase(), password);
       navigate("/");
     } catch (err) {
+      if (err.response?.data?.isUnverified) {
+        setShowOtpView(true);
+        setError("Please verify your email address before logging in.");
+        setOtpSuccessMsg(`A 6-digit verification code was sent to ${email.trim().toLowerCase()}.`);
+      } else {
+        setError(
+          err.response?.data?.error || "Invalid credentials. Please verify your email and password."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setOtpSuccessMsg("");
+
+    const cleanOtp = (otpCode || "").trim();
+    if (!cleanOtp || cleanOtp.length !== 6) {
+      setError("Please enter the 6-digit verification code.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await verifyOtp(email.trim().toLowerCase(), cleanOtp);
+      navigate("/");
+    } catch (err) {
       setError(
-        err.response?.data?.error || "Invalid credentials. Please verify your email and password."
+        err.response?.data?.error || "Invalid or expired verification OTP code."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSocialAuth = async (provider) => {
+  const handleResendOtp = async () => {
     setError("");
-    const inputEmail = window.prompt(`Enter your ${provider === "google" ? "Google Account" : "GitHub"} Email address:`);
-    if (!inputEmail) return;
-
-    const emailErr = validateEmail(inputEmail);
-    if (emailErr) {
-      setError(emailErr);
-      return;
-    }
-
+    setOtpSuccessMsg("");
+    setLoading(true);
     try {
-      setLoading(true);
-      const defaultUsername = inputEmail.split("@")[0] || `${provider}_user`;
-      await socialLogin(provider, inputEmail.trim().toLowerCase(), defaultUsername);
-      navigate("/");
+      await sendOtp(email.trim().toLowerCase());
+      setOtpSuccessMsg("A new 6-digit OTP code has been sent to your email.");
     } catch (err) {
-      setError(err.response?.data?.error || `${provider} sign-in failed.`);
+      setError(err.response?.data?.error || "Failed to resend OTP code.");
     } finally {
       setLoading(false);
     }
@@ -131,7 +188,7 @@ export default function Login() {
           padding: 50px 60px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
+          justify-space-between;
           position: relative;
           z-index: 10;
         }
@@ -216,7 +273,7 @@ export default function Login() {
         }
 
         .cf-social-btn {
-          flex: 1;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -259,7 +316,7 @@ export default function Login() {
       <div className="cf-ambient-orb-1" />
       <div className="cf-ambient-orb-2" />
 
-      {/* 🟢 LEFT SHOWCASE PANEL */}
+      {/* LEFT SHOWCASE PANEL */}
       <div className="cf-auth-left">
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{ padding: "10px", backgroundColor: "rgba(56, 139, 253, 0.15)", borderRadius: "12px", border: "1px solid rgba(56, 139, 253, 0.3)" }}>
@@ -282,25 +339,6 @@ export default function Login() {
           <p style={{ fontSize: "14px", color: "#8b949e", lineHeight: "1.6", margin: "0 0 28px 0" }}>
             Experience zero-latency real-time pair programming, sandboxed Docker code execution, and Gemini AI-powered automated code reviews.
           </p>
-
-          <div style={{ backgroundColor: "#0d1117", border: "1px solid #21262d", borderRadius: "14px", overflow: "hidden", boxShadow: "0 16px 36px rgba(0, 0, 0, 0.5)" }}>
-            <div style={{ backgroundColor: "#161b22", padding: "10px 16px", borderBottom: "1px solid #21262d", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", gap: "6px" }}>
-                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#ff5f56" }} />
-                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#ffbd2e" }} />
-                <div style={{ width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "#27c93f" }} />
-              </div>
-              <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#8b949e", display: "flex", alignItems: "center", gap: "6px" }}>
-                <Terminal size={12} color="#58a6ff" /> main.py — Docker Runner
-              </span>
-            </div>
-            <div style={{ padding: "16px", fontFamily: "Consolas, Monaco, monospace", fontSize: "12px", color: "#e6edf3", lineHeight: "1.7" }}>
-              <p style={{ margin: 0, color: "#8b949e" }}># Booting ephemeral container...</p>
-              <p style={{ margin: "4px 0" }}><span style={{ color: "#a371f7" }}>import</span> <span style={{ color: "#79c0ff" }}>codeforge</span></p>
-              <p style={{ margin: "4px 0" }}><span style={{ color: "#79c0ff" }}>sandbox</span> = codeforge.<span style={{ color: "#7ee787" }}>mount</span>(<span style={{ color: "#a5d6ff" }}>"python:3.10-slim"</span>)</p>
-              <p style={{ margin: "8px 0 0 0", color: "#3fb950", fontWeight: "bold" }}>✓ Container initialized in 0.18s [Memory: 128MB | CPU: 0.5]</p>
-            </div>
-          </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
@@ -316,126 +354,205 @@ export default function Login() {
         </div>
       </div>
 
-      {/* 🔵 RIGHT AUTH FORM PANEL (EMAIL & PASSWORD AT TOP, GOOGLE & GITHUB AT BOTTOM) */}
+      {/* RIGHT AUTH FORM PANEL */}
       <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
         
         <div className="cf-auth-card">
-          <div style={{ marginBottom: "26px" }}>
-            <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
-              Sign in to CodeForge
-            </h2>
-            <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-              Enter your validated email and password to launch your cloud IDE
-            </p>
-          </div>
+          
+          {/* 🟢 STEP 2: UNVERIFIED USER OTP VIEW */}
+          {showOtpView ? (
+            <div>
+              <div style={{ textAlign: "center", marginBottom: "24px" }}>
+                <div style={{ width: "52px", height: "52px", borderRadius: "14px", backgroundColor: "rgba(56, 139, 253, 0.15)", border: "1px solid rgba(56, 139, 253, 0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px auto" }}>
+                  <KeyRound size={26} color="#58a6ff" />
+                </div>
+                <h2 style={{ margin: "0 0 8px 0", fontSize: "24px", fontWeight: "900", color: "#ffffff" }}>
+                  Account Verification Required
+                </h2>
+                <p style={{ margin: 0, fontSize: "13px", color: "#8b949e", lineHeight: "1.5" }}>
+                  Please enter the 6-digit verification code sent to <br />
+                  <strong style={{ color: "#ffffff" }}>{email}</strong>
+                </p>
+              </div>
 
-          {error && (
-            <div style={{ padding: "14px 16px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px" }}>
-              <AlertCircle size={18} />
-              <span>{error}</span>
+              {error && (
+                <div style={{ padding: "12px 14px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <AlertCircle size={18} />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              {otpSuccessMsg && (
+                <div style={{ padding: "12px 14px", backgroundColor: "rgba(46, 160, 67, 0.15)", border: "1px solid rgba(46, 160, 67, 0.4)", borderRadius: "12px", color: "#3fb950", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <CheckCircle2 size={18} />
+                  <span>{otpSuccessMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleVerifyOtp}>
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    6-Digit OTP Code
+                  </label>
+                  <KeyRound className="cf-input-icon" size={18} />
+                  <input
+                    type="text"
+                    required
+                    maxLength={6}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                    placeholder="123456"
+                    className="cf-input-field"
+                    style={{ letterSpacing: "6px", fontSize: "18px", fontWeight: "bold", textAlign: "center", paddingLeft: "16px" }}
+                  />
+                </div>
+
+                <button type="submit" disabled={loading} className="cf-btn-submit">
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Verifying OTP...
+                    </>
+                  ) : (
+                    <>
+                      <span>Verify & Launch Workspace</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #21262d", fontSize: "13px" }}>
+                <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={loading}
+                  style={{ background: "none", border: "none", color: "#58a6ff", fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                >
+                  <RefreshCw size={14} /> Resend OTP Code
+                </button>
+
+                <span 
+                  onClick={() => setShowOtpView(false)} 
+                  style={{ color: "#8b949e", cursor: "pointer", textDecoration: "underline" }}
+                >
+                  Back to Sign In
+                </span>
+              </div>
+            </div>
+          ) : (
+            /* 🔵 STEP 1: LOGIN FORM */
+            <div>
+              <div style={{ marginBottom: "26px" }}>
+                <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
+                  Sign in to CodeForge
+                </h2>
+                <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+                  Enter your validated email and password to launch your cloud IDE
+                </p>
+              </div>
+
+              {error && (
+                <div style={{ padding: "14px 16px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <AlertCircle size={18} />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    Work Email
+                  </label>
+                  <Mail className="cf-input-icon" size={18} />
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="developer@example.com"
+                    className="cf-input-field"
+                  />
+                </div>
+
+                <div className="cf-input-wrapper">
+                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                    Password
+                  </label>
+                  <Lock className="cf-input-icon" size={18} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="cf-input-field"
+                    style={{ paddingRight: "44px" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{ position: "absolute", right: "14px", top: "40px", background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: 0 }}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+
+                <button type="submit" disabled={loading} className="cf-btn-submit">
+                  {loading ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Authenticating...
+                    </>
+                  ) : (
+                    <>
+                      <span>Sign In to Workspace</span>
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div style={{ display: "flex", alignItems: "center", margin: "24px 0 18px 0" }}>
+                <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+                <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
+                <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
+                <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleError}
+                    theme="filled_black"
+                    shape="rectangular"
+                    size="large"
+                    width="360"
+                    text="continue_with"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGithubLogin}
+                  disabled={loading}
+                  className="cf-social-btn"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>GitHub</span>
+                </button>
+              </div>
+
+              <div style={{ textAlign: "center", paddingTop: "18px", borderTop: "1px solid #21262d" }}>
+                <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+                  Don't have an account yet?{" "}
+                  <Link to="/signup" style={{ color: "#58a6ff", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>
+                    Create Account
+                  </Link>
+                </p>
+              </div>
             </div>
           )}
-
-          {/* 1. EMAIL & PASSWORD FORM AT THE TOP OF CARD */}
-          <form onSubmit={handleSubmit}>
-            <div className="cf-input-wrapper">
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
-                Work Email
-              </label>
-              <Mail className="cf-input-icon" size={18} />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="developer@example.com"
-                className="cf-input-field"
-              />
-            </div>
-
-            <div className="cf-input-wrapper">
-              <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
-                Password
-              </label>
-              <Lock className="cf-input-icon" size={18} />
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••••••"
-                className="cf-input-field"
-                style={{ paddingRight: "44px" }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ position: "absolute", right: "14px", top: "40px", background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: 0 }}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-
-            <button type="submit" disabled={loading} className="cf-btn-submit">
-              {loading ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" /> Authenticating...
-                </>
-              ) : (
-                <>
-                  <span>Sign In to Workspace</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* 2. OR DIVIDER AND GOOGLE & GITHUB SOCIAL BUTTONS AT BOTTOM OF CARD */}
-          <div style={{ display: "flex", alignItems: "center", margin: "24px 0 18px 0" }}>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
-            <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
-            <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", marginBottom: "24px" }}>
-            {/* GOOGLE SIGN IN BUTTON */}
-            <button
-              type="button"
-              onClick={() => handleSocialAuth("google")}
-              disabled={loading}
-              className="cf-social-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.2 9 5 12 5z" />
-                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z" />
-                <path fill="#FBBC05" d="M5.6 14.8c-.3-.8-.4-1.8-.4-2.8s.1-2 .4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z" />
-                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.2-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z" />
-              </svg>
-              <span>Google</span>
-            </button>
-
-            {/* GITHUB SIGN IN BUTTON */}
-            <button
-              type="button"
-              onClick={() => handleSocialAuth("github")}
-              disabled={loading}
-              className="cf-social-btn"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
-                <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-              </svg>
-              <span>GitHub</span>
-            </button>
-          </div>
-
-          <div style={{ textAlign: "center", paddingTop: "18px", borderTop: "1px solid #21262d" }}>
-            <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-              Don't have an account yet?{" "}
-              <Link to="/signup" style={{ color: "#58a6ff", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>
-                Create Account
-              </Link>
-            </p>
-          </div>
 
         </div>
       </div>

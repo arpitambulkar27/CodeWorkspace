@@ -7,6 +7,7 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Workspace from "./pages/Workspace";
 import DsaSheets from "./pages/DsaSheets";
+import GithubCallback from "./pages/GithubCallback";
 
 export default function App() {
   return (
@@ -16,6 +17,9 @@ export default function App() {
           {/* Public Landing Page Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/landing" element={<LandingPage />} />
+
+          {/* OAuth Callbacks */}
+          <Route path="/auth/github/callback" element={<GithubCallback />} />
 
           {/* Inline Auth Landing Page Redirects */}
           <Route

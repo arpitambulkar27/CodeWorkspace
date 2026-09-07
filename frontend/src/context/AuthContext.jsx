@@ -41,10 +41,37 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
     });
-    const { token: newToken, ...userData } = res.data;
-    localStorage.setItem("token", newToken);
-    setToken(newToken);
-    setUser(userData);
+    if (res.data && res.data.token) {
+      const { token: newToken, ...userData } = res.data;
+      localStorage.setItem("token", newToken);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+      setToken(newToken);
+      setUser(userData);
+    }
+    return res.data;
+  };
+
+  // Send / Resend OTP
+  const sendOtp = async (email) => {
+    const res = await axios.post("http://localhost:5000/api/auth/send-otp", {
+      email,
+    });
+    return res.data;
+  };
+
+  // Verify OTP
+  const verifyOtp = async (email, otp) => {
+    const res = await axios.post("http://localhost:5000/api/auth/verify-otp", {
+      email,
+      otp,
+    });
+    if (res.data && res.data.token) {
+      const { token: newToken, ...userData } = res.data;
+      localStorage.setItem("token", newToken);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+      setToken(newToken);
+      setUser(userData);
+    }
     return res.data;
   };
 
@@ -54,14 +81,43 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
     });
+    if (res.data && res.data.token) {
+      const { token: newToken, ...userData } = res.data;
+      localStorage.setItem("token", newToken);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+      setToken(newToken);
+      setUser(userData);
+    }
+    return res.data;
+  };
+
+  // Google One-Tap / Button Login
+  const loginWithGoogle = async (credential) => {
+    const res = await axios.post("http://localhost:5000/api/auth/google", {
+      credential,
+    });
     const { token: newToken, ...userData } = res.data;
     localStorage.setItem("token", newToken);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
     setToken(newToken);
     setUser(userData);
     return res.data;
   };
 
-  // Google & GitHub Social OAuth Login / Signup
+  // GitHub OAuth Login
+  const loginWithGithub = async (code) => {
+    const res = await axios.post("http://localhost:5000/api/auth/github", {
+      code,
+    });
+    const { token: newToken, ...userData } = res.data;
+    localStorage.setItem("token", newToken);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+    setToken(newToken);
+    setUser(userData);
+    return res.data;
+  };
+
+  // Google & GitHub Social OAuth Login / Signup Fallback
   const socialLogin = async (provider, email, username, avatar) => {
     const res = await axios.post("http://localhost:5000/api/auth/social", {
       provider,
@@ -71,6 +127,7 @@ export const AuthProvider = ({ children }) => {
     });
     const { token: newToken, ...userData } = res.data;
     localStorage.setItem("token", newToken);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
     setToken(newToken);
     setUser(userData);
     return res.data;
@@ -79,13 +136,26 @@ export const AuthProvider = ({ children }) => {
   // Logout User
   const logout = () => {
     localStorage.removeItem("token");
+    delete axios.defaults.headers.common["Authorization"];
     setToken("");
     setUser(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, login, register, socialLogin, logout }}
+      value={{
+        user,
+        token,
+        loading,
+        login,
+        register,
+        sendOtp,
+        verifyOtp,
+        loginWithGoogle,
+        loginWithGithub,
+        socialLogin,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
