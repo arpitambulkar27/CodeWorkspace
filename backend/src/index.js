@@ -78,7 +78,7 @@ io.on("connection", (socket) => {
   activeSocketsGauge.inc();
   console.log(`🔌 [Socket.io] Client connected: ${socket.id}`);
 
-  socket.on("join-room", ({ roomId, roomCode, username }) => {
+  socket.on("join-room", ({ roomId, roomCode, username, code, language, problemSlug, problemTitle, platform, externalUrl }) => {
     const targetRoom = roomId || roomCode;
     if (!targetRoom) return;
 
@@ -94,6 +94,20 @@ io.on("connection", (socket) => {
 
     const userList = Array.from(participants.values());
 
+    // Store code, language & problem metadata in room state if provided
+    if (code !== undefined || language || problemSlug) {
+      const currentState = roomStates.get(targetRoom) || {};
+      roomStates.set(targetRoom, {
+        ...currentState,
+        code: code !== undefined ? code : currentState.code,
+        language: language || currentState.language,
+        problemSlug: problemSlug || currentState.problemSlug,
+        problemTitle: problemTitle || currentState.problemTitle,
+        platform: platform || currentState.platform,
+        externalUrl: externalUrl || currentState.externalUrl,
+      });
+    }
+
     // Broadcast updated participant list to all clients in room
     io.to(targetRoom).emit("room-participants", {
       roomId: targetRoom,
@@ -107,7 +121,7 @@ io.on("connection", (socket) => {
       count: userList.length,
     });
 
-    // If active room state exists, send initial code & language sync to joining socket
+    // If active room state exists, send initial code, language & problem state sync to joining socket
     if (roomStates.has(targetRoom)) {
       socket.emit("sync-initial-state", roomStates.get(targetRoom));
     }
@@ -117,13 +131,22 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("code-change", ({ roomId, roomCode, code, language }) => {
+  socket.on("code-change", ({ roomId, roomCode, code, language, problemSlug, problemTitle, platform, externalUrl }) => {
     const targetRoom = roomId || roomCode;
     if (targetRoom) {
       const currentState = roomStates.get(targetRoom) || {};
-      roomStates.set(targetRoom, { ...currentState, code: code !== undefined ? code : currentState.code, language: language || currentState.language });
-      socket.to(targetRoom).emit("code-update", code);
-      socket.to(targetRoom).emit("code-change", code);
+      const updatedState = {
+        ...currentState,
+        code: code !== undefined ? code : currentState.code,
+        language: language || currentState.language,
+        problemSlug: problemSlug !== undefined ? problemSlug : currentState.problemSlug,
+        problemTitle: problemTitle !== undefined ? problemTitle : currentState.problemTitle,
+        platform: platform !== undefined ? platform : currentState.platform,
+        externalUrl: externalUrl !== undefined ? externalUrl : currentState.externalUrl,
+      };
+      roomStates.set(targetRoom, updatedState);
+      socket.to(targetRoom).emit("code-update", updatedState);
+      socket.to(targetRoom).emit("code-change", updatedState);
     }
   });
 
@@ -133,6 +156,22 @@ io.on("connection", (socket) => {
       const currentState = roomStates.get(targetRoom) || {};
       roomStates.set(targetRoom, { ...currentState, language, code: code !== undefined ? code : currentState.code });
       socket.to(targetRoom).emit("language-update", { language, code });
+    }
+  });
+
+  socket.on("problem-change", ({ roomId, roomCode, problemSlug, problemTitle, platform, externalUrl }) => {
+    const targetRoom = roomId || roomCode;
+    if (targetRoom) {
+      const currentState = roomStates.get(targetRoom) || {};
+      const updatedState = {
+        ...currentState,
+        problemSlug,
+        problemTitle,
+        platform,
+        externalUrl,
+      };
+      roomStates.set(targetRoom, updatedState);
+      socket.to(targetRoom).emit("problem-update", updatedState);
     }
   });
 
@@ -147,23 +186,34 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnect", () => {
-    activeSocketsGauge.dec();
-    const roomId = socket.roomId;
-    if (roomId && roomUsers.has(roomId)) {
-      const participants = roomUsers.get(roomId);
+  const handleLeaveRoom = (targetRoom) => {
+    if (targetRoom && roomUsers.has(targetRoom)) {
+      const participants = roomUsers.get(targetRoom);
       participants.delete(socket.id);
+      socket.leave(targetRoom);
       if (participants.size === 0) {
-        roomUsers.delete(roomId);
+        roomUsers.delete(targetRoom);
+        roomStates.delete(targetRoom);
       } else {
         const userList = Array.from(participants.values());
-        io.to(roomId).emit("room-participants", {
-          roomId,
+        io.to(targetRoom).emit("room-participants", {
+          roomId: targetRoom,
           participants: userList,
           count: userList.length,
         });
       }
     }
+  };
+
+  socket.on("leave-room", ({ roomId, roomCode }) => {
+    const targetRoom = roomId || roomCode || socket.roomId;
+    handleLeaveRoom(targetRoom);
+  });
+
+  socket.on("disconnect", () => {
+    activeSocketsGauge.dec();
+    const roomId = socket.roomId;
+    handleLeaveRoom(roomId);
     console.log(`🔌 [Socket.io] Client disconnected: ${socket.id}`);
   });
 });

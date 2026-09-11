@@ -111,6 +111,10 @@ export default function Workspace() {
   const [problemLoading, setProblemLoading] = useState(false);
   const [problemLeftPanelOpen, setProblemLeftPanelOpen] = useState(!!problemSlug);
   const [codeSnippets, setCodeSnippets] = useState([]);
+  const [activeProblemSlug, setActiveProblemSlug] = useState(problemSlug || null);
+  const [activePlatform, setActivePlatform] = useState(searchParams.get("platform") || "LeetCode");
+  const [activeTitle, setActiveTitle] = useState(searchParams.get("title") || "");
+  const [activeExternalUrl, setActiveExternalUrl] = useState(searchParams.get("url") || "");
 
   // Panel Resizing States (Horizontal Width & Vertical Height)
   const [problemPanelWidth, setProblemPanelWidth] = useState(480);
@@ -118,7 +122,7 @@ export default function Workspace() {
   const [terminalHeight, setTerminalHeight] = useState(230);
   const [isResizingTerminal, setIsResizingTerminal] = useState(false);
 
-  // Gemini AI Drawer State
+  // AI Code Reviewer Drawer State
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiMode, setAiMode] = useState("hints"); // 'hints' | 'analysis'
   const [aiLoading, setAiLoading] = useState(false);
@@ -129,6 +133,10 @@ export default function Workspace() {
   const lastRemoteChangeTime = useRef(0);
   const codeRef = useRef(code);
   const languageRef = useRef(language);
+  const activeProblemSlugRef = useRef(activeProblemSlug);
+  const activePlatformRef = useRef(activePlatform);
+  const activeTitleRef = useRef(activeTitle);
+  const activeExternalUrlRef = useRef(activeExternalUrl);
   const token = localStorage.getItem("token");
 
   // Keep refs in sync with state for socket callbacks
@@ -139,6 +147,22 @@ export default function Workspace() {
   useEffect(() => {
     languageRef.current = language;
   }, [language]);
+
+  useEffect(() => {
+    activeProblemSlugRef.current = activeProblemSlug;
+  }, [activeProblemSlug]);
+
+  useEffect(() => {
+    activePlatformRef.current = activePlatform;
+  }, [activePlatform]);
+
+  useEffect(() => {
+    activeTitleRef.current = activeTitle;
+  }, [activeTitle]);
+
+  useEffect(() => {
+    activeExternalUrlRef.current = activeExternalUrl;
+  }, [activeExternalUrl]);
 
   // Handle Problem Panel Resizing (Horizontal Width)
   const handleMouseDownProblemResize = (e) => {
@@ -225,11 +249,11 @@ export default function Workspace() {
       };
       const defaultFile = {
         id: `file-main-${Date.now()}`,
-        name: DEFAULT_FILE_NAMES[languageParam || "python"] || "main.py",
+        name: DEFAULT_FILE_NAMES[langParam || "python"] || "main.py",
         type: "file",
         parentId: rootFolder.id,
-        content: LANGUAGE_BOILERPLATE[languageParam || "python"] || LANGUAGE_BOILERPLATE.python,
-        language: languageParam || "python",
+        content: LANGUAGE_BOILERPLATE[langParam || "python"] || LANGUAGE_BOILERPLATE.python,
+        language: langParam || "python",
       };
       setFiles([rootFolder, defaultFile]);
       setSelectedFolderId(rootFolder.id);
@@ -240,25 +264,12 @@ export default function Workspace() {
     }
   }, [id]);
 
-  // 2. Fetch Official Problem Data (LeetCode or GFG) if problem slug exists
+  // 2. Fetch Official Problem Data (LeetCode or GFG) if problem slug exists on initial host load
   useEffect(() => {
     if (problemSlug) {
-      fetchOfficialProblem(problemSlug);
+      fetchOfficialProblem(problemSlug, searchParams.get("platform"), searchParams.get("title"), searchParams.get("url"), true);
     }
   }, [problemSlug]);
-
-  // Update starter code whenever selected language or code snippets change
-  useEffect(() => {
-    if (codeSnippets && codeSnippets.length > 0) {
-      const targetLang = language === "python" ? "python3" : language;
-      const snippet = codeSnippets.find(
-        (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
-      );
-      if (snippet && snippet.code) {
-        setCode(snippet.code);
-      }
-    }
-  }, [language, codeSnippets]);
 
   const fetchWorkspaceData = async (wsId) => {
     try {
@@ -313,15 +324,23 @@ export default function Workspace() {
   };
 
   // Fetch official question from backend unified problem details endpoint (/api/problems/details)
-  const fetchOfficialProblem = async (slug) => {
+  const fetchOfficialProblem = async (slugToFetch, platformToUse, titleToUse, urlToUse, isInitialHostLoad = false) => {
+    const slug = slugToFetch || activeProblemSlug || problemSlug;
+    if (!slug) return;
+
     setProblemLoading(true);
     setProblemLeftPanelOpen(true);
     setExplorerOpen(false);
 
-    const platformParam = searchParams.get("platform") || "LeetCode";
-    const titleParam = searchParams.get("title") || "";
-    const externalUrlParam = searchParams.get("url") || "";
-    const isGfg = platformParam === "GFG" || (rawProblemSlug && rawProblemSlug.includes("geeksforgeeks"));
+    const platformParam = platformToUse || activePlatform || searchParams.get("platform") || "LeetCode";
+    const titleParam = titleToUse || activeTitle || searchParams.get("title") || "";
+    const externalUrlParam = urlToUse || activeExternalUrl || searchParams.get("url") || "";
+    const isGfg = platformParam === "GFG" || (slug && slug.includes("geeksforgeeks"));
+
+    setActiveProblemSlug(slug);
+    setActivePlatform(platformParam);
+    setActiveTitle(titleParam);
+    setActiveExternalUrl(externalUrlParam);
 
     try {
       const res = await axios.get("http://localhost:5000/api/problems/details", {
@@ -348,13 +367,27 @@ export default function Workspace() {
 
         if (Array.isArray(data.codeSnippets) && data.codeSnippets.length > 0) {
           setCodeSnippets(data.codeSnippets);
-          const targetLang = language === "python" ? "python3" : language;
+          const currentLang = languageRef.current || "python";
+          const targetLang = currentLang === "python" ? "python3" : currentLang;
           const snippet = data.codeSnippets.find(
-            (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
+            (s) => s.langSlug === currentLang || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === currentLang.toLowerCase())
           );
-          const activeSnippetCode = snippet && snippet.code ? snippet.code : (LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
-          setCode(activeSnippetCode);
-          socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: activeSnippetCode, language });
+          
+          // Only initialize starter code if this is the initial host load AND no remote state has been synced
+          if (isInitialHostLoad && !isRemoteSynced.current) {
+            const activeSnippetCode = snippet && snippet.code ? snippet.code : (LANGUAGE_BOILERPLATE[currentLang] || LANGUAGE_BOILERPLATE.python);
+            setCode(activeSnippetCode);
+            socket.emit("code-change", {
+              roomId: roomParam,
+              roomCode: roomParam,
+              code: activeSnippetCode,
+              language: currentLang,
+              problemSlug: slug,
+              problemTitle: data.title,
+              platform: platformParam,
+              externalUrl: externalUrlParam,
+            });
+          }
         }
         return;
       }
@@ -410,6 +443,8 @@ export default function Workspace() {
     }
   };
 
+  const isRemoteSynced = useRef(false);
+
   // 3. Socket.io Multiplayer Setup
   useEffect(() => {
     const userStr = localStorage.getItem("user");
@@ -422,25 +457,53 @@ export default function Workspace() {
       }
     }
 
-    socket.emit("join-room", { roomId: roomParam, roomCode: roomParam, username });
+    socket.emit("join-room", {
+      roomId: roomParam,
+      roomCode: roomParam,
+      username,
+      code: codeRef.current,
+      language: languageRef.current,
+      problemSlug: activeProblemSlugRef.current,
+      problemTitle: activeTitleRef.current,
+      platform: activePlatformRef.current,
+      externalUrl: activeExternalUrlRef.current,
+    });
 
     const handleRemoteCodeUpdate = (data) => {
       const newCode = typeof data === "string" ? data : (data?.code !== undefined ? data.code : "");
-      if (newCode === codeRef.current) return;
-      lastRemoteChangeTime.current = Date.now();
-      isRemoteChange.current = true;
-      setCode(newCode);
-      if (activeFileId) {
-        setFiles((prev) =>
-          prev.map((f) => (f.id === activeFileId ? { ...f, content: newCode } : f))
-        );
+      const newLang = typeof data === "object" ? data?.language : null;
+      const newProblemSlug = typeof data === "object" ? data?.problemSlug : null;
+
+      isRemoteSynced.current = true;
+
+      if (newLang && newLang !== languageRef.current) {
+        setLanguage(newLang);
+      }
+
+      if (newCode !== undefined && newCode !== codeRef.current) {
+        lastRemoteChangeTime.current = Date.now();
+        isRemoteChange.current = true;
+        setCode(newCode);
+        if (activeFileId) {
+          setFiles((prev) =>
+            prev.map((f) => (f.id === activeFileId ? { ...f, content: newCode } : f))
+          );
+        }
+      }
+
+      if (newProblemSlug && newProblemSlug !== activeProblemSlugRef.current) {
+        setActiveProblemSlug(newProblemSlug);
+        setProblemLeftPanelOpen(true);
+        setExplorerOpen(false);
+        fetchOfficialProblem(newProblemSlug, data.platform, data.problemTitle, data.externalUrl, false);
       }
     };
 
     const handleInitialStateSync = (state) => {
       if (state) {
+        isRemoteSynced.current = true;
         if (state.language) setLanguage(state.language);
-        if (state.code !== undefined && state.code !== codeRef.current) {
+        if (state.code !== undefined) {
           lastRemoteChangeTime.current = Date.now();
           isRemoteChange.current = true;
           setCode(state.code);
@@ -450,6 +513,21 @@ export default function Workspace() {
             );
           }
         }
+        if (state.problemSlug && state.problemSlug !== activeProblemSlugRef.current) {
+          setActiveProblemSlug(state.problemSlug);
+          setProblemLeftPanelOpen(true);
+          setExplorerOpen(false);
+          fetchOfficialProblem(state.problemSlug, state.platform, state.problemTitle, state.externalUrl, false);
+        }
+      }
+    };
+
+    const handleProblemSync = (data) => {
+      if (data && data.problemSlug && data.problemSlug !== activeProblemSlugRef.current) {
+        setActiveProblemSlug(data.problemSlug);
+        setProblemLeftPanelOpen(true);
+        setExplorerOpen(false);
+        fetchOfficialProblem(data.problemSlug, data.platform, data.problemTitle, data.externalUrl);
       }
     };
 
@@ -468,14 +546,19 @@ export default function Workspace() {
     socket.on("code-change", handleRemoteCodeUpdate);
     socket.on("sync-initial-state", handleInitialStateSync);
     socket.on("language-update", handleLanguageSync);
+    socket.on("problem-update", handleProblemSync);
 
     socket.on("user-joined", () => {
-      // Broadcast active host code and language to newly joined participant
+      // Broadcast active host code, language & problem details to newly joined participant
       socket.emit("code-change", {
         roomId: roomParam,
         roomCode: roomParam,
         code: codeRef.current,
         language: languageRef.current,
+        problemSlug: activeProblemSlugRef.current,
+        problemTitle: activeTitleRef.current,
+        platform: activePlatformRef.current,
+        externalUrl: activeExternalUrlRef.current,
       });
     });
 
@@ -500,10 +583,12 @@ export default function Workspace() {
     });
 
     return () => {
+      socket.emit("leave-room", { roomId: roomParam, roomCode: roomParam });
       socket.off("code-update", handleRemoteCodeUpdate);
       socket.off("code-change", handleRemoteCodeUpdate);
       socket.off("sync-initial-state", handleInitialStateSync);
       socket.off("language-update", handleLanguageSync);
+      socket.off("problem-update", handleProblemSync);
       socket.off("user-joined");
       socket.off("room-participants");
       socket.off("execution-result");
@@ -716,7 +801,7 @@ export default function Workspace() {
     setAiDrawerOpen((prev) => !prev);
   };
 
-  // Gemini AI Code Review / Hints / Analysis Handler
+  // AI Code Review / Hints / Analysis Handler
   const handleAIReview = async (mode = "hints") => {
     setAiDrawerOpen(true);
     setAiMode(mode);
@@ -736,7 +821,7 @@ export default function Workspace() {
       const cleanOutput = rawOutput.replace(/\$|\\mathcal|\{|\}/g, "");
       setAiAnalysis(cleanOutput);
     } catch (error) {
-      setAiAnalysis(`⚠️ Gemini AI Request Failed:\n${error.response?.data?.error || error.message}`);
+      setAiAnalysis(`⚠️ AI Assistance Request Failed:\n${error.response?.data?.error || error.message}`);
     } finally {
       setAiLoading(false);
     }
@@ -822,7 +907,7 @@ export default function Workspace() {
     const fromParam = searchParams.get("from");
     if (problemSlug || problem || sheet || fromParam === "dsa-sheets") {
       const targetSheet = sheet || sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
-      navigate(`/dsa-sheets?sheet=${encodeURIComponent(targetSheet)}`);
+      navigate(`/sheets?sheet=${encodeURIComponent(targetSheet)}`);
     } else {
       navigate("/dashboard");
     }
@@ -862,7 +947,7 @@ export default function Workspace() {
           </button>
         )}
 
-        <button onClick={toggleAIDrawer} title="Gemini AI Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
+        <button onClick={toggleAIDrawer} title="AI Code Reviewer Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <Bot size={18} color="#ffffff" />
         </button>
 
@@ -1022,7 +1107,7 @@ export default function Workspace() {
               style={{ backgroundColor: "#09090b", color: "#ffffff", border: "1px solid #27272a", borderRadius: "8px", padding: "6px 12px", fontSize: "13px", outline: "none", cursor: "pointer", fontWeight: "600" }}
             >
               <option value="python">Python 3</option>
-              <option value="javascript">JavaScript (Node.js)</option>
+              <option value="javascript">JavaScript</option>
               <option value="java">Java 21</option>
               <option value="cpp">C++ 20</option>
             </select>
@@ -1210,12 +1295,12 @@ export default function Workspace() {
         </div>
       </div>
 
-      {/* GEMINI AI ASSISTANCE DRAWER */}
+      {/* AI CODE REVIEWER ASSISTANCE DRAWER */}
       {aiDrawerOpen && (
         <div style={{ width: "420px", backgroundColor: "#121215", borderLeft: "1px solid #27272a", display: "flex", flexDirection: "column", zIndex: 30 }}>
           <div style={{ padding: "14px 18px", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Bot size={18} color="#ffffff" /> Gemini AI Assistant
+              <Bot size={18} color="#ffffff" /> AI Code Reviewer
             </h3>
             <button onClick={() => setAiDrawerOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
               ✕
@@ -1282,7 +1367,7 @@ export default function Workspace() {
               <div style={{ padding: "40px 16px", textAlign: "center", color: "#a1a1aa", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
                 <Bot size={32} color="#52525b" />
                 <div>
-                  <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Gemini AI Assistant</h4>
+                  <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>AI Code Reviewer</h4>
                   <p style={{ margin: 0, fontSize: "12.5px", color: "#a1a1aa" }}>
                     Select an option above to generate a short GFG-style hint or analyze your code's Big-O complexity.
                   </p>

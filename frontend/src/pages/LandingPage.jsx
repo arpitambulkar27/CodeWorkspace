@@ -28,7 +28,7 @@ const HighlightPython = () => (
 
 const HighlightJS = () => (
   <span>
-    <span style={{ color: "#6a9955" }}>// CodeWorkspace Node.js Sandbox</span>{"\n"}
+    <span style={{ color: "#6a9955" }}>// CodeWorkspace JavaScript Sandbox</span>{"\n"}
     <span style={{ color: "#569cd6" }}>function</span> <span style={{ color: "#dcdcaa" }}>validParentheses</span>(<span style={{ color: "#9cdcfe" }}>s</span>) {"{\n"}
     {"  "}<span style={{ color: "#569cd6" }}>const</span> <span style={{ color: "#9cdcfe" }}>stack</span> = [];{"\n"}
     {"  "}<span style={{ color: "#569cd6" }}>const</span> <span style={{ color: "#9cdcfe" }}>map</span> = {"{ ')' : '(', '}' : '{', ']' : '[' };\n"}
@@ -265,20 +265,18 @@ export default function LandingPage({ initialAuthMode }) {
     }
   }, [location.search, initialAuthMode]);
 
-  // Requirement 1: Bidirectional Scroll Reveal / Vanish Effect
+  // Smooth Scroll Reveal Effect (Unobserve on reveal to prevent stammering/buffering flicker)
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("cf-reveal-visible");
-          } else {
-            // Remove visible class when scrolling back away to give smooth vanish effect
-            entry.target.classList.remove("cf-reveal-visible");
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.1 }
     );
 
     const elements = document.querySelectorAll(".cf-reveal");
@@ -700,7 +698,7 @@ export default function LandingPage({ initialAuthMode }) {
         </h1>
 
         <p className="cf-reveal" style={{ fontSize: "16px", color: "#a1a1aa", lineHeight: "1.6", maxWidth: "760px", margin: "0 auto 36px auto" }}>
-          Spin up isolated Python, Javascript, C++, and Java containers in under 180ms. Collaborate in real-time over WebSockets with automated Gemini AI code reviews.
+          Spin up isolated Python, Javascript, C++, and Java containers in under 180ms. Collaborate in real-time over WebSockets with automated AI code reviews.
         </p>
 
         {/* Requirement 8: Single Get Started Action Button */}
@@ -727,7 +725,7 @@ export default function LandingPage({ initialAuthMode }) {
             {/* Language Switcher Tabs */}
             <div style={{ display: "flex", gap: "6px" }}>
               <button className={`cf-code-tab ${activeLang === "python" ? "active" : ""}`} onClick={() => { setActiveLang("python"); setDemoOutput(CODE_OUTPUT.python); }}>Python</button>
-              <button className={`cf-code-tab ${activeLang === "javascript" ? "active" : ""}`} onClick={() => { setActiveLang("javascript"); setDemoOutput(CODE_OUTPUT.javascript); }}>Node.js</button>
+              <button className={`cf-code-tab ${activeLang === "javascript" ? "active" : ""}`} onClick={() => { setActiveLang("javascript"); setDemoOutput(CODE_OUTPUT.javascript); }}>JavaScript</button>
               <button className={`cf-code-tab ${activeLang === "cpp" ? "active" : ""}`} onClick={() => { setActiveLang("cpp"); setDemoOutput(CODE_OUTPUT.cpp); }}>C++ 20</button>
               <button className={`cf-code-tab ${activeLang === "java" ? "active" : ""}`} onClick={() => { setActiveLang("java"); setDemoOutput(CODE_OUTPUT.java); }}>Java 21</button>
             </div>
@@ -816,7 +814,7 @@ export default function LandingPage({ initialAuthMode }) {
             </div>
             <h3 style={{ margin: "0 0 10px 0", fontSize: "20px", fontWeight: "bold", color: "#ffffff" }}>BullMQ & Redis Worker Queue</h3>
             <p style={{ margin: 0, fontSize: "14px", color: "#a1a1aa", lineHeight: "1.6" }}>
-              Decouples heavy code execution workloads from HTTP threads to keep the Node.js event loop fast and responsive under heavy traffic.
+              Decouples heavy code execution workloads from HTTP threads to keep the backend event loop fast and responsive under heavy traffic.
             </p>
           </div>
 
@@ -834,7 +832,7 @@ export default function LandingPage({ initialAuthMode }) {
             <div style={{ padding: "10px", backgroundColor: "rgba(244, 114, 182, 0.15)", borderRadius: "12px", width: "fit-content", marginBottom: "20px", border: "1px solid rgba(244, 114, 182, 0.3)" }}>
               <Bot size={24} color="#f472b6" />
             </div>
-            <h3 style={{ margin: "0 0 10px 0", fontSize: "20px", fontWeight: "bold", color: "#ffffff" }}>Gemini AI Code Reviewer</h3>
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "20px", fontWeight: "bold", color: "#ffffff" }}>AI Code Reviewer</h3>
             <p style={{ margin: 0, fontSize: "14px", color: "#a1a1aa", lineHeight: "1.6" }}>
               Automated 3-category code reviews providing Bug Detection, O(N) Time/Space Complexity estimates, and clean refactoring tips.
             </p>

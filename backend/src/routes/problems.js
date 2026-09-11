@@ -113,6 +113,7 @@ router.get("/details", async (req, res) => {
         difficulty: q.difficulty,
         content: q.content,
         codeSnippets: q.codeSnippets || [],
+        exampleTestcases: q.exampleTestcases || "",
       });
     } catch (err) {
       console.error("LeetCode fetch error:", err.message || err);

@@ -20,8 +20,9 @@ router.post("/review", protect, aiRateLimiter, async (req, res) => {
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({
-      error: "Gemini API key is not configured in backend .env file.",
+    return res.status(200).json({
+      review: "⚠️ **AI API Key Missing**: `GEMINI_API_KEY` is not set in `backend/.env`.\n\n**Quick Fix:**\n- Get a free API key from [Google AI Studio](https://aistudio.google.com/).\n- Add `GEMINI_API_KEY=your_key_here` to `backend/.env` and restart the backend server.",
+      analysis: "⚠️ **AI API Key Missing**: `GEMINI_API_KEY` is not set in `backend/.env`.\n\n**Quick Fix:**\n- Get a free API key from [Google AI Studio](https://aistudio.google.com/).\n- Add `GEMINI_API_KEY=your_key_here` to `backend/.env` and restart the backend server."
     });
   }
 
@@ -54,7 +55,7 @@ RULES:
     } else {
       // Mode: "analysis" - Complexity & Code Evaluation ONLY on written code (NO solution code!)
       prompt = `
-You are Gemini AI Code Complexity Analyzer.
+You are AI Code Complexity Analyzer.
 
 PROBLEM: ${problemTitle ? problemTitle : "DSA Problem"}
 USER'S WRITTEN CODE (${language || "code"}):
@@ -75,29 +76,53 @@ Format your analysis clearly in Markdown using these 3 exact sections:
 `;
     }
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+    const candidateModels = [
+      "gemini-3.6-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-flash-latest",
+      "gemini-1.5-flash"
+    ];
+
+    let response = null;
+    let lastError = null;
+
+    for (const model of candidateModels) {
+      try {
+        response = await ai.models.generateContent({
+          model,
+          contents: prompt,
+        });
+        if (response && response.text) break;
+      } catch (err) {
+        lastError = err;
+        console.warn(`[AI Route] Model ${model} failed, trying next:`, err.message || err);
+      }
+    }
+
+    if (!response || !response.text) {
+      throw lastError || new Error("All AI model fallbacks failed to respond.");
+    }
 
     let cleanText = response.text || "";
     // Clean any LaTeX $ math formatting
-    cleanText = cleanText.replace(/\$|\\mathcal|\{|\}/g, "");
+    cleanText = cleanText.replace(/\$|\\text|\\mathcal|\{|\}/g, "");
 
     res.json({ review: cleanText, analysis: cleanText });
   } catch (error) {
     const errStr = JSON.stringify(error) || error.message || "";
-    console.error("Gemini API Error:", error.message || error);
+    console.error("AI Service Error:", error.message || error);
 
     if (error.status === 429 || errStr.includes("429") || errStr.includes("RESOURCE_EXHAUSTED") || errStr.includes("Quota exceeded")) {
       return res.status(200).json({
-        review: "⚠️ **Gemini Free Tier Quota Reached**: You have hit the daily free limit (20 requests/day) for this Gemini API key.\n\n**Solutions:**\n- Wait 1-2 minutes for the rate limit window to reset.\n- Or generate a new free API key from [Google AI Studio](https://aistudio.google.com/) and paste it in `backend/.env` under `GEMINI_API_KEY`.",
-        analysis: "⚠️ **Gemini Free Tier Quota Reached**: You have hit the daily free limit (20 requests/day) for this Gemini API key.\n\n**Solutions:**\n- Wait 1-2 minutes for the rate limit window to reset.\n- Or generate a new free API key from [Google AI Studio](https://aistudio.google.com/) and paste it in `backend/.env` under `GEMINI_API_KEY`."
+        review: "⚠️ **AI Free Tier Quota Reached**: You have hit the daily free limit for this API key.\n\n**Solutions:**\n- Wait 1-2 minutes for the rate limit window to reset.\n- Or generate a new free API key from [Google AI Studio](https://aistudio.google.com/) and update `GEMINI_API_KEY` in `backend/.env`.",
+        analysis: "⚠️ **AI Free Tier Quota Reached**: You have hit the daily free limit for this API key.\n\n**Solutions:**\n- Wait 1-2 minutes for the rate limit window to reset.\n- Or generate a new free API key from [Google AI Studio](https://aistudio.google.com/) and update `GEMINI_API_KEY` in `backend/.env`."
       });
     }
 
-    res.status(500).json({
-      error: "AI service failed to generate help. Please check backend API key configuration.",
+    const errorMessage = error.message || "Failed to generate AI response";
+    return res.status(200).json({
+      review: "⚠️ **AI Service Error**: " + errorMessage + ".\n\n**Quick Fix:**\n- Verify your `GEMINI_API_KEY` in `backend/.env`.\n- Get a fresh free API key from [Google AI Studio](https://aistudio.google.com/).",
+      analysis: "⚠️ **AI Service Error**: " + errorMessage + ".\n\n**Quick Fix:**\n- Verify your `GEMINI_API_KEY` in `backend/.env`.\n- Get a fresh free API key from [Google AI Studio](https://aistudio.google.com/)."
     });
   }
 });

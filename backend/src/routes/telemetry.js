@@ -26,16 +26,24 @@ router.get("/", async (req, res) => {
       },
       database: {
         mongoDB: mongoStatus,
+        documentStore: "Document Store",
         redis: redisStatus,
+        rateLimiter: "10 runs / min",
         totalWorkspaces: workspaceCount,
         totalProblems: problemCount,
       },
+      monitoring: {
+        prometheus: "/metrics",
+        liveScraping: "GraphQL / Cheerio",
+      },
       sandbox: {
+        dockerCap: "128MB / 0.5 CPU",
         memoryLimit: "128 MB",
         cpuQuota: "0.5 CPU",
         timeoutLimit: "5000 ms",
+        isolation: "Hardened Isolation",
         networkMode: "none (Isolated)",
-        rateLimit: "10 runs/min",
+        rateLimit: "10 runs / min",
       },
     });
   } catch (error) {

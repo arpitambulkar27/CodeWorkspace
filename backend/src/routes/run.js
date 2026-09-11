@@ -28,15 +28,6 @@ router.post("/run", protect, runRateLimiter, async (req, res) => {
     // Execute code safely inside sandboxed Docker container
     const result = await runCode({ language, code, stdin: targetStdin });
 
-    // Emit Socket.io result if room exists
-    const io = req.app.get("io");
-    if (io && targetRoom) {
-      io.to(targetRoom).emit("execution-result", {
-        output: result.output || result.stdout,
-        error: result.error || result.stderr,
-      });
-    }
-
     return res.status(200).json({
       status: "completed",
       stdout: result.stdout || "",

@@ -337,7 +337,7 @@ export default function Login() {
             Isolated Execution Sandboxes on Demand
           </h2>
           <p style={{ fontSize: "14px", color: "#8b949e", lineHeight: "1.6", margin: "0 0 28px 0" }}>
-            Experience zero-latency real-time pair programming, sandboxed Docker code execution, and Gemini AI-powered automated code reviews.
+            Experience zero-latency real-time pair programming, sandboxed Docker code execution, and AI-powered automated code reviews.
           </p>
         </div>
 

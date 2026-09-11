@@ -7,7 +7,7 @@ import {
   Loader2, LogOut, X, Play, BookOpen, Coffee, Terminal,
   Activity, Flame, Target, Sparkles, ArrowRight, ExternalLink,
   Layers, CheckCircle, HelpCircle, User, Edit3, Mail, Check, AlertCircle,
-  Radio, RefreshCw
+  Radio, RefreshCw, Database, Server
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -129,6 +129,11 @@ const Dashboard = () => {
   const [workspaces, setWorkspaces] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Live Telemetry State
+  const [telemetry, setTelemetry] = useState(null);
+  const [telemetryLoading, setTelemetryLoading] = useState(true);
+  const [telemetryLastUpdated, setTelemetryLastUpdated] = useState(null);
+
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -140,7 +145,23 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchWorkspaces();
+    fetchTelemetry();
+    const interval = setInterval(fetchTelemetry, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchTelemetry = async () => {
+    try {
+      setTelemetryLoading(true);
+      const res = await axios.get("http://localhost:5000/api/telemetry");
+      setTelemetry(res.data);
+      setTelemetryLastUpdated(new Date().toLocaleTimeString());
+    } catch (err) {
+      console.warn("Failed to fetch telemetry metrics:", err.message);
+    } finally {
+      setTelemetryLoading(false);
+    }
+  };
 
   const fetchWorkspaces = async () => {
     try {
@@ -265,7 +286,7 @@ const Dashboard = () => {
   const getLanguageLabel = (lang) => {
     switch (lang?.toLowerCase()) {
       case "python": return "Python 3";
-      case "javascript": return "Node.js";
+      case "javascript": return "JavaScript";
       case "java": return "Java 21";
       case "cpp": return "C++ 20";
       default: return lang || "Code";
@@ -559,95 +580,169 @@ const Dashboard = () => {
 
           </div>
 
-          {/* RECENT WORKSPACES LIST GRID */}
-          <div className="cd-card">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "700", color: "#ffffff" }}>Recent Workspaces</h3>
-              <span style={{ fontSize: "12px", color: "#a1a1aa", background: "#18181b", border: "1px solid #27272a", padding: "4px 10px", borderRadius: "6px", fontWeight: "600" }}>
-                {filteredWorkspaces.length} workspace(s)
-              </span>
-            </div>
-
-            {loading ? (
-              <div style={{ padding: "40px", textAlign: "center", color: "#a1a1aa", fontSize: "13.5px" }}>
-                Loading workspaces...
+          {/* CONTENT SECTION: 2 COLUMNS (WORKSPACES LEFT, COMPACT TELEMETRY SIDE CARD RIGHT) */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 310px", gap: "20px", alignItems: "start" }}>
+            
+            {/* RECENT WORKSPACES LIST GRID (LEFT COLUMN) */}
+            <div className="cd-card" style={{ margin: 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "700", color: "#ffffff" }}>Recent Workspaces</h3>
+                <span style={{ fontSize: "12px", color: "#a1a1aa", background: "#18181b", border: "1px solid #27272a", padding: "4px 10px", borderRadius: "6px", fontWeight: "600" }}>
+                  {filteredWorkspaces.length} workspace(s)
+                </span>
               </div>
-            ) : filteredWorkspaces.length === 0 ? (
-              <div style={{ padding: "36px", border: "1px dashed #27272a", borderRadius: "12px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
-                <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Folder size={20} color="#a1a1aa" />
-                </div>
-                <div>
-                  <h4 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#ffffff" }}>No Workspaces Found</h4>
-                  <p style={{ margin: "4px 0 0 0", fontSize: "12.5px", color: "#a1a1aa" }}>
-                    {searchQuery ? `No workspace matches "${searchQuery}".` : "Create your first multi-file cloud sandbox with 1-click templates below!"}
-                  </p>
-                </div>
-                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-                  <button 
-                    onClick={(e) => handleCreateWorkspace(e, "Python Algorithm Sandbox", "python")} 
-                    className="cd-btn-bw"
-                  >
-                    + Python 3 Sandbox
-                  </button>
-                  <button 
-                    onClick={(e) => handleCreateWorkspace(e, "Node.js Web App", "javascript")} 
-                    className="cd-btn-outline"
-                  >
-                    + JavaScript Sandbox
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                {filteredWorkspaces.map((ws) => {
-                  const langLabel = getLanguageLabel(ws.language);
-                  const updatedDate = new Date(ws.updatedAt || Date.now()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-                  const fileCount = Array.isArray(ws.files) && ws.files.length > 0 ? ws.files.length : 1;
-                  const folderCount = Array.isArray(ws.files) ? ws.files.filter(f => f.type === "folder").length : 0;
 
-                  return (
-                    <div 
-                      key={ws._id}
-                      className="cd-list-item"
-                      onClick={() => navigate(`/workspace/${ws._id}`)}
-                      style={{ cursor: "pointer" }}
+              {loading ? (
+                <div style={{ padding: "40px", textAlign: "center", color: "#a1a1aa", fontSize: "13.5px" }}>
+                  Loading workspaces...
+                </div>
+              ) : filteredWorkspaces.length === 0 ? (
+                <div style={{ padding: "36px", border: "1px dashed #27272a", borderRadius: "12px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
+                  <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Folder size={20} color="#a1a1aa" />
+                  </div>
+                  <div>
+                    <h4 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#ffffff" }}>No Workspaces Found</h4>
+                    <p style={{ margin: "4px 0 0 0", fontSize: "12.5px", color: "#a1a1aa" }}>
+                      {searchQuery ? `No workspace matches "${searchQuery}".` : "Create your first multi-file cloud sandbox with 1-click templates below!"}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+                    <button 
+                      onClick={(e) => handleCreateWorkspace(e, "Python Algorithm Sandbox", "python")} 
+                      className="cd-btn-bw"
                     >
-                      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                        <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Folder size={20} color="#ffffff" />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: "15px", fontWeight: "600", color: "#ffffff", marginBottom: "3px" }}>{ws.title}</div>
-                          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                            <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: "600" }}>{langLabel}</span>
-                            <span style={{ fontSize: "12px", color: "#71717a" }}>• {fileCount} file(s), {folderCount} folder(s)</span>
-                            <span style={{ fontSize: "12px", color: "#71717a" }}>• Updated {updatedDate}</span>
+                      + Python 3 Sandbox
+                    </button>
+                    <button 
+                      onClick={(e) => handleCreateWorkspace(e, "JavaScript Web App", "javascript")} 
+                      className="cd-btn-outline"
+                    >
+                      + JavaScript Sandbox
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {filteredWorkspaces.map((ws) => {
+                    const langLabel = getLanguageLabel(ws.language);
+                    const updatedDate = new Date(ws.updatedAt || Date.now()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                    const fileCount = Array.isArray(ws.files) && ws.files.length > 0 ? ws.files.length : 1;
+                    const folderCount = Array.isArray(ws.files) ? ws.files.filter(f => f.type === "folder").length : 0;
+
+                    return (
+                      <div 
+                        key={ws._id}
+                        className="cd-list-item"
+                        onClick={() => navigate(`/workspace/${ws._id}`)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                          <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Folder size={20} color="#ffffff" />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: "15px", fontWeight: "600", color: "#ffffff", marginBottom: "3px" }}>{ws.title}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                              <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: "600" }}>{langLabel}</span>
+                              <span style={{ fontSize: "12px", color: "#71717a" }}>• {fileCount} file(s), {folderCount} folder(s)</span>
+                              <span style={{ fontSize: "12px", color: "#71717a" }}>• Updated {updatedDate}</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                        <button 
-                          onClick={(e) => handleForkWorkspace(e, ws._id)}
-                          style={{ background: "#18181b", border: "1px solid #27272a", color: "#a1a1aa", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontWeight: "600" }}
-                          title="Fork Workspace"
-                        >
-                          <GitFork size={14} /> Fork
-                        </button>
-                        <button 
-                          onClick={(e) => handleDeleteWorkspace(e, ws._id)}
-                          style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#f87171", borderRadius: "8px", padding: "7px 12px", fontSize: "12px", cursor: "pointer" }}
-                          title="Delete Workspace"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          <button 
+                            onClick={(e) => handleForkWorkspace(e, ws._id)}
+                            style={{ background: "#18181b", border: "1px solid #27272a", color: "#a1a1aa", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontWeight: "600" }}
+                            title="Fork Workspace"
+                          >
+                            <GitFork size={14} /> Fork
+                          </button>
+                          <button 
+                            onClick={(e) => handleDeleteWorkspace(e, ws._id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#f87171", borderRadius: "8px", padding: "7px 12px", fontSize: "12px", cursor: "pointer" }}
+                            title="Delete Workspace"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* COMPACT SYSTEM TELEMETRY SIDE CARD (RIGHT COLUMN) */}
+            <div className="cd-card" style={{ margin: 0, padding: "20px" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <Activity size={16} color="#10b981" />
+                  <span style={{ fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Engine Telemetry</span>
+                </div>
+                <span style={{ fontSize: "10px", fontWeight: "700", backgroundColor: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "#34d399", padding: "2px 6px", borderRadius: "10px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                  <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: "#10b981" }} /> LIVE
+                </span>
               </div>
-            )}
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "12px" }}>
+                
+                {/* 1. Database & Persistence */}
+                <div style={{ padding: "10px 12px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px" }}>
+                  <div style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>DATABASE & STORE</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <span style={{ color: "#71717a" }}>MongoDB Database:</span>
+                    <span style={{ color: telemetry?.database?.mongoDB === "Connected" ? "#34d399" : "#f87171", fontWeight: "700" }}>● {telemetry?.database?.mongoDB || "Connected"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "#71717a" }}>Document Store:</span>
+                    <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.database?.documentStore || "Active"}</span>
+                  </div>
+                </div>
+
+                {/* 2. Redis & Rate Limiter */}
+                <div style={{ padding: "10px 12px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px" }}>
+                  <div style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>QUEUE & RATE LIMITER</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <span style={{ color: "#71717a" }}>Redis Connected:</span>
+                    <span style={{ color: telemetry?.database?.redis === "Connected" ? "#34d399" : "#f87171", fontWeight: "700" }}>● {telemetry?.database?.redis || "Connected"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "#71717a" }}>Redis Rate Limiter:</span>
+                    <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.database?.rateLimiter || "10 runs / min"}</span>
+                  </div>
+                </div>
+
+                {/* 4. Docker Sandbox & Isolation */}
+                <div style={{ padding: "10px 12px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px" }}>
+                  <div style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>DOCKER SANDBOX & ISOLATION</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                    <span style={{ color: "#71717a" }}>Docker Sandbox Cap:</span>
+                    <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.sandbox?.dockerCap || "128MB / 0.5 CPU"}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span style={{ color: "#71717a" }}>Hardened Isolation:</span>
+                    <span style={{ color: "#34d399", fontWeight: "600" }}>{telemetry?.sandbox?.isolation || "Active (Isolated)"}</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "11px", color: "#71717a" }}>
+                  {telemetryLastUpdated ? `Updated ${telemetryLastUpdated}` : "Connecting..."}
+                </span>
+                <button 
+                  onClick={fetchTelemetry} 
+                  style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "2px 4px", borderRadius: "4px" }}
+                  title="Refresh Telemetry Metrics"
+                >
+                  <RefreshCw size={13} className={telemetryLoading ? "animate-spin" : ""} />
+                </button>
+              </div>
+            </div>
+
           </div>
 
         </div>

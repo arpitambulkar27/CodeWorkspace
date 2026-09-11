@@ -24,15 +24,6 @@ function initExecutionWorker(io) {
       // Execute code safely inside Docker container
       const result = await runCode({ language, code, stdin: targetStdin });
 
-      // Broadcast execution results back via Socket.io to the room
-      if (io && targetRoom) {
-        io.to(targetRoom).emit("execution-result", {
-          jobId: job.id,
-          output: result.output || result.stdout,
-          error: result.error || result.stderr,
-        });
-      }
-
       return result;
     },
     { connection: redisConnection, concurrency: 5 }
