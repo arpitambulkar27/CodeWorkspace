@@ -113,6 +113,11 @@ router.post("/:id/fork", protect, async (req, res) => {
       return res.status(404).json({ error: "Workspace not found to fork." });
     }
 
+    // Security check: Only allow forking if workspace is public or owned by user
+    if (!original.isPublic && original.userId.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ error: "Unauthorized: Cannot fork a private workspace." });
+    }
+
     const forkedWorkspace = await Workspace.create({
       userId: req.user._id,
       title: `${original.title} (Fork)`,

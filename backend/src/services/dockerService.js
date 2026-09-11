@@ -49,13 +49,16 @@ async function runCode({ language, code, stdin = "" }) {
     const cpus = isJava ? "1.0" : "0.5";
     const executionTimeout = isJava ? 10000 : 8000;
 
-    const dockerCmd = `docker run --rm -i --memory="${memory}" --cpus="${cpus}" -v "${tempDir}:/app" -w /app ${imageName} sh -c "${runCmd} < input.txt"`;
+    const containerName = `cf_${jobId}`;
+    const dockerCmd = `docker run --name "${containerName}" --stop-timeout 5 --rm -i --network="none" --pids-limit=64 --security-opt no-new-privileges --memory="${memory}" --cpus="${cpus}" -v "${tempDir}:/app" -w /app ${imageName} sh -c "${runCmd} < input.txt"`;
 
     exec(dockerCmd, { timeout: executionTimeout }, (error, stdout, stderr) => {
       // Clean up temporary host directory
       fs.rm(tempDir, { recursive: true, force: true }, () => {});
 
       if (error && error.killed) {
+        // Force kill container in Docker daemon to prevent orphan background processes
+        exec(`docker rm -f ${containerName}`, () => {});
         return resolve({
           error: `Time Limit Exceeded: Execution took longer than ${executionTimeout / 1000} seconds.`,
         });

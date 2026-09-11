@@ -17,6 +17,20 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 // In-memory rate limiting map for OTP requests (email -> timestamps array)
 const otpRateLimitMap = new Map();
 
+// Periodic cleanup to prevent memory leak (runs every 10 minutes)
+setInterval(() => {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  for (const [email, timestamps] of otpRateLimitMap.entries()) {
+    const valid = timestamps.filter((ts) => now - ts < windowMs);
+    if (valid.length === 0) {
+      otpRateLimitMap.delete(email);
+    } else {
+      otpRateLimitMap.set(email, valid);
+    }
+  }
+}, 10 * 60 * 1000);
+
 /**
  * Enforces rate limit: max 3 requests per email per 10 minutes.
  * @param {string} email
@@ -41,7 +55,10 @@ const checkOtpRateLimit = (email) => {
 
 // Helper function to generate JWT
 const generateToken = (id) => {
-  const secret = process.env.JWT_SECRET || "codeforge_jwt_secret_key_2026_production_grade";
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("FATAL CONFIG ERROR: JWT_SECRET environment variable is missing.");
+  }
   return jwt.sign({ id }, secret, {
     expiresIn: "7d",
   });
@@ -493,50 +510,11 @@ router.post("/login", async (req, res) => {
 });
 
 // @route   POST /api/auth/social
-// @desc    Google & GitHub OAuth Sign-Up / Login Handler
+// @desc    Disabled endpoint: OAuth sign-ins must be verified via /api/auth/google or /api/auth/github
 router.post("/social", async (req, res) => {
-  try {
-    const { provider, email, username, avatar } = req.body;
-
-    if (!email || !provider) {
-      return res.status(400).json({ error: "Social authentication details missing." });
-    }
-
-    const cleanEmail = email.trim().toLowerCase();
-    if (!EMAIL_REGEX.test(cleanEmail)) {
-      return res.status(400).json({ error: "Invalid social account email format." });
-    }
-
-    let user = await User.findOne({ email: cleanEmail });
-
-    if (!user) {
-      const generatedUsername = username || cleanEmail.split("@")[0] || `Dev_${Date.now().toString().slice(-4)}`;
-      user = await User.create({
-        username: generatedUsername,
-        email: cleanEmail,
-        avatar: avatar || "",
-        authProvider: provider === "google" ? "google" : "local",
-        isVerified: true,
-      });
-    } else {
-      if (!user.isVerified) {
-        user.isVerified = true;
-        await user.save();
-      }
-    }
-
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      avatar: user.avatar,
-      isVerified: true,
-      token: generateToken(user._id),
-    });
-  } catch (error) {
-    console.error("Social Auth Error:", error.message);
-    res.status(500).json({ error: "Social sign-in failed. Please try again." });
-  }
+  return res.status(410).json({
+    error: "This endpoint is disabled for security reasons. Please use Google or GitHub OAuth buttons.",
+  });
 });
 
 // @route   GET /api/auth/me

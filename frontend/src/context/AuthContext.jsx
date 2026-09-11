@@ -2,6 +2,8 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -24,7 +26,7 @@ export const AuthProvider = ({ children }) => {
   // Fetch logged-in user profile on boot
   const fetchCurrentUser = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/auth/me");
+      const res = await axios.get(`${API_BASE_URL}/api/auth/me`);
       setUser(res.data);
     } catch (err) {
       console.error("Failed to fetch current user:", err);
@@ -36,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
   // Register User
   const register = async (username, email, password) => {
-    const res = await axios.post("http://localhost:5000/api/auth/register", {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/register`, {
       username,
       email,
       password,
@@ -53,7 +55,7 @@ export const AuthProvider = ({ children }) => {
 
   // Send / Resend OTP
   const sendOtp = async (email) => {
-    const res = await axios.post("http://localhost:5000/api/auth/send-otp", {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/send-otp`, {
       email,
     });
     return res.data;
@@ -61,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   // Verify OTP
   const verifyOtp = async (email, otp) => {
-    const res = await axios.post("http://localhost:5000/api/auth/verify-otp", {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/verify-otp`, {
       email,
       otp,
     });
@@ -77,7 +79,7 @@ export const AuthProvider = ({ children }) => {
 
   // Login User
   const login = async (email, password) => {
-    const res = await axios.post("http://localhost:5000/api/auth/login", {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
       email,
       password,
     });
@@ -93,7 +95,7 @@ export const AuthProvider = ({ children }) => {
 
   // Google One-Tap / Button Login
   const loginWithGoogle = async (credential) => {
-    const res = await axios.post("http://localhost:5000/api/auth/google", {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/google`, {
       credential,
     });
     const { token: newToken, ...userData } = res.data;
@@ -106,7 +108,7 @@ export const AuthProvider = ({ children }) => {
 
   // GitHub OAuth Login
   const loginWithGithub = async (code) => {
-    const res = await axios.post("http://localhost:5000/api/auth/github", {
+    const res = await axios.post(`${API_BASE_URL}/api/auth/github`, {
       code,
     });
     const { token: newToken, ...userData } = res.data;
@@ -117,20 +119,9 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  // Google & GitHub Social OAuth Login / Signup Fallback
+  // Deprecated fallback route
   const socialLogin = async (provider, email, username, avatar) => {
-    const res = await axios.post("http://localhost:5000/api/auth/social", {
-      provider,
-      email,
-      username,
-      avatar,
-    });
-    const { token: newToken, ...userData } = res.data;
-    localStorage.setItem("token", newToken);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-    setToken(newToken);
-    setUser(userData);
-    return res.data;
+    throw new Error("Social login fallback is deprecated. Use Google or GitHub buttons.");
   };
 
   // Logout User

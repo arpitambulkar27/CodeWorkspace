@@ -67,8 +67,10 @@ const extractCleanSlug = (val) => {
   return parts[parts.length - 1] || str;
 };
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 // Initialize Socket connection
-const socket = io("http://localhost:5000", {
+const socket = io(API_BASE_URL, {
   autoConnect: true,
 });
 
@@ -124,7 +126,19 @@ export default function Workspace() {
 
   const editorRef = useRef(null);
   const isRemoteChange = useRef(false);
+  const lastRemoteChangeTime = useRef(0);
+  const codeRef = useRef(code);
+  const languageRef = useRef(language);
   const token = localStorage.getItem("token");
+
+  // Keep refs in sync with state for socket callbacks
+  useEffect(() => {
+    codeRef.current = code;
+  }, [code]);
+
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
 
   // Handle Problem Panel Resizing (Horizontal Width)
   const handleMouseDownProblemResize = (e) => {
@@ -209,12 +223,20 @@ export default function Workspace() {
         type: "folder",
         parentId: null,
       };
-      setFiles([rootFolder]);
+      const defaultFile = {
+        id: `file-main-${Date.now()}`,
+        name: DEFAULT_FILE_NAMES[languageParam || "python"] || "main.py",
+        type: "file",
+        parentId: rootFolder.id,
+        content: LANGUAGE_BOILERPLATE[languageParam || "python"] || LANGUAGE_BOILERPLATE.python,
+        language: languageParam || "python",
+      };
+      setFiles([rootFolder, defaultFile]);
       setSelectedFolderId(rootFolder.id);
       setExpandedFolders({ [rootFolder.id]: true });
-      setExplorerOpen(true);
-      setActiveFileId(null);
-      setCode("");
+      setExplorerOpen(false); // Hide explorer by default on join
+      setActiveFileId(defaultFile.id);
+      setCode(defaultFile.content);
     }
   }, [id]);
 
@@ -240,7 +262,7 @@ export default function Workspace() {
 
   const fetchWorkspaceData = async (wsId) => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/workspaces/${wsId}`, {
+      const res = await axios.get(`${API_BASE_URL}/api/workspaces/${wsId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data) {
@@ -330,11 +352,9 @@ export default function Workspace() {
           const snippet = data.codeSnippets.find(
             (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
           );
-          if (snippet && snippet.code) {
-            setCode(snippet.code);
-          } else {
-            setCode(LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
-          }
+          const activeSnippetCode = snippet && snippet.code ? snippet.code : (LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
+          setCode(activeSnippetCode);
+          socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: activeSnippetCode, language });
         }
         return;
       }
@@ -404,7 +424,10 @@ export default function Workspace() {
 
     socket.emit("join-room", { roomId: roomParam, roomCode: roomParam, username });
 
-    const handleRemoteCodeUpdate = (newCode) => {
+    const handleRemoteCodeUpdate = (data) => {
+      const newCode = typeof data === "string" ? data : (data?.code !== undefined ? data.code : "");
+      if (newCode === codeRef.current) return;
+      lastRemoteChangeTime.current = Date.now();
       isRemoteChange.current = true;
       setCode(newCode);
       if (activeFileId) {
@@ -414,8 +437,47 @@ export default function Workspace() {
       }
     };
 
+    const handleInitialStateSync = (state) => {
+      if (state) {
+        if (state.language) setLanguage(state.language);
+        if (state.code !== undefined && state.code !== codeRef.current) {
+          lastRemoteChangeTime.current = Date.now();
+          isRemoteChange.current = true;
+          setCode(state.code);
+          if (activeFileId) {
+            setFiles((prev) =>
+              prev.map((f) => (f.id === activeFileId ? { ...f, content: state.code } : f))
+            );
+          }
+        }
+      }
+    };
+
+    const handleLanguageSync = (data) => {
+      if (data && data.language) {
+        setLanguage(data.language);
+        if (data.code !== undefined && data.code !== codeRef.current) {
+          lastRemoteChangeTime.current = Date.now();
+          isRemoteChange.current = true;
+          setCode(data.code);
+        }
+      }
+    };
+
     socket.on("code-update", handleRemoteCodeUpdate);
     socket.on("code-change", handleRemoteCodeUpdate);
+    socket.on("sync-initial-state", handleInitialStateSync);
+    socket.on("language-update", handleLanguageSync);
+
+    socket.on("user-joined", () => {
+      // Broadcast active host code and language to newly joined participant
+      socket.emit("code-change", {
+        roomId: roomParam,
+        roomCode: roomParam,
+        code: codeRef.current,
+        language: languageRef.current,
+      });
+    });
 
     socket.on("room-participants", (data) => {
       if (data.count) setConnectedUsers(data.count);
@@ -440,6 +502,9 @@ export default function Workspace() {
     return () => {
       socket.off("code-update", handleRemoteCodeUpdate);
       socket.off("code-change", handleRemoteCodeUpdate);
+      socket.off("sync-initial-state", handleInitialStateSync);
+      socket.off("language-update", handleLanguageSync);
+      socket.off("user-joined");
       socket.off("room-participants");
       socket.off("execution-result");
     };
@@ -448,6 +513,7 @@ export default function Workspace() {
   // Language Change Handler
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
+    let targetCode = codeRef.current;
     
     // Check if we have an official LeetCode snippet for this language
     if (codeSnippets && codeSnippets.length > 0) {
@@ -456,36 +522,45 @@ export default function Workspace() {
         (s) => s.langSlug === newLang || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === newLang.toLowerCase())
       );
       if (snippet && snippet.code) {
-        setCode(snippet.code);
-        socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: snippet.code });
-        return;
+        targetCode = snippet.code;
+        setCode(targetCode);
+      }
+    } else {
+      targetCode = LANGUAGE_BOILERPLATE[newLang] || LANGUAGE_BOILERPLATE.python;
+      setCode(targetCode);
+      if (activeFileId) {
+        setFiles((prev) =>
+          prev.map((f) => (f.id === activeFileId ? { ...f, content: targetCode, language: newLang } : f))
+        );
       }
     }
 
-    let targetCode = LANGUAGE_BOILERPLATE[newLang] || LANGUAGE_BOILERPLATE.python;
-    setCode(targetCode);
-    if (activeFileId) {
-      setFiles((prev) =>
-        prev.map((f) => (f.id === activeFileId ? { ...f, content: targetCode, language: newLang } : f))
-      );
-    }
-    socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: targetCode });
+    socket.emit("language-change", { roomId: roomParam, roomCode: roomParam, language: newLang, code: targetCode });
   };
 
   // Handle Monaco Editor Change
   const handleEditorChange = (value) => {
+    const val = value || "";
+    // 1. If value is identical to current codeRef, do not emit
+    if (val === codeRef.current) return;
+
+    // 2. Ignore echo events within 400ms of receiving a remote update
+    if (Date.now() - lastRemoteChangeTime.current < 400) {
+      return;
+    }
+
     if (isRemoteChange.current) {
       isRemoteChange.current = false;
       return;
     }
-    const val = value || "";
+
     setCode(val);
     if (activeFileId) {
       setFiles((prev) =>
         prev.map((f) => (f.id === activeFileId ? { ...f, content: val } : f))
       );
     }
-    socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: val });
+    socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: val, language: languageRef.current });
   };
 
   // File & Folder Operations
@@ -741,6 +816,18 @@ export default function Workspace() {
     });
   };
 
+  // Handle Navigation Back Button (DSA Sheets vs Dashboard)
+  const handleBackNavigation = () => {
+    const sheet = searchParams.get("sheet");
+    const fromParam = searchParams.get("from");
+    if (problemSlug || problem || sheet || fromParam === "dsa-sheets") {
+      const targetSheet = sheet || sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
+      navigate(`/dsa-sheets?sheet=${encodeURIComponent(targetSheet)}`);
+    } else {
+      navigate("/dashboard");
+    }
+  };
+
   return (
     <div style={{ display: "flex", height: "100vh", backgroundColor: "#09090b", color: "#ffffff", fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif", overflow: "hidden", position: "relative" }}>
       
@@ -759,7 +846,7 @@ export default function Workspace() {
       
       {/* 1. Left Vertical Activity Bar (File Explorer, Live Collab, AI Help) */}
       <div style={{ width: "52px", minWidth: "52px", borderRight: "1px solid #27272a", display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "12px", paddingBottom: "12px", gap: "12px", backgroundColor: "#0c0c0e", zIndex: 25, flexShrink: 0, overflowY: "auto", overflowX: "hidden" }}>
-        <button onClick={() => navigate("/dashboard")} title="Back to Dashboard" style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
+        <button onClick={handleBackNavigation} title={(problemSlug || problem) ? "Back to DSA Sheets" : "Back to Dashboard"} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <ArrowLeft size={18} />
         </button>
 
@@ -769,9 +856,11 @@ export default function Workspace() {
           </button>
         )}
 
-        <button onClick={() => setExplorerOpen(!explorerOpen)} title="Toggle File Explorer" style={{ background: explorerOpen ? "#27272a" : "none", border: "none", color: explorerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
-          <Folder size={18} />
-        </button>
+        {!problem && (
+          <button onClick={() => setExplorerOpen(!explorerOpen)} title="Toggle File Explorer" style={{ background: explorerOpen ? "#27272a" : "none", border: "none", color: explorerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
+            <Folder size={18} />
+          </button>
+        )}
 
         <button onClick={toggleAIDrawer} title="Gemini AI Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <Bot size={18} color="#ffffff" />

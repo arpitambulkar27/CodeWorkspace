@@ -23,6 +23,9 @@ const { httpRequestCounter, activeSocketsGauge } = require("./services/metrics")
 const app = express();
 const server = http.createServer(app);
 
+// Trust first proxy for accurate IP rate limiting behind proxies/load balancers
+app.set("trust proxy", 1);
+
 // Connect to MongoDB
 connectDB();
 
@@ -67,8 +70,9 @@ const io = new Server(server, {
 // Set io on app so REST routes can emit socket events
 app.set("io", io);
 
-// In-memory active room participants state
+// In-memory active room participants & editor state
 const roomUsers = new Map(); // roomId -> Map(socketId -> username)
+const roomStates = new Map(); // roomId -> { code, language }
 
 io.on("connection", (socket) => {
   activeSocketsGauge.inc();
@@ -103,16 +107,32 @@ io.on("connection", (socket) => {
       count: userList.length,
     });
 
+    // If active room state exists, send initial code & language sync to joining socket
+    if (roomStates.has(targetRoom)) {
+      socket.emit("sync-initial-state", roomStates.get(targetRoom));
+    }
+
     console.log(
       `👥 [Socket.io] User ${socket.username} (${socket.id}) joined room: ${targetRoom} [Count: ${userList.length}]`
     );
   });
 
-  socket.on("code-change", ({ roomId, roomCode, code }) => {
+  socket.on("code-change", ({ roomId, roomCode, code, language }) => {
     const targetRoom = roomId || roomCode;
     if (targetRoom) {
+      const currentState = roomStates.get(targetRoom) || {};
+      roomStates.set(targetRoom, { ...currentState, code: code !== undefined ? code : currentState.code, language: language || currentState.language });
       socket.to(targetRoom).emit("code-update", code);
       socket.to(targetRoom).emit("code-change", code);
+    }
+  });
+
+  socket.on("language-change", ({ roomId, roomCode, language, code }) => {
+    const targetRoom = roomId || roomCode;
+    if (targetRoom) {
+      const currentState = roomStates.get(targetRoom) || {};
+      roomStates.set(targetRoom, { ...currentState, language, code: code !== undefined ? code : currentState.code });
+      socket.to(targetRoom).emit("language-update", { language, code });
     }
   });
 

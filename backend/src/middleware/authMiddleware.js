@@ -20,7 +20,11 @@ const protect = async (req, res, next) => {
     }
 
     // Verify token
-    const secret = process.env.JWT_SECRET || "codeforge_jwt_secret_key_2026_production_grade";
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      console.error("FATAL CONFIG ERROR: JWT_SECRET environment variable is missing.");
+      return res.status(500).json({ error: "Internal server authentication configuration error." });
+    }
     const decoded = jwt.verify(token, secret);
 
     // Fetch user (excluding password)

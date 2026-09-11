@@ -800,7 +800,7 @@ export default function DsaSheets() {
                                               }
                                               const probTitle = prob.title || "";
                                               const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
-                                              navigate(`/workspace?problem=${encodeURIComponent(cleanSlug)}&platform=${encodeURIComponent(platformParam)}&url=${encodeURIComponent(url)}&title=${encodeURIComponent(probTitle)}&room=${randomRoom}&sheet=${activeSheetId}`);
+                                              navigate(`/workspace?problem=${encodeURIComponent(cleanSlug)}&platform=${encodeURIComponent(platformParam)}&url=${encodeURIComponent(url)}&title=${encodeURIComponent(probTitle)}&room=${randomRoom}&sheet=${activeSheetId}&from=dsa-sheets`);
                                             }}
                                             className="cd-btn-outline"
                                             style={{ width: "120px", padding: "6px 0", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", flexShrink: 0 }}
@@ -1001,7 +1001,7 @@ export default function DsaSheets() {
                                                       }
                                                       const probTitle = prob.title || "";
                                                       const randomRoom = `CF-${Math.floor(100000 + Math.random() * 900000)}`;
-                                                      navigate(`/workspace?problem=${encodeURIComponent(cleanSlug)}&platform=${encodeURIComponent(platformParam)}&url=${encodeURIComponent(url)}&title=${encodeURIComponent(probTitle)}&room=${randomRoom}&sheet=${activeSheetId}`);
+                                                      navigate(`/workspace?problem=${encodeURIComponent(cleanSlug)}&platform=${encodeURIComponent(platformParam)}&url=${encodeURIComponent(url)}&title=${encodeURIComponent(probTitle)}&room=${randomRoom}&sheet=${activeSheetId}&from=dsa-sheets`);
                                                     }}
                                                     className="cd-btn-outline"
                                                     style={{ width: "120px", padding: "6px 0", fontSize: "12px", display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", flexShrink: 0 }}

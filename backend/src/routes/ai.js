@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { GoogleGenAI } = require("@google/genai");
 const { aiRateLimiter } = require("../middleware/rateLimiter");
+const { protect } = require("../middleware/authMiddleware");
 
-// Apply Redis Sliding-Window Rate Limiter
-router.post("/review", aiRateLimiter, async (req, res) => {
+// Apply Auth Protection & Redis Sliding-Window Rate Limiter
+router.post("/review", protect, aiRateLimiter, async (req, res) => {
   const {
     code,
     language,
@@ -75,7 +76,7 @@ Format your analysis clearly in Markdown using these 3 exact sections:
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-2.5-flash",
       contents: prompt,
     });
 

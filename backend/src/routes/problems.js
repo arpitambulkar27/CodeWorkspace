@@ -4,6 +4,7 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 const Problem = require("../models/Problem");
 const { runCode } = require("../services/dockerService");
+const { protect } = require("../middleware/authMiddleware");
 
 // Helper to strip trailing numeric IDs from GFG slugs (e.g., maximum-product-subarray3604 -> maximum-product-subarray)
 const cleanGfgSlug = (slugStr) => {
@@ -265,7 +266,7 @@ router.get("/:slug", async (req, res) => {
 
 // @route   POST /api/problems/:slug/submit
 // @desc    Submit code solution for a problem and evaluate against test cases
-router.post("/:slug/submit", async (req, res) => {
+router.post("/:slug/submit", protect, async (req, res) => {
   try {
     const { language, code } = req.body;
     if (!language || !code) {
@@ -277,11 +278,10 @@ router.post("/:slug/submit", async (req, res) => {
       return res.status(404).json({ error: "Problem not found." });
     }
 
-    const results = [];
-    let passedCount = 0;
+    // Limit execution to first 10 test cases max to prevent Gateway Timeouts
+    const testCasesToRun = (problem.testCases || []).slice(0, 10);
 
-    for (let i = 0; i < problem.testCases.length; i++) {
-      const tc = problem.testCases[i];
+    const testPromises = testCasesToRun.map(async (tc, index) => {
       const runResult = await runCode({
         language,
         code,
@@ -292,24 +292,24 @@ router.post("/:slug/submit", async (req, res) => {
       const expected = (tc.expectedOutput || "").trim();
       const passed = actualOutput === expected;
 
-      if (passed) passedCount++;
-
-      results.push({
-        testCaseIndex: i + 1,
+      return {
+        testCaseIndex: index + 1,
         input: tc.isHidden ? "[Hidden Test Case]" : tc.input,
         expectedOutput: tc.isHidden ? "[Hidden Test Case]" : tc.expectedOutput,
         actualOutput: tc.isHidden && !passed ? "[Hidden Test Case Failed]" : actualOutput,
         passed,
         error: runResult.stderr || runResult.error || null,
         isHidden: tc.isHidden,
-      });
-    }
+      };
+    });
 
-    const allPassed = passedCount === problem.testCases.length;
+    const results = await Promise.all(testPromises);
+    const passedCount = results.filter((r) => r.passed).length;
+    const allPassed = passedCount === testCasesToRun.length;
 
     res.json({
       passed: allPassed,
-      totalTestCases: problem.testCases.length,
+      totalTestCases: testCasesToRun.length,
       passedCount,
       scoreCard: results,
     });
