@@ -3,10 +3,28 @@ const { Worker } = require("bullmq");
 const Redis = require("ioredis");
 const { runCode } = require("../src/services/dockerService");
 
-const redisConnection = new Redis({
-  host: process.env.REDIS_HOST || "127.0.0.1",
-  port: process.env.REDIS_PORT || 6379,
+const redisOptions = {
   maxRetriesPerRequest: null,
+  enableOfflineQueue: false,
+  retryStrategy(times) {
+    if (!process.env.REDIS_URL && !process.env.REDIS_HOST && times > 3) {
+      return null;
+    }
+    return Math.min(times * 1000, 3000);
+  },
+};
+
+const redisConnection = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, redisOptions)
+  : new Redis({
+      host: process.env.REDIS_HOST || "127.0.0.1",
+      port: process.env.REDIS_PORT || 6379,
+      ...redisOptions,
+    });
+
+redisConnection.on("error", (err) => {
+  if (err.code === "ECONNREFUSED") return;
+  console.error("❌ Redis Connection Error:", err.message);
 });
 
 function initExecutionWorker(io) {
