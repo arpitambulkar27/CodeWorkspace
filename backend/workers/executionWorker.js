@@ -14,8 +14,16 @@ const redisOptions = {
   },
 };
 
-const redisConnection = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL, redisOptions)
+function getCleanRedisUrl(raw) {
+  if (!raw) return null;
+  const matches = [...raw.matchAll(/(rediss?:\/\/[^\s"']+)/gi)];
+  return matches.length > 0 ? matches[matches.length - 1][1] : raw.trim();
+}
+
+const cleanRedisUrl = getCleanRedisUrl(process.env.REDIS_URL);
+
+const redisConnection = cleanRedisUrl
+  ? new Redis(cleanRedisUrl, redisOptions)
   : new Redis({
       host: process.env.REDIS_HOST || "127.0.0.1",
       port: process.env.REDIS_PORT || 6379,
