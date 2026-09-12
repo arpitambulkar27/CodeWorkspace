@@ -3,9 +3,10 @@ const router = express.Router();
 const { runCode } = require("../services/dockerService");
 const { runRateLimiter } = require("../middleware/rateLimiter");
 const { protect } = require("../middleware/authMiddleware");
+const { validateBody, runSchemas } = require("../middleware/schemaValidation");
 
-// Apply Auth Protection & Redis Sliding-Window Rate Limiter (Max 10 runs per minute)
-router.post("/run", protect, runRateLimiter, async (req, res) => {
+// Apply Auth Protection, Joi Validation, & Redis Sliding-Window Rate Limiter (Max 10 runs per minute)
+router.post("/run", protect, runRateLimiter, validateBody(runSchemas.run), async (req, res) => {
   const { language, code, stdin, stdinInput, roomId, roomCode } = req.body;
 
   const targetStdin = stdinInput !== undefined ? stdinInput : stdin;

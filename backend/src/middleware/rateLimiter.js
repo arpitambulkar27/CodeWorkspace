@@ -91,4 +91,30 @@ const aiRateLimiter = createRateLimiter({
   message: "Rate limit exceeded: Max 5 AI reviews per minute allowed.",
 });
 
-module.exports = { createRateLimiter, runRateLimiter, aiRateLimiter };
+const globalRateLimiter = createRateLimiter({
+  windowMs: 60000, // 1 minute
+  maxRequests: 120, // Max 120 requests per minute per IP
+  message: "Global rate limit exceeded. Please slow down your requests.",
+});
+
+const authRateLimiter = createRateLimiter({
+  windowMs: 60000, // 1 minute
+  maxRequests: 15, // Max 15 auth requests per minute per IP
+  message: "Too many authentication requests. Please wait a minute before trying again.",
+});
+
+const detailsRateLimiter = createRateLimiter({
+  windowMs: 60000, // 1 minute
+  maxRequests: 30, // Max 30 problem details proxy requests per minute
+  message: "Rate limit exceeded: Max 30 problem detail requests per minute allowed.",
+});
+
+module.exports = {
+  createRateLimiter,
+  runRateLimiter,
+  aiRateLimiter,
+  globalRateLimiter,
+  authRateLimiter,
+  detailsRateLimiter,
+};
+

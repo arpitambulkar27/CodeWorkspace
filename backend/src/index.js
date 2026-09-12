@@ -5,12 +5,16 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const helmet = require("helmet");
 
 // Import MongoDB connection
 const connectDB = require("./config/db");
 
-// Import Worker & Routes
+// Import Worker, Middlewares & Routes
 const { initExecutionWorker } = require("../workers/executionWorker");
+const { globalRateLimiter } = require("./middleware/rateLimiter");
+const errorHandler = require("./middleware/errorHandler");
+
 const runRoutes = require("./routes/run");
 const aiRoutes = require("./routes/ai");
 const authRoutes = require("./routes/auth");
@@ -30,6 +34,7 @@ app.set("trust proxy", 1);
 connectDB();
 
 // Middlewares
+app.use(helmet({ contentSecurityPolicy: false })); // HTTP Security Headers
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
@@ -50,6 +55,10 @@ app.use((req, res, next) => {
 // Health Check & Telemetry Routes
 app.get("/health", (req, res) => res.json({ status: "ok", docker: "ready", timestamp: new Date() }));
 app.use("/metrics", metricsRoutes);
+
+// Apply Global Rate Limiter to all /api endpoints (Max 120 req/min)
+app.use("/api", globalRateLimiter);
+
 app.use("/api/telemetry", telemetryRoutes);
 
 // REST Routes
@@ -219,6 +228,9 @@ io.on("connection", (socket) => {
 });
 
 initExecutionWorker(io);
+
+// Global Error Handler Middleware
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

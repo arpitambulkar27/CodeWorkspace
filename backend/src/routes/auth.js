@@ -8,6 +8,8 @@ const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
 const OTP = require("../models/OTP");
 const { protect } = require("../middleware/authMiddleware");
+const { authRateLimiter } = require("../middleware/rateLimiter");
+const { validateBody, authSchemas } = require("../middleware/schemaValidation");
 const { validateEmail } = require("../utils/verifyEmailDomain");
 const { sendOTP } = require("../utils/mailer");
 
@@ -66,7 +68,7 @@ const generateToken = (id) => {
 
 // @route   POST /api/auth/send-otp
 // @desc    Generate and send 6-digit OTP to user's email
-router.post("/send-otp", async (req, res) => {
+router.post("/send-otp", authRateLimiter, validateBody(authSchemas.sendOtp), async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) {
@@ -111,7 +113,7 @@ router.post("/send-otp", async (req, res) => {
 
 // @route   POST /api/auth/verify-otp
 // @desc    Verify 6-digit OTP and activate user account
-router.post("/verify-otp", async (req, res) => {
+router.post("/verify-otp", authRateLimiter, validateBody(authSchemas.verifyOtp), async (req, res) => {
   try {
     const { email, otp } = req.body;
     if (!email || !otp) {
@@ -169,7 +171,7 @@ router.post("/verify-otp", async (req, res) => {
 
 // @route   POST /api/auth/google
 // @desc    Authenticate user via Google OAuth ID Token
-router.post("/google", async (req, res) => {
+router.post("/google", authRateLimiter, validateBody(authSchemas.googleAuth), async (req, res) => {
   try {
     const { credential } = req.body;
 
@@ -251,7 +253,7 @@ router.post("/google", async (req, res) => {
 
 // @route   POST /api/auth/github
 // @desc    Authenticate user via GitHub OAuth Code
-router.post("/github", async (req, res) => {
+router.post("/github", authRateLimiter, validateBody(authSchemas.githubAuth), async (req, res) => {
   try {
     const { code } = req.body;
 
@@ -381,7 +383,7 @@ router.post("/github", async (req, res) => {
 
 // @route   POST /api/auth/register
 // @desc    Register a new user (isVerified: false), sends OTP
-router.post("/register", async (req, res) => {
+router.post("/register", authRateLimiter, validateBody(authSchemas.register), async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -450,7 +452,7 @@ router.post("/register", async (req, res) => {
 
 // @route   POST /api/auth/login
 // @desc    Authenticate user & get token with verification check
-router.post("/login", async (req, res) => {
+router.post("/login", authRateLimiter, validateBody(authSchemas.login), async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -524,7 +526,7 @@ router.get("/me", protect, async (req, res) => {
 
 // @route   PUT /api/auth/profile
 // @desc    Update user profile username or email with validation
-router.put("/profile", protect, async (req, res) => {
+router.put("/profile", protect, validateBody(authSchemas.updateProfile), async (req, res) => {
   try {
     const { username, email } = req.body;
     const user = await User.findById(req.user._id);

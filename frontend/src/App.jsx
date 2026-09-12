@@ -4,6 +4,8 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
 import LandingPage from "./pages/LandingPage";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Workspace from "./pages/Workspace";
 import DsaSheets from "./pages/DsaSheets";
@@ -18,15 +20,12 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/landing" element={<LandingPage />} />
 
-          {/* OAuth Callbacks */}
-          <Route path="/auth/github/callback" element={<GithubCallback />} />
-
-          {/* Inline Auth Landing Page Redirects */}
+          {/* Dedicated Auth Pages */}
           <Route
             path="/login"
             element={
               <PublicRoute>
-                <LandingPage initialAuthMode="login" />
+                <Login />
               </PublicRoute>
             }
           />
@@ -34,10 +33,13 @@ export default function App() {
             path="/signup"
             element={
               <PublicRoute>
-                <LandingPage initialAuthMode="signup" />
+                <Signup />
               </PublicRoute>
             }
           />
+
+          {/* OAuth Callbacks */}
+          <Route path="/auth/github/callback" element={<GithubCallback />} />
 
           {/* Protected Application Routes */}
           <Route

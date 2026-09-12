@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { 
@@ -10,98 +10,7 @@ import {
   Radio, RefreshCw, Database, Server
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-
-// Dynamic Animated Cosmic Background Canvas (Identical to Landing Page)
-const DynamicCosmosCanvas = () => {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    let animationFrameId;
-
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
-
-    const handleResize = () => {
-      if (!canvas) return;
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-    window.addEventListener("resize", handleResize);
-
-    const particles = Array.from({ length: 60 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      radius: Math.random() * 1.6 + 0.4,
-      vx: (Math.random() - 0.5) * 0.3,
-      vy: (Math.random() - 0.5) * 0.3,
-      alpha: Math.random() * 0.4 + 0.15,
-      color: ["#ffffff", "#e4e4e7", "#a1a1aa", "#71717a"][Math.floor(Math.random() * 4)],
-    }));
-
-    const render = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 100) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(255, 255, 255, ${0.06 * (1 - dist / 100)})`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      particles.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-
-        if (p.x < 0 || p.x > width) p.vx *= -1;
-        if (p.y < 0 || p.y > height) p.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.alpha;
-        ctx.fill();
-        ctx.globalAlpha = 1.0;
-      });
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
-        opacity: 0.5,
-      }}
-    />
-  );
-};
+import LandingPage from "./LandingPage";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -247,11 +156,6 @@ const Dashboard = () => {
     }
   };
 
-  const handleRejoinSession = (roomCode = "CF-DEFAULT") => {
-    setIsCollabModalOpen(false);
-    navigate(`/workspace?room=${roomCode}`);
-  };
-
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
@@ -280,7 +184,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     if (logout) logout();
     else localStorage.clear();
-    navigate("/?auth=login");
+    navigate("/");
   };
 
   const getLanguageLabel = (lang) => {
@@ -301,597 +205,596 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="cd-root">
-      <DynamicCosmosCanvas />
+    <div className="relative min-h-screen w-full overflow-hidden bg-black text-foreground">
+      {/* BACKGROUND LAYER: Blurred reflection of the Landing Page */}
+      <div 
+        aria-hidden="true" 
+        className="fixed inset-0 pointer-events-none select-none overflow-hidden z-0 filter blur-[10px] brightness-75 scale-105 transform-gpu opacity-75"
+      >
+        <LandingPage />
+      </div>
 
-      <style>{`
-        .cd-root {
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-          width: 100vw;
-          background-color: #09090b;
-          color: #ffffff;
-          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-          overflow-x: hidden;
-          position: relative;
-        }
+      {/* OVERLAY: Dark glassmorphic backdrop */}
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-0 pointer-events-none" />
 
-        .cd-scrollable {
-          overflow-y: auto;
-        }
-        .cd-scrollable::-webkit-scrollbar {
-          width: 6px;
-        }
-        .cd-scrollable::-webkit-scrollbar-thumb {
-          background: #27272a;
-          border-radius: 4px;
-        }
-
-        /* Smooth Page Fade-In Transition */
-        @keyframes pageFadeIn {
-          0% {
-            opacity: 0;
-            transform: translateY(8px);
+      {/* FOREGROUND DASHBOARD ROOT */}
+      <div className="cd-root">
+        <style>{`
+          .cd-root {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100vw;
+            background-color: transparent;
+            color: #ffffff;
+            font-family: inherit;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 10;
           }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
+
+          .cd-scrollable {
+            overflow-y: auto;
           }
-        }
-        .cd-page-fade {
-          animation: pageFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Smooth Card Pop Animations */
-        @keyframes smoothPop {
-          0% {
-            opacity: 0;
-            transform: scale(0.97) translateY(6px);
+          .cd-scrollable::-webkit-scrollbar {
+            width: 6px;
           }
-          100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
+          .cd-scrollable::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
           }
-        }
-        .cd-animate-pop {
-          animation: smoothPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
 
-        .cd-topbar {
-          height: 60px;
-          background-color: rgba(12, 12, 14, 0.9);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid #27272a;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 28px;
-          position: sticky;
-          top: 0;
-          z-index: 40;
-          flex-shrink: 0;
-        }
+          /* Smooth Page Fade-In Transition */
+          @keyframes pageFadeIn {
+            0% {
+              opacity: 0;
+              transform: translateY(8px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .cd-page-fade {
+            animation: pageFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
 
-        .cd-logo-btn {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          background-color: #18181b;
-          border: 1px solid #3f3f46;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.2s ease;
-          cursor: pointer;
-        }
-        .cd-logo-btn:hover {
-          border-color: #ffffff;
-          box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
-        }
+          /* Smooth Card Pop Animations */
+          @keyframes smoothPop {
+            0% {
+              opacity: 0;
+              transform: scale(0.97) translateY(6px);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+          .cd-animate-pop {
+            animation: smoothPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
 
-        /* HIGH-CONTRAST MONOCHROMATIC BUTTONS */
-        .cd-btn-bw {
-          background-color: #ffffff;
-          color: #09090b;
-          border: none;
-          border-radius: 8px;
-          padding: 8px 18px;
-          font-size: 13px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
-        }
-        .cd-btn-bw:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
-        }
+          .cd-topbar {
+            height: 64px;
+            background-color: rgba(10, 10, 15, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            flex-shrink: 0;
+          }
 
-        .cd-btn-outline {
-          background-color: #121215;
-          color: #ffffff;
-          border: 1px solid #27272a;
-          border-radius: 8px;
-          padding: 8px 16px;
-          font-size: 13px;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .cd-btn-outline:hover {
-          background-color: #18181b;
-          border-color: #52525b;
-        }
+          /* HIGH-CONTRAST MONOCHROMATIC BUTTONS MATCHING LANDING PAGE */
+          .cd-btn-bw {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 9999px;
+            padding: 8px 20px;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+          }
+          .cd-btn-bw:hover {
+            transform: translateY(-1px);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
+          }
 
-        /* Hero Cards */
-        .cd-hero-card {
-          background: #121215;
-          border: 1px solid #27272a;
-          border-radius: 12px;
-          padding: 22px;
-          cursor: pointer;
-          transition: all 0.25s ease;
-        }
-        .cd-hero-card:hover {
-          border-color: #52525b;
-          background: #18181b;
-          transform: translateY(-2px);
-        }
+          .cd-btn-outline {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 9999px;
+            padding: 8px 18px;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+          .cd-btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.35);
+          }
 
-        .cd-list-item {
-          background-color: #121215;
-          border: 1px solid #27272a;
-          border-radius: 10px;
-          padding: 16px 20px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          transition: all 0.2s ease;
-        }
-        .cd-list-item:hover {
-          border-color: #3f3f46;
-          background-color: #18181b;
-        }
+          /* Hero Cards Translucent Glass Style */
+          .cd-hero-card {
+            background: rgba(10, 10, 15, 0.55);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+          }
+          .cd-hero-card:hover {
+            border-color: rgba(236, 168, 214, 0.6);
+            background: rgba(18, 18, 26, 0.65);
+            transform: translateY(-2px);
+          }
 
-        .cd-card {
-          background: #121215;
-          border: 1px solid #27272a;
-          border-radius: 12px;
-          padding: 24px;
-        }
-      `}</style>
+          .cd-list-item {
+            background-color: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+          }
+          .cd-list-item:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background-color: rgba(255, 255, 255, 0.08);
+          }
 
-      {/* 1. TOPBAR */}
-      <header className="cd-topbar">
-        <div 
-          onClick={() => navigate("/")} 
-          style={{ display: "flex", alignItems: "center", gap: "12px", cursor: "pointer" }}
-        >
-          <div className="cd-logo-btn">
-            <Code2 size={18} color="#ffffff" />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ fontSize: "15px", fontWeight: "800", color: "#ffffff", letterSpacing: "-0.02em" }}>CodeWorkspace</span>
-            <span style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "500" }}>IDE PLATFORM</span>
-          </div>
-        </div>
+          .cd-card {
+            background: rgba(10, 10, 15, 0.55);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+          }
+        `}</style>
 
-        {/* Live Working Search Input */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "8px", padding: "8px 14px", width: "340px" }}>
-          <Search size={16} color="#71717a" />
-          <input 
-            type="text" 
-            placeholder="Search workspaces by title or language..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: "13px", width: "100%" }}
-          />
-        </div>
-
-        {/* Topbar Action Controls */}
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button className="cd-btn-bw" onClick={() => setIsNewWorkspaceModalOpen(true)}>
-            <Plus size={15} /> New Workspace
-          </button>
-
+        {/* 1. TOPBAR */}
+        <header className="cd-topbar">
           <div 
-            onClick={() => setIsProfileModalOpen(true)}
-            style={{ width: "34px", height: "34px", borderRadius: "50%", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "#ffffff", fontWeight: "bold", cursor: "pointer" }}
-            title="View / Edit Profile"
+            onClick={() => navigate("/")} 
+            style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
           >
-            {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
+            <span className="font-display tracking-tight text-xl text-white">CODEFORGE</span>
+            <span className="font-mono text-[10px] text-[#eca8d6] mt-0.5">IDE</span>
           </div>
 
-          <button 
-            onClick={handleLogout}
-            style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.25)", color: "#f87171", borderRadius: "8px", padding: "8px 12px", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
-            title="Log Out"
-          >
-            <LogOut size={15} color="#f87171" />
-          </button>
-        </div>
-      </header>
-
-      {/* 2. MAIN DASHBOARD CONTENT AREA WITH SMOOTH FADE-IN */}
-      <main className="cd-scrollable cd-page-fade" style={{ flex: 1, padding: "32px 28px", zIndex: 10 }}>
-        <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
-          
-          {/* PAGE TITLE */}
-          <div style={{ marginBottom: "24px" }}>
-            <h1 style={{ margin: 0, fontSize: "24px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "10px", letterSpacing: "-0.02em" }}>
-              My Workspace Dashboard
-            </h1>
-            <p style={{ margin: "4px 0 0 0", fontSize: "13.5px", color: "#a1a1aa" }}>
-              Welcome back, <strong style={{ color: "#ffffff" }}>{user?.username || "Developer"}</strong>! Manage cloud sandboxes, multi-language files, and pair programming rooms.
-            </p>
+          {/* Live Working Search Input */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", backgroundColor: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "9999px", padding: "8px 16px", width: "360px" }}>
+            <Search size={15} color="#8b949e" />
+            <input 
+              type="text" 
+              placeholder="Search workspaces by title or language..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ background: "transparent", border: "none", outline: "none", color: "#ffffff", fontSize: "13px", width: "100%" }}
+            />
           </div>
 
-          {/* HERO CARDS */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "18px", marginBottom: "32px" }}>
+          {/* Topbar Action Controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <button className="cd-btn-bw" onClick={() => setIsNewWorkspaceModalOpen(true)}>
+              <Plus size={14} /> New Workspace
+            </button>
+
+            <div 
+              onClick={() => setIsProfileModalOpen(true)}
+              style={{ width: "34px", height: "34px", borderRadius: "50%", background: "rgba(236, 168, 214, 0.15)", border: "1px solid rgba(236, 168, 214, 0.35)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", color: "#eca8d6", fontWeight: "bold", cursor: "pointer" }}
+              title="View / Edit Profile"
+            >
+              {user?.username ? user.username.charAt(0).toUpperCase() : "U"}
+            </div>
+
+            <button 
+              onClick={handleLogout}
+              style={{ background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.3)", color: "#f87171", borderRadius: "9999px", padding: "7px 14px", fontSize: "12px", fontFamily: "monospace", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+              title="Log Out"
+            >
+              <LogOut size={14} color="#f87171" />
+            </button>
+          </div>
+        </header>
+
+        {/* 2. MAIN DASHBOARD CONTENT AREA WITH SMOOTH FADE-IN */}
+        <main className="cd-scrollable cd-page-fade" style={{ flex: 1, padding: "32px 28px", zIndex: 10 }}>
+          <div style={{ maxWidth: "1240px", margin: "0 auto" }}>
             
-            {/* Card 1: My Workspace */}
-            <div className="cd-hero-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <span style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em" }}>ACTIVE WORKSPACES</span>
-                <Folder size={18} color="#ffffff" />
-              </div>
-              <div style={{ fontSize: "34px", fontWeight: "800", color: "#ffffff" }}>
-                {workspaces.length}
-              </div>
-              <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "6px", fontWeight: "500" }}>
-                Cloud code sandboxes in Docker runner →
-              </div>
+            {/* PAGE TITLE */}
+            <div style={{ marginBottom: "28px" }}>
+              <h1 className="font-display tracking-tight text-3xl md:text-4xl text-white mb-2">
+                My Workspace Dashboard
+              </h1>
+              <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+                Welcome back, <strong style={{ color: "#ffffff" }}>{user?.username || "Developer"}</strong>! Manage cloud sandboxes, multi-language files, and pair programming rooms.
+              </p>
             </div>
 
-            {/* Card 2: Live Collaboration */}
-            <div className="cd-hero-card" onClick={() => setIsCollabModalOpen(true)}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <span style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em" }}>LIVE COLLABORATION</span>
-                <Users size={18} color="#ffffff" />
-              </div>
-              <div style={{ fontSize: "20px", fontWeight: "700", color: "#ffffff" }}>
-                Room Options
-              </div>
-              <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "12px", fontWeight: "500" }}>
-                Create or join room →
-              </div>
-            </div>
-
-            {/* Card 3: DSA Practice Sheets */}
-            <div className="cd-hero-card" onClick={() => navigate("/sheets")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-                <span style={{ fontSize: "11px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em" }}>DSA PRACTICE SHEETS</span>
-                <Target size={18} color="#ffffff" />
-              </div>
-              <div style={{ fontSize: "20px", fontWeight: "700", color: "#ffffff" }}>
-                Striver & Babbar Sheets
-              </div>
-              <div style={{ fontSize: "12px", color: "#a1a1aa", marginTop: "12px", fontWeight: "500" }}>
-                Browse curated roadmaps & solve →
-              </div>
-            </div>
-
-          </div>
-
-          {/* CONTENT SECTION: 2 COLUMNS (WORKSPACES LEFT, COMPACT TELEMETRY SIDE CARD RIGHT) */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 310px", gap: "20px", alignItems: "start" }}>
-            
-            {/* RECENT WORKSPACES LIST GRID (LEFT COLUMN) */}
-            <div className="cd-card" style={{ margin: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "700", color: "#ffffff" }}>Recent Workspaces</h3>
-                <span style={{ fontSize: "12px", color: "#a1a1aa", background: "#18181b", border: "1px solid #27272a", padding: "4px 10px", borderRadius: "6px", fontWeight: "600" }}>
-                  {filteredWorkspaces.length} workspace(s)
-                </span>
-              </div>
-
-              {loading ? (
-                <div style={{ padding: "40px", textAlign: "center", color: "#a1a1aa", fontSize: "13.5px" }}>
-                  Loading workspaces...
+            {/* HERO CARDS */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", marginBottom: "32px" }}>
+              
+              {/* Card 1: My Workspace */}
+              <div className="cd-hero-card">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">ACTIVE WORKSPACES</span>
+                  <Folder size={20} color="#eca8d6" />
                 </div>
-              ) : filteredWorkspaces.length === 0 ? (
-                <div style={{ padding: "36px", border: "1px dashed #27272a", borderRadius: "12px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
-                  <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Folder size={20} color="#a1a1aa" />
-                  </div>
-                  <div>
-                    <h4 style={{ margin: 0, fontSize: "15px", fontWeight: "700", color: "#ffffff" }}>No Workspaces Found</h4>
-                    <p style={{ margin: "4px 0 0 0", fontSize: "12.5px", color: "#a1a1aa" }}>
-                      {searchQuery ? `No workspace matches "${searchQuery}".` : "Create your first multi-file cloud sandbox with 1-click templates below!"}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-                    <button 
-                      onClick={(e) => handleCreateWorkspace(e, "Python Algorithm Sandbox", "python")} 
-                      className="cd-btn-bw"
-                    >
-                      + Python 3 Sandbox
-                    </button>
-                    <button 
-                      onClick={(e) => handleCreateWorkspace(e, "JavaScript Web App", "javascript")} 
-                      className="cd-btn-outline"
-                    >
-                      + JavaScript Sandbox
-                    </button>
-                  </div>
+                <div className="font-display text-4xl text-white">
+                  {workspaces.length}
                 </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  {filteredWorkspaces.map((ws) => {
-                    const langLabel = getLanguageLabel(ws.language);
-                    const updatedDate = new Date(ws.updatedAt || Date.now()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-                    const fileCount = Array.isArray(ws.files) && ws.files.length > 0 ? ws.files.length : 1;
-                    const folderCount = Array.isArray(ws.files) ? ws.files.filter(f => f.type === "folder").length : 0;
+                <div style={{ fontSize: "12px", color: "#8b949e", marginTop: "8px" }} className="font-mono">
+                  Cloud code sandboxes in Docker runner &rarr;
+                </div>
+              </div>
 
-                    return (
-                      <div 
-                        key={ws._id}
-                        className="cd-list-item"
-                        onClick={() => navigate(`/workspace/${ws._id}`)}
-                        style={{ cursor: "pointer" }}
+              {/* Card 2: Live Collaboration */}
+              <div className="cd-hero-card" onClick={() => setIsCollabModalOpen(true)}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">LIVE COLLABORATION</span>
+                  <Users size={20} color="#eca8d6" />
+                </div>
+                <div className="font-display text-2xl text-white">
+                  Room Options
+                </div>
+                <div style={{ fontSize: "12px", color: "#8b949e", marginTop: "14px" }} className="font-mono">
+                  Create or join room &rarr;
+                </div>
+              </div>
+
+              {/* Card 3: DSA Practice Sheets */}
+              <div className="cd-hero-card" onClick={() => navigate("/sheets")}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+                  <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">DSA PRACTICE SHEETS</span>
+                  <Target size={20} color="#eca8d6" />
+                </div>
+                <div className="font-display text-2xl text-white">
+                  Striver & Babbar Sheets
+                </div>
+                <div style={{ fontSize: "12px", color: "#8b949e", marginTop: "14px" }} className="font-mono">
+                  Browse curated roadmaps & solve &rarr;
+                </div>
+              </div>
+
+            </div>
+
+            {/* CONTENT SECTION: 2 COLUMNS (WORKSPACES LEFT, COMPACT TELEMETRY SIDE CARD RIGHT) */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "24px", alignItems: "start" }}>
+              
+              {/* RECENT WORKSPACES LIST GRID (LEFT COLUMN) */}
+              <div className="cd-card" style={{ margin: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "22px" }}>
+                  <h3 className="font-display text-xl text-white">Recent Workspaces</h3>
+                  <span style={{ fontSize: "11px", fontFamily: "monospace", color: "#8b949e", background: "rgba(255, 255, 255, 0.08)", border: "1px solid rgba(255, 255, 255, 0.15)", padding: "4px 12px", borderRadius: "9999px" }}>
+                    {filteredWorkspaces.length} workspace(s)
+                  </span>
+                </div>
+
+                {loading ? (
+                  <div style={{ padding: "40px", textAlign: "center", color: "#8b949e", fontSize: "14px" }}>
+                    Loading workspaces...
+                  </div>
+                ) : filteredWorkspaces.length === 0 ? (
+                  <div style={{ padding: "40px", border: "1px dashed rgba(255, 255, 255, 0.2)", borderRadius: "16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
+                    <div style={{ width: "48px", height: "48px", borderRadius: "14px", background: "rgba(255, 255, 255, 0.06)", border: "1px solid rgba(255, 255, 255, 0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <Folder size={22} color="#8b949e" />
+                    </div>
+                    <div>
+                      <h4 className="font-display text-lg text-white mb-1">No Workspaces Found</h4>
+                      <p style={{ margin: 0, fontSize: "13px", color: "#8b949e" }}>
+                        {searchQuery ? `No workspace matches "${searchQuery}".` : "Create your first multi-file cloud sandbox with 1-click templates below!"}
+                      </p>
+                    </div>
+                    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center", marginTop: "6px" }}>
+                      <button 
+                        onClick={(e) => handleCreateWorkspace(e, "Python Algorithm Sandbox", "python")} 
+                        className="cd-btn-bw"
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                          <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                            <Folder size={20} color="#ffffff" />
-                          </div>
-                          <div>
-                            <div style={{ fontSize: "15px", fontWeight: "600", color: "#ffffff", marginBottom: "3px" }}>{ws.title}</div>
-                            <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
-                              <span style={{ fontSize: "12px", color: "#a1a1aa", fontWeight: "600" }}>{langLabel}</span>
-                              <span style={{ fontSize: "12px", color: "#71717a" }}>• {fileCount} file(s), {folderCount} folder(s)</span>
-                              <span style={{ fontSize: "12px", color: "#71717a" }}>• Updated {updatedDate}</span>
+                        + Python 3 Sandbox
+                      </button>
+                      <button 
+                        onClick={(e) => handleCreateWorkspace(e, "JavaScript Web App", "javascript")} 
+                        className="cd-btn-outline"
+                      >
+                        + JavaScript Sandbox
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                    {filteredWorkspaces.map((ws) => {
+                      const langLabel = getLanguageLabel(ws.language);
+                      const updatedDate = new Date(ws.updatedAt || Date.now()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                      const fileCount = Array.isArray(ws.files) && ws.files.length > 0 ? ws.files.length : 1;
+                      const folderCount = Array.isArray(ws.files) ? ws.files.filter(f => f.type === "folder").length : 0;
+
+                      return (
+                        <div 
+                          key={ws._id}
+                          className="cd-list-item"
+                          onClick={() => navigate(`/workspace/${ws._id}`)}
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                            <div style={{ width: "42px", height: "42px", borderRadius: "12px", background: "rgba(236, 168, 214, 0.15)", border: "1px solid rgba(236, 168, 214, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                              <Folder size={20} color="#eca8d6" />
+                            </div>
+                            <div>
+                              <div style={{ fontSize: "15px", fontWeight: "600", color: "#ffffff", marginBottom: "4px" }}>{ws.title}</div>
+                              <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                                <span style={{ fontSize: "12px", color: "#eca8d6", fontFamily: "monospace", fontWeight: "600" }}>{langLabel}</span>
+                                <span style={{ fontSize: "12px", color: "#8b949e" }}>• {fileCount} file(s), {folderCount} folder(s)</span>
+                                <span style={{ fontSize: "12px", color: "#8b949e" }}>• Updated {updatedDate}</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                          <button 
-                            onClick={(e) => handleForkWorkspace(e, ws._id)}
-                            style={{ background: "#18181b", border: "1px solid #27272a", color: "#a1a1aa", borderRadius: "8px", padding: "7px 14px", fontSize: "12px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontWeight: "600" }}
-                            title="Fork Workspace"
-                          >
-                            <GitFork size={14} /> Fork
-                          </button>
-                          <button 
-                            onClick={(e) => handleDeleteWorkspace(e, ws._id)}
-                            style={{ background: "rgba(239, 68, 68, 0.1)", border: "1px solid rgba(239, 68, 68, 0.2)", color: "#f87171", borderRadius: "8px", padding: "7px 12px", fontSize: "12px", cursor: "pointer" }}
-                            title="Delete Workspace"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                            <button 
+                              onClick={(e) => handleForkWorkspace(e, ws._id)}
+                              className="cd-btn-outline"
+                              style={{ padding: "6px 12px", fontSize: "11px" }}
+                              title="Fork Workspace"
+                            >
+                              <GitFork size={13} /> Fork
+                            </button>
+                            <button 
+                              onClick={(e) => handleDeleteWorkspace(e, ws._id)}
+                              style={{ background: "rgba(239, 68, 68, 0.15)", border: "1px solid rgba(239, 68, 68, 0.25)", color: "#f87171", borderRadius: "9999px", padding: "6px 10px", fontSize: "11px", cursor: "pointer" }}
+                              title="Delete Workspace"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* COMPACT SYSTEM TELEMETRY SIDE CARD (RIGHT COLUMN) */}
+              <div className="cd-card" style={{ margin: 0, padding: "22px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "18px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <Activity size={16} color="#eca8d6" />
+                    <span className="font-display text-base text-white">Engine Telemetry</span>
+                  </div>
+                  <span style={{ fontSize: "10px", fontFamily: "monospace", fontWeight: "700", backgroundColor: "rgba(236, 168, 214, 0.15)", border: "1px solid rgba(236, 168, 214, 0.35)", color: "#eca8d6", padding: "2px 8px", borderRadius: "9999px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                    <span style={{ width: "6px", height: "6px", borderRadius: "50%", backgroundColor: "#eca8d6" }} className="animate-pulse" /> LIVE
+                  </span>
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", fontSize: "12px" }}>
+                  
+                  {/* 1. Database & Persistence */}
+                  <div style={{ padding: "12px", backgroundColor: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px" }}>
+                    <div style={{ fontSize: "10px", color: "#8b949e", fontFamily: "monospace", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>DATABASE & STORE</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <span style={{ color: "#8b949e" }}>MongoDB Database:</span>
+                      <span style={{ color: telemetry?.database?.mongoDB === "Connected" ? "#eca8d6" : "#f87171", fontWeight: "700" }}>● {telemetry?.database?.mongoDB || "Connected"}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#8b949e" }}>Document Store:</span>
+                      <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.database?.documentStore || "Active"}</span>
+                    </div>
+                  </div>
+
+                  {/* 2. Redis & Rate Limiter */}
+                  <div style={{ padding: "12px", backgroundColor: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px" }}>
+                    <div style={{ fontSize: "10px", color: "#8b949e", fontFamily: "monospace", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>QUEUE & RATE LIMITER</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <span style={{ color: "#8b949e" }}>Redis Connected:</span>
+                      <span style={{ color: telemetry?.database?.redis === "Connected" ? "#eca8d6" : "#f87171", fontWeight: "700" }}>● {telemetry?.database?.redis || "Connected"}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#8b949e" }}>Redis Rate Limiter:</span>
+                      <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.database?.rateLimiter || "10 runs / min"}</span>
+                    </div>
+                  </div>
+
+                  {/* 3. Docker Sandbox & Isolation */}
+                  <div style={{ padding: "12px", backgroundColor: "rgba(0, 0, 0, 0.4)", border: "1px solid rgba(255, 255, 255, 0.1)", borderRadius: "12px" }}>
+                    <div style={{ fontSize: "10px", color: "#8b949e", fontFamily: "monospace", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>DOCKER SANDBOX & ISOLATION</div>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <span style={{ color: "#8b949e" }}>Docker Sandbox Cap:</span>
+                      <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.sandbox?.dockerCap || "128MB / 0.5 CPU"}</span>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ color: "#8b949e" }}>Hardened Isolation:</span>
+                      <span style={{ color: "#eca8d6", fontWeight: "600" }}>{telemetry?.sandbox?.isolation || "Active (Isolated)"}</span>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div style={{ marginTop: "16px", paddingTop: "12px", borderTop: "1px solid rgba(255, 255, 255, 0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: "11px", color: "#8b949e", fontFamily: "monospace" }}>
+                    {telemetryLastUpdated ? `Updated ${telemetryLastUpdated}` : "Connecting..."}
+                  </span>
+                  <button 
+                    onClick={fetchTelemetry} 
+                    style={{ background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: "2px 4px" }}
+                    title="Refresh Telemetry Metrics"
+                  >
+                    <RefreshCw size={13} className={telemetryLoading ? "animate-spin" : ""} />
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </main>
+
+        {/* 1. NEW WORKSPACE CARD MODAL */}
+        {isNewWorkspaceModalOpen && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.8)", backdropFilter: "blur(16px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+            <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "440px", backgroundColor: "rgba(10, 10, 15, 0.75)", backdropFilter: "blur(28px)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "24px", padding: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h3 className="font-display text-xl text-white">Create Cloud Workspace</h3>
+                <button onClick={() => setIsNewWorkspaceModalOpen(false)} style={{ background: "none", border: "none", color: "#8b949e", cursor: "pointer" }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              <form onSubmit={(e) => handleCreateWorkspace(e)}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Workspace Title</label>
+                  <input 
+                    type="text"
+                    placeholder="e.g. Binary Search Tree Sandbox"
+                    value={newTitle}
+                    onChange={(e) => setNewTitle(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#eca8d6]"
+                    required
+                  />
+                </div>
+
+                <div style={{ marginBottom: "24px" }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Default Language</label>
+                  <select
+                    value={newLang}
+                    onChange={(e) => setNewLang(e.target.value)}
+                    className="w-full bg-black/80 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#eca8d6]"
+                  >
+                    <option value="python">Python 3</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java 21</option>
+                    <option value="cpp">C++ 20</option>
+                  </select>
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                  <button type="button" onClick={() => setIsNewWorkspaceModalOpen(false)} className="cd-btn-outline">Cancel</button>
+                  <button type="submit" disabled={creating} className="cd-btn-bw">
+                    {creating ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
+                    <span>Create</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 2. COLLABORATION ROOM MODAL */}
+        {isCollabModalOpen && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.8)", backdropFilter: "blur(16px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+            <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "460px", backgroundColor: "rgba(10, 10, 15, 0.75)", backdropFilter: "blur(28px)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "24px", padding: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h3 className="font-display text-xl text-white flex items-center gap-2">
+                  <Users size={20} className="text-[#eca8d6]" /> Live Pair Programming
+                </h3>
+                <button onClick={() => setIsCollabModalOpen(false)} style={{ background: "none", border: "none", color: "#8b949e", cursor: "pointer" }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <div style={{ padding: "18px", backgroundColor: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "16px" }}>
+                  <h4 className="font-display text-base text-white mb-1">Create New Room</h4>
+                  <p style={{ margin: "0 0 14px 0", fontSize: "13px", color: "#8b949e" }}>Generate a random room code and share it with peers for live code syncing.</p>
+                  <button onClick={handleCreateRoom} className="cd-btn-bw" style={{ width: "100%", justifyContent: "center" }}>
+                    <Plus size={15} /> Create Host Room
+                  </button>
+                </div>
+
+                <div style={{ padding: "18px", backgroundColor: "rgba(255, 255, 255, 0.04)", border: "1px solid rgba(255, 255, 255, 0.12)", borderRadius: "16px" }}>
+                  <h4 className="font-display text-base text-white mb-1">Join Existing Room</h4>
+                  <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
+                    <input 
+                      type="text" 
+                      placeholder="Enter room code (e.g. CF-4829)"
+                      value={roomCodeInput}
+                      onChange={(e) => setRoomCodeInput(e.target.value)}
+                      className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#eca8d6]"
+                    />
+                    <button onClick={handleJoinRoom} className="cd-btn-outline">Join</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3. EDIT PROFILE MODAL */}
+        {isProfileModalOpen && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.8)", backdropFilter: "blur(16px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
+            <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "420px", backgroundColor: "rgba(10, 10, 15, 0.75)", backdropFilter: "blur(28px)", border: "1px solid rgba(255, 255, 255, 0.15)", borderRadius: "24px", padding: "28px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h3 className="font-display text-xl text-white flex items-center gap-2">
+                  <User size={20} className="text-[#eca8d6]" /> Edit User Profile
+                </h3>
+                <button onClick={() => setIsProfileModalOpen(false)} style={{ background: "none", border: "none", color: "#8b949e", cursor: "pointer" }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              {profileMsg && (
+                <div style={{ padding: "12px 14px", borderRadius: "12px", fontSize: "13px", marginBottom: "16px", backgroundColor: profileMsg.includes("successfully") ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", border: profileMsg.includes("successfully") ? "1px solid rgba(16, 185, 129, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", color: profileMsg.includes("successfully") ? "#34d399" : "#f87171" }}>
+                  {profileMsg}
                 </div>
               )}
-            </div>
 
-            {/* COMPACT SYSTEM TELEMETRY SIDE CARD (RIGHT COLUMN) */}
-            <div className="cd-card" style={{ margin: 0, padding: "20px" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <Activity size={16} color="#10b981" />
-                  <span style={{ fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Engine Telemetry</span>
-                </div>
-                <span style={{ fontSize: "10px", fontWeight: "700", backgroundColor: "rgba(16, 185, 129, 0.15)", border: "1px solid rgba(16, 185, 129, 0.3)", color: "#34d399", padding: "2px 6px", borderRadius: "10px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
-                  <span style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: "#10b981" }} /> LIVE
-                </span>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "12px" }}>
-                
-                {/* 1. Database & Persistence */}
-                <div style={{ padding: "10px 12px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px" }}>
-                  <div style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>DATABASE & STORE</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                    <span style={{ color: "#71717a" }}>MongoDB Database:</span>
-                    <span style={{ color: telemetry?.database?.mongoDB === "Connected" ? "#34d399" : "#f87171", fontWeight: "700" }}>● {telemetry?.database?.mongoDB || "Connected"}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#71717a" }}>Document Store:</span>
-                    <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.database?.documentStore || "Active"}</span>
-                  </div>
-                </div>
-
-                {/* 2. Redis & Rate Limiter */}
-                <div style={{ padding: "10px 12px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px" }}>
-                  <div style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>QUEUE & RATE LIMITER</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                    <span style={{ color: "#71717a" }}>Redis Connected:</span>
-                    <span style={{ color: telemetry?.database?.redis === "Connected" ? "#34d399" : "#f87171", fontWeight: "700" }}>● {telemetry?.database?.redis || "Connected"}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#71717a" }}>Redis Rate Limiter:</span>
-                    <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.database?.rateLimiter || "10 runs / min"}</span>
-                  </div>
-                </div>
-
-                {/* 4. Docker Sandbox & Isolation */}
-                <div style={{ padding: "10px 12px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px" }}>
-                  <div style={{ fontSize: "10px", color: "#a1a1aa", fontWeight: "700", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>DOCKER SANDBOX & ISOLATION</div>
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                    <span style={{ color: "#71717a" }}>Docker Sandbox Cap:</span>
-                    <span style={{ color: "#ffffff", fontWeight: "600" }}>{telemetry?.sandbox?.dockerCap || "128MB / 0.5 CPU"}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between" }}>
-                    <span style={{ color: "#71717a" }}>Hardened Isolation:</span>
-                    <span style={{ color: "#34d399", fontWeight: "600" }}>{telemetry?.sandbox?.isolation || "Active (Isolated)"}</span>
-                  </div>
-                </div>
-
-              </div>
-
-              <div style={{ marginTop: "14px", paddingTop: "10px", borderTop: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: "11px", color: "#71717a" }}>
-                  {telemetryLastUpdated ? `Updated ${telemetryLastUpdated}` : "Connecting..."}
-                </span>
-                <button 
-                  onClick={fetchTelemetry} 
-                  style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer", padding: "2px 4px", borderRadius: "4px" }}
-                  title="Refresh Telemetry Metrics"
-                >
-                  <RefreshCw size={13} className={telemetryLoading ? "animate-spin" : ""} />
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-      </main>
-
-      {/* 1. NEW WORKSPACE CARD MODAL */}
-      {isNewWorkspaceModalOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.82)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-          <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "420px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "800", color: "#ffffff" }}>Create Cloud Workspace</h3>
-              <button onClick={() => setIsNewWorkspaceModalOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
-                <X size={18} />
-              </button>
-            </div>
-
-            <form onSubmit={(e) => handleCreateWorkspace(e)}>
-              <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Workspace Title</label>
-                <input 
-                  type="text"
-                  placeholder="e.g. Binary Search Tree Sandbox"
-                  value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
-                  required
-                />
-              </div>
-
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Default Language</label>
-                <select
-                  value={newLang}
-                  onChange={(e) => setNewLang(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
-                >
-                  <option value="python">Python 3</option>
-                  <option value="javascript">JavaScript</option>
-                  <option value="java">Java 21</option>
-                  <option value="cpp">C++ 20</option>
-                </select>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-                <button type="button" onClick={() => setIsNewWorkspaceModalOpen(false)} className="cd-btn-outline">Cancel</button>
-                <button type="submit" disabled={creating} className="cd-btn-bw">
-                  {creating ? <Loader2 size={15} className="animate-spin" /> : <Plus size={15} />}
-                  <span>Create</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* 2. COLLABORATION ROOM MODAL */}
-      {isCollabModalOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.82)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-          <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "440px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
-                <Users size={18} /> Live Pair Programming
-              </h3>
-              <button onClick={() => setIsCollabModalOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
-                <X size={18} />
-              </button>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div style={{ padding: "16px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "12px" }}>
-                <h4 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Create New Room</h4>
-                <p style={{ margin: "0 0 12px 0", fontSize: "12px", color: "#a1a1aa" }}>Generate a random room code and share it with peers for live code syncing.</p>
-                <button onClick={handleCreateRoom} className="cd-btn-bw" style={{ width: "100%", justifyContent: "center" }}>
-                  <Plus size={15} /> Create Host Room
-                </button>
-              </div>
-
-              <div style={{ padding: "16px", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "12px" }}>
-                <h4 style={{ margin: "0 0 6px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Join Existing Room</h4>
-                <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+              <form onSubmit={handleUpdateProfile}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Username</label>
                   <input 
-                    type="text" 
-                    placeholder="Enter room code (e.g. CF-4829)"
-                    value={roomCodeInput}
-                    onChange={(e) => setRoomCodeInput(e.target.value)}
-                    style={{ flex: 1, backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "8px", padding: "8px 12px", color: "#ffffff", fontSize: "13px", outline: "none" }}
+                    type="text"
+                    value={editUsername}
+                    onChange={(e) => setEditUsername(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#eca8d6]"
+                    required
                   />
-                  <button onClick={handleJoinRoom} className="cd-btn-outline">Join</button>
                 </div>
-              </div>
+
+                <div style={{ marginBottom: "24px" }}>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Email Address</label>
+                  <input 
+                    type="email"
+                    value={editEmail}
+                    onChange={(e) => setEditEmail(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#eca8d6]"
+                    required
+                  />
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                  <button type="button" onClick={() => setIsProfileModalOpen(false)} className="cd-btn-outline">Cancel</button>
+                  <button type="submit" disabled={profileSaving} className="cd-btn-bw">
+                    {profileSaving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+                    <span>Save Changes</span>
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* 3. EDIT PROFILE MODAL */}
-      {isProfileModalOpen && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, backgroundColor: "rgba(0, 0, 0, 0.82)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "16px" }}>
-          <div className="cd-animate-pop" style={{ width: "100%", maxWidth: "400px", backgroundColor: "#121215", border: "1px solid #27272a", borderRadius: "16px", padding: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <h3 style={{ margin: 0, fontSize: "17px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
-                <User size={18} /> Edit User Profile
-              </h3>
-              <button onClick={() => setIsProfileModalOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
-                <X size={18} />
-              </button>
-            </div>
-
-            {profileMsg && (
-              <div style={{ padding: "10px 14px", borderRadius: "8px", fontSize: "12.5px", marginBottom: "14px", backgroundColor: profileMsg.includes("successfully") ? "rgba(16, 185, 129, 0.1)" : "rgba(239, 68, 68, 0.1)", border: profileMsg.includes("successfully") ? "1px solid rgba(16, 185, 129, 0.25)" : "1px solid rgba(239, 68, 68, 0.25)", color: profileMsg.includes("successfully") ? "#34d399" : "#f87171" }}>
-                {profileMsg}
-              </div>
-            )}
-
-            <form onSubmit={handleUpdateProfile}>
-              <div style={{ marginBottom: "14px" }}>
-                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Username</label>
-                <input 
-                  type="text"
-                  value={editUsername}
-                  onChange={(e) => setEditUsername(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
-                  required
-                />
-              </div>
-
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{ display: "block", fontSize: "12px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "600" }}>Email Address</label>
-                <input 
-                  type="email"
-                  value={editEmail}
-                  onChange={(e) => setEditEmail(e.target.value)}
-                  style={{ width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px 14px", color: "#ffffff", fontSize: "13px", outline: "none" }}
-                  required
-                />
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
-                <button type="button" onClick={() => setIsProfileModalOpen(false)} className="cd-btn-outline">Cancel</button>
-                <button type="submit" disabled={profileSaving} className="cd-btn-bw">
-                  {profileSaving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
-                  <span>Save Changes</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
+      </div>
     </div>
   );
 };

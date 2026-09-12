@@ -1,67 +1,238 @@
-/* frontend/src/index.css */
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import 'tailwindcss';
 
-/* 1. Global Box-Sizing Reset */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-instrument: 'Instrument Sans', 'Geist', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
+
+  --background: oklch(0.06 0.008 260);
+  --foreground: oklch(0.94 0.005 90);
+  --card: oklch(0.09 0.008 260);
+  --card-foreground: oklch(0.94 0.005 90);
+  --popover: oklch(0.09 0.008 260);
+  --popover-foreground: oklch(0.94 0.005 90);
+  --primary: oklch(0.94 0.005 90);
+  --primary-foreground: oklch(0.06 0.008 260);
+  --secondary: oklch(0.12 0.008 260);
+  --secondary-foreground: oklch(0.94 0.005 90);
+  --muted: oklch(0.12 0.008 260);
+  --muted-foreground: oklch(0.55 0.015 90);
+  --accent: oklch(0.14 0.01 260);
+  --accent-foreground: oklch(0.94 0.005 90);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.94 0.005 90);
+  --border: oklch(0.18 0.008 260);
+  --input: oklch(0.14 0.008 260);
+  --ring: oklch(0.94 0.005 90);
+  --chart-1: oklch(0.94 0.005 90);
+  --chart-2: oklch(0.72 0.01 90);
+  --chart-3: oklch(0.52 0.015 90);
+  --chart-4: oklch(0.35 0.01 90);
+  --chart-5: oklch(0.20 0.008 90);
+  --radius: 0.25rem;
+  --sidebar: oklch(0.06 0.008 260);
+  --sidebar-foreground: oklch(0.94 0.005 90);
+  --sidebar-primary: oklch(0.94 0.005 90);
+  --sidebar-primary-foreground: oklch(0.06 0.008 260);
+  --sidebar-accent: oklch(0.12 0.008 260);
+  --sidebar-accent-foreground: oklch(0.94 0.005 90);
+  --sidebar-border: oklch(0.18 0.008 260);
+  --sidebar-ring: oklch(0.55 0.015 90);
 }
 
-/* 2. Force Viewport Bounds & Kill Defaults */
-html, body, #root {
-  width: 100%;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  background-color: #09090b;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+@theme inline {
+  --font-sans: 'Instrument Sans', 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Instrument Sans', 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* 3. Stop Flex Children (Monaco Editor) from blowing out horizontally */
-div {
-  min-width: 0;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-/* Dark Mode Markdown Formatting inside AI Sidebar */
-.markdown-body h1, .markdown-body h2, .markdown-body h3 {
-  color: #ffffff;
-  margin-top: 12px;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
+@layer utilities {
+  .font-display {
+    font-family: 'Instrument Sans', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    letter-spacing: -0.035em;
+  }
+  .font-sans {
+    font-family: 'Instrument Sans', 'Geist', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+  
+  .text-stroke {
+    -webkit-text-stroke: 1.5px currentColor;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .marquee {
+    animation: marquee 30s linear infinite;
+  }
+  
+  .marquee-reverse {
+    animation: marquee-reverse 25s linear infinite;
+  }
 
-.markdown-body ul, .markdown-body ol {
-  padding-left: 20px;
-  margin-bottom: 12px;
-}
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  
+  @keyframes marquee-reverse {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+  
+  .line-reveal {
+    clip-path: inset(0 100% 0 0);
+    animation: line-reveal 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+  }
+  
+  @keyframes line-reveal {
+    to { clip-path: inset(0 0 0 0); }
+  }
+  
+  .hover-lift {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+  }
+  
+  .letter-spin {
+    display: inline-block;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .letter-spin:hover {
+    transform: rotateY(360deg);
+  }
+  
+  .animate-char-in {
+    animation: char-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+    transform: translateY(60%);
+  }
+  
+  @keyframes char-in {
+    0% {
+      opacity: 0;
+      transform: translateY(60%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
-.markdown-body li {
-  margin-bottom: 4px;
-}
+  .noise-overlay {
+    position: relative;
+  }
+  
+  .noise-overlay::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .how-it-works-bg {
+    background-color: oklch(0.10 0.008 260);
+  }
 
-.markdown-body code {
-  background-color: #18181b;
-  color: #ffffff;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-family: monospace;
-  font-size: 12px;
-}
+  .word-gradient {
+    background: linear-gradient(
+      45deg,
+      #eca8d6 0%,
+      #a78bfa 25%,
+      #67e8f9 50%,
+      #fbbf24 75%,
+      #eca8d6 100%
+    );
+    background-size: 300% 300%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradient-shift 1.5s ease infinite;
+  }
 
-.markdown-body pre {
-  background-color: #121215;
-  border: 1px solid #27272a;
-  border-radius: 6px;
-  padding: 10px;
-  overflow-x: auto;
-  margin: 10px 0;
-}
+  @keyframes drawLine {
+    0%   { stroke-dashoffset: 1000; opacity: 0; }
+    15%  { opacity: 1; }
+    70%  { opacity: 0.7; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
 
-.markdown-body pre code {
-  background-color: transparent;
-  color: #ffffff;
-  padding: 0;
+  .connecting-line {
+    stroke: #eca8d6;
+    stroke-width: 1.2;
+    fill: none;
+    stroke-dasharray: 1000;
+    animation: drawLine 3s ease-in-out infinite;
+  }
+
+  @keyframes progress {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  .animate-progress {
+    animation: progress 6s linear forwards;
+  }
 }

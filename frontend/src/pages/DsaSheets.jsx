@@ -6,6 +6,7 @@ import {
   Flame
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import LandingPage from "./LandingPage";
 
 import striverData from "../data/striverA2Z.json";
 import babbarData from "../data/loveBabbar450.json";
@@ -318,130 +319,137 @@ export default function DsaSheets() {
     totalProblemsCount > 0 ? Math.round((solvedProblemsCount / totalProblemsCount) * 100) : 0;
 
   return (
-    <div className="cd-root">
-      <DynamicCosmosCanvas />
+    <div className="relative min-h-screen w-full overflow-hidden bg-black text-foreground">
+      {/* BACKGROUND LAYER: Blurred reflection of the Landing Page */}
+      <div 
+        aria-hidden="true" 
+        className="fixed inset-0 pointer-events-none select-none overflow-hidden z-0 filter blur-[10px] brightness-75 scale-105 transform-gpu opacity-75"
+      >
+        <LandingPage />
+      </div>
 
-      <style>{`
-        .cd-root {
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-          width: 100vw;
-          background-color: #09090b;
-          color: #ffffff;
-          font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-          overflow-x: hidden;
-          position: relative;
-        }
+      {/* OVERLAY: Dark glassmorphic backdrop */}
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-0 pointer-events-none" />
 
-        .cd-scrollable {
-          overflow-y: auto;
-        }
-        .cd-scrollable::-webkit-scrollbar {
-          width: 6px;
-        }
-        .cd-scrollable::-webkit-scrollbar-thumb {
-          background: #27272a;
-          border-radius: 4px;
-        }
-
-        @keyframes smoothPop {
-          0% {
-            opacity: 0;
-            transform: scale(0.97) translateY(6px);
+      {/* FOREGROUND CONTENT LAYER */}
+      <div className="cd-root">
+        <style>{`
+          .cd-root {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100vw;
+            background-color: transparent;
+            color: #ffffff;
+            font-family: inherit;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 10;
           }
-          100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
+
+          .cd-scrollable {
+            overflow-y: auto;
           }
-        }
-        .cd-animate-pop {
-          animation: smoothPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+          .cd-scrollable::-webkit-scrollbar {
+            width: 6px;
+          }
+          .cd-scrollable::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+          }
 
-        .cd-topbar {
-          height: 60px;
-          background-color: rgba(12, 12, 14, 0.9);
-          backdrop-filter: blur(12px);
-          border-bottom: 1px solid #27272a;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 28px;
-          position: sticky;
-          top: 0;
-          z-index: 40;
-          flex-shrink: 0;
-        }
+          @keyframes smoothPop {
+            0% {
+              opacity: 0;
+              transform: scale(0.97) translateY(6px);
+            }
+            100% {
+              opacity: 1;
+              transform: scale(1) translateY(0);
+            }
+          }
+          .cd-animate-pop {
+            animation: smoothPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
 
-        .cd-logo-btn {
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
-          background-color: #18181b;
-          border: 1px solid #3f3f46;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+          .cd-topbar {
+            height: 64px;
+            background-color: rgba(10, 10, 15, 0.55);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            flex-shrink: 0;
+          }
 
-        .cd-btn-bw {
-          background-color: #ffffff;
-          color: #09090b;
-          border: none;
-          border-radius: 8px;
-          padding: 8px 16px;
-          font-size: 12.5px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-          box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
-        }
-        .cd-btn-bw:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
-        }
+          .cd-btn-bw {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 9999px;
+            padding: 8px 18px;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+          }
+          .cd-btn-bw:hover {
+            transform: translateY(-1px);
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.35);
+          }
 
-        .cd-btn-outline {
-          background-color: #121215;
-          color: #ffffff;
-          border: 1px solid #27272a;
-          border-radius: 8px;
-          padding: 8px 14px;
-          font-size: 12.5px;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .cd-btn-outline:hover {
-          background-color: #18181b;
-          border-color: #52525b;
-        }
+          .cd-btn-outline {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 9999px;
+            padding: 8px 16px;
+            font-family: monospace;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+          }
+          .cd-btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.35);
+          }
 
-        .cd-card {
-          background: #121215;
-          border: 1px solid #27272a;
-          border-radius: 12px;
-          padding: 22px;
-        }
+          .cd-card {
+            background: rgba(10, 10, 15, 0.55);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+          }
 
-        /* Sheet Accordion Card Style */
-        .cd-sheet-accordion {
-          background-color: #121215;
-          border: 1px solid #27272a;
-          border-radius: 8px;
-          overflow: hidden;
-          transition: all 0.2s ease;
-        }
-        .cd-sheet-accordion:hover {
-          border-color: #3f3f46;
-        }
+          /* Sheet Accordion Card Style */
+          .cd-sheet-accordion {
+            background: rgba(10, 10, 15, 0.55);
+            backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+          }
+          .cd-sheet-accordion:hover {
+            border-color: rgba(236, 168, 214, 0.5);
+          }
 
         .cd-sheet-header {
           padding: 16px 20px;
@@ -1042,6 +1050,7 @@ export default function DsaSheets() {
 
         </div>
       </main>
+    </div>
     </div>
   );
 }

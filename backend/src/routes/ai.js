@@ -3,9 +3,10 @@ const router = express.Router();
 const { GoogleGenAI } = require("@google/genai");
 const { aiRateLimiter } = require("../middleware/rateLimiter");
 const { protect } = require("../middleware/authMiddleware");
+const { validateBody, aiSchemas } = require("../middleware/schemaValidation");
 
-// Apply Auth Protection & Redis Sliding-Window Rate Limiter
-router.post("/review", protect, aiRateLimiter, async (req, res) => {
+// Apply Auth Protection, Joi Validation (max 10,000 chars code cap), & Redis Sliding-Window Rate Limiter
+router.post("/review", protect, aiRateLimiter, validateBody(aiSchemas.review), async (req, res) => {
   const {
     code,
     language,

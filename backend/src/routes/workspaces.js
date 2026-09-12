@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Workspace = require("../models/Workspace");
 const { protect } = require("../middleware/authMiddleware");
+const { validateBody, workspaceSchemas } = require("../middleware/schemaValidation");
 
 // @route   POST /api/workspaces
 // @desc    Create a new workspace (Strictly 1 root folder only, no files by default)
-router.post("/", protect, async (req, res) => {
+router.post("/", protect, validateBody(workspaceSchemas.create), async (req, res) => {
   try {
     const { title, language = "python", customInput } = req.body;
     const folderName = title?.trim() || "src";
@@ -74,7 +75,7 @@ router.get("/:id", protect, async (req, res) => {
 
 // @route   PUT /api/workspaces/:id
 // @desc    Save/update workspace code, title, language, files, customInput, or isPublic
-router.put("/:id", protect, async (req, res) => {
+router.put("/:id", protect, validateBody(workspaceSchemas.update), async (req, res) => {
   try {
     const { title, code, language, files, customInput, isPublic } = req.body;
 

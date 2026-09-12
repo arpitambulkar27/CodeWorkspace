@@ -5,6 +5,8 @@ const cheerio = require("cheerio");
 const Problem = require("../models/Problem");
 const { runCode } = require("../services/dockerService");
 const { protect } = require("../middleware/authMiddleware");
+const { detailsRateLimiter } = require("../middleware/rateLimiter");
+const { validateBody, problemSchemas } = require("../middleware/schemaValidation");
 
 // Helper to strip trailing numeric IDs from GFG slugs (e.g., maximum-product-subarray3604 -> maximum-product-subarray)
 const cleanGfgSlug = (slugStr) => {
@@ -30,7 +32,7 @@ router.get("/", async (req, res) => {
 
 // @route   GET /api/problems/details
 // @desc    Unified problem details proxy for LeetCode and GeeksforGeeks (using Cheerio scraper & GraphQL)
-router.get("/details", async (req, res) => {
+router.get("/details", protect, detailsRateLimiter, async (req, res) => {
   const { platform, slug, url, title } = req.query;
 
   if (!slug && !url && !title) {
@@ -267,7 +269,7 @@ router.get("/:slug", async (req, res) => {
 
 // @route   POST /api/problems/:slug/submit
 // @desc    Submit code solution for a problem and evaluate against test cases
-router.post("/:slug/submit", protect, async (req, res) => {
+router.post("/:slug/submit", protect, validateBody(problemSchemas.submit), async (req, res) => {
   try {
     const { language, code } = req.body;
     if (!language || !code) {

@@ -3,9 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { 
   Code2, Mail, Lock, ArrowRight, ShieldCheck, Cpu, 
-  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, KeyRound, RefreshCw, CheckCircle2
+  Zap, Eye, EyeOff, AlertCircle, Loader2, Sparkles, KeyRound, RefreshCw, CheckCircle2, X
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import LandingPage from "./LandingPage";
 
 // Strict RFC 5322 Email Regex
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -140,300 +141,122 @@ export default function Login() {
   };
 
   return (
-    <div className="cf-auth-root">
-      <style>{`
-        .cf-auth-root {
-          min-height: 100vh;
-          width: 100vw;
-          display: flex;
-          background-color: #07090e;
-          color: #e6edf3;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-          overflow: hidden;
-          position: relative;
-        }
-
-        .cf-ambient-orb-1 {
-          position: absolute;
-          top: -150px;
-          left: -100px;
-          width: 600px;
-          height: 600px;
-          background: radial-gradient(circle, rgba(37, 99, 235, 0.18) 0%, rgba(7, 9, 14, 0) 70%);
-          pointer-events: none;
-        }
-        .cf-ambient-orb-2 {
-          position: absolute;
-          bottom: -150px;
-          right: -100px;
-          width: 600px;
-          height: 600px;
-          background: radial-gradient(circle, rgba(147, 51, 234, 0.15) 0%, rgba(7, 9, 14, 0) 70%);
-          pointer-events: none;
-        }
-
-        .cf-bg-grid {
-          position: absolute;
-          inset: 0;
-          background-image: radial-gradient(#1e293b 1px, transparent 1px);
-          background-size: 32px 32px;
-          opacity: 0.15;
-          pointer-events: none;
-        }
-
-        .cf-auth-left {
-          flex: 1.1;
-          background: linear-gradient(135deg, #0b0f19 0%, #080c14 100%);
-          border-right: 1px solid #1e293b;
-          padding: 50px 60px;
-          display: flex;
-          flex-direction: column;
-          justify-space-between;
-          position: relative;
-          z-index: 10;
-        }
-
-        @media (max-width: 1024px) {
-          .cf-auth-left { display: none; }
-        }
-
-        .cf-input-wrapper {
-          position: relative;
-          width: 100%;
-          margin-bottom: 20px;
-        }
-
-        .cf-input-field {
-          width: 100%;
-          box-sizing: border-box;
-          padding: 14px 16px 14px 44px;
-          background-color: #0d1117;
-          border: 1px solid #21262d;
-          border-radius: 12px;
-          color: #f0f6fc;
-          font-size: 14px;
-          outline: none;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .cf-input-field::placeholder {
-          color: #6e7681;
-        }
-
-        .cf-input-field:hover {
-          border-color: #388bfd;
-          background-color: #111622;
-          box-shadow: 0 0 16px rgba(56, 139, 253, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .cf-input-field:focus {
-          border-color: #58a6ff;
-          background-color: #111622;
-          box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.25), 0 0 20px rgba(56, 139, 253, 0.3);
-        }
-
-        .cf-input-icon {
-          position: absolute;
-          left: 14px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #8b949e;
-          transition: color 0.25s ease;
-          pointer-events: none;
-        }
-
-        .cf-input-wrapper:focus-within .cf-input-icon {
-          color: #58a6ff;
-        }
-
-        .cf-btn-submit {
-          width: 100%;
-          padding: 14px 24px;
-          background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #1d4ed8 100%);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 12px;
-          color: #ffffff;
-          font-weight: 700;
-          font-size: 15px;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 0 8px 24px -4px rgba(37, 99, 235, 0.4);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          margin-top: 10px;
-        }
-
-        .cf-btn-submit:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 30px -4px rgba(37, 99, 235, 0.6);
-          filter: brightness(1.1);
-        }
-
-        .cf-social-btn {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          padding: 12px 16px;
-          background-color: #0d1117;
-          border: 1px solid #30363d;
-          border-radius: 12px;
-          color: #f0f6fc;
-          font-size: 13.5px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-        .cf-social-btn:hover {
-          background-color: #161b22;
-          border-color: #58a6ff;
-          transform: translateY(-1px);
-        }
-
-        .cf-auth-card {
-          background-color: rgba(13, 17, 23, 0.85);
-          border: 1px solid #21262d;
-          border-radius: 20px;
-          padding: 40px;
-          width: 100%;
-          max-width: 440px;
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 139, 253, 0.08);
-          backdrop-filter: blur(16px);
-          position: relative;
-          z-index: 20;
-          transition: border-color 0.3s ease;
-        }
-        .cf-auth-card:hover {
-          border-color: rgba(56, 139, 253, 0.4);
-        }
-      `}</style>
-
-      <div className="cf-bg-grid" />
-      <div className="cf-ambient-orb-1" />
-      <div className="cf-ambient-orb-2" />
-
-      {/* LEFT SHOWCASE PANEL */}
-      <div className="cf-auth-left">
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ padding: "10px", backgroundColor: "rgba(56, 139, 253, 0.15)", borderRadius: "12px", border: "1px solid rgba(56, 139, 253, 0.3)" }}>
-            <Code2 size={26} color="#58a6ff" />
-          </div>
-          <div>
-            <h1 style={{ margin: 0, fontSize: "20px", fontWeight: "800", letterSpacing: "-0.5px", color: "#ffffff" }}>CodeForge</h1>
-            <span style={{ fontSize: "11px", color: "#58a6ff", fontWeight: "bold" }}>Cloud IDE & Technical Interview Platform</span>
-          </div>
-        </div>
-
-        <div style={{ margin: "auto 0", maxWidth: "520px" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", padding: "6px 14px", borderRadius: "20px", backgroundColor: "rgba(56, 139, 253, 0.12)", border: "1px solid rgba(56, 139, 253, 0.25)", color: "#58a6ff", fontSize: "12px", fontWeight: "bold", marginBottom: "20px" }}>
-            <Sparkles size={14} /> Next-Gen Developer Workspaces
-          </div>
-
-          <h2 style={{ fontSize: "36px", fontWeight: "900", color: "#ffffff", lineHeight: "1.25", letterSpacing: "-0.8px", margin: "0 0 16px 0" }}>
-            Isolated Execution Sandboxes on Demand
-          </h2>
-          <p style={{ fontSize: "14px", color: "#8b949e", lineHeight: "1.6", margin: "0 0 28px 0" }}>
-            Experience zero-latency real-time pair programming, sandboxed Docker code execution, and AI-powered automated code reviews.
-          </p>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "24px", paddingTop: "24px", borderTop: "1px solid #1e293b", fontSize: "12px", color: "#8b949e" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <ShieldCheck size={16} color="#3fb950" /> Ephemeral Isolation
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Cpu size={16} color="#58a6ff" /> BullMQ Task Queues
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Zap size={16} color="#d29922" /> Socket.io Multiplayer
-          </div>
-        </div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-black text-foreground flex items-center justify-center">
+      {/* BACKGROUND LAYER: Blurred reflection of the Landing Page */}
+      <div 
+        aria-hidden="true" 
+        className="fixed inset-0 pointer-events-none select-none overflow-hidden z-0 filter blur-[10px] brightness-75 scale-105 transform-gpu opacity-75"
+      >
+        <LandingPage />
       </div>
 
-      {/* RIGHT AUTH FORM PANEL */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px", position: "relative", zIndex: 20 }}>
-        
-        <div className="cf-auth-card">
+      {/* OVERLAY: Dark glassmorphic backdrop */}
+      <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-10" />
+
+      {/* AUTH CARD: Translucent blur card */}
+      <div className="relative z-20 w-full max-w-[460px] mx-4 my-8">
+        <div className="bg-black/50 backdrop-blur-2xl border border-white/15 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-black/80 transition-all duration-300">
           
+          {/* Header Brand & Close Button */}
+          <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
+            <Link to="/" className="flex items-center gap-2 group">
+              <span className="text-2xl font-display tracking-tight text-white">CODEFORGE</span>
+              <span className="text-xs font-mono text-[#eca8d6] mt-0.5">IDE</span>
+            </Link>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-muted-foreground px-3 py-1 bg-white/5 border border-white/10 rounded-full hidden sm:inline-block">
+                Cloud Auth
+              </span>
+              <Link 
+                to="/" 
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 flex items-center justify-center text-muted-foreground hover:text-white transition-all cursor-pointer"
+                title="Close and return to landing page"
+              >
+                <X className="w-4 h-4" />
+              </Link>
+            </div>
+          </div>
+
           {/* 🟢 STEP 2: UNVERIFIED USER OTP VIEW */}
           {showOtpView ? (
             <div>
-              <div style={{ textAlign: "center", marginBottom: "24px" }}>
-                <div style={{ width: "52px", height: "52px", borderRadius: "14px", backgroundColor: "rgba(56, 139, 253, 0.15)", border: "1px solid rgba(56, 139, 253, 0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px auto" }}>
-                  <KeyRound size={26} color="#58a6ff" />
+              <div className="text-center mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-[#eca8d6]/10 border border-[#eca8d6]/30 flex items-center justify-center mx-auto mb-4">
+                  <KeyRound className="w-7 h-7 text-[#eca8d6]" />
                 </div>
-                <h2 style={{ margin: "0 0 8px 0", fontSize: "24px", fontWeight: "900", color: "#ffffff" }}>
-                  Account Verification Required
+                <h2 className="text-2xl font-display text-white mb-2">
+                  Verify Account
                 </h2>
-                <p style={{ margin: 0, fontSize: "13px", color: "#8b949e", lineHeight: "1.5" }}>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Please enter the 6-digit verification code sent to <br />
-                  <strong style={{ color: "#ffffff" }}>{email}</strong>
+                  <strong className="text-white">{email}</strong>
                 </p>
               </div>
 
               {error && (
-                <div style={{ padding: "12px 14px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <AlertCircle size={18} />
+                <div className="p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs font-medium mb-5 flex items-center gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
 
               {otpSuccessMsg && (
-                <div style={{ padding: "12px 14px", backgroundColor: "rgba(46, 160, 67, 0.15)", border: "1px solid rgba(46, 160, 67, 0.4)", borderRadius: "12px", color: "#3fb950", fontSize: "13px", fontWeight: "600", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <CheckCircle2 size={18} />
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-medium mb-5 flex items-center gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{otpSuccessMsg}</span>
                 </div>
               )}
 
-              <form onSubmit={handleVerifyOtp}>
-                <div className="cf-input-wrapper">
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+              <form onSubmit={handleVerifyOtp} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
                     6-Digit OTP Code
                   </label>
-                  <KeyRound className="cf-input-icon" size={18} />
-                  <input
-                    type="text"
-                    required
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    placeholder="123456"
-                    className="cf-input-field"
-                    style={{ letterSpacing: "6px", fontSize: "18px", fontWeight: "bold", textAlign: "center", paddingLeft: "16px" }}
-                  />
+                  <div className="relative">
+                    <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type="text"
+                      required
+                      maxLength={6}
+                      value={otpCode}
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                      placeholder="123456"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 text-white placeholder:text-muted-foreground text-center tracking-[6px] text-lg font-mono focus:outline-none focus:border-[#eca8d6] focus:ring-1 focus:ring-[#eca8d6] transition-all"
+                    />
+                  </div>
                 </div>
 
-                <button type="submit" disabled={loading} className="cf-btn-submit">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 px-6 bg-white hover:bg-white/90 text-black font-mono text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/10"
+                >
                   {loading ? (
                     <>
-                      <Loader2 size={18} className="animate-spin" /> Verifying OTP...
+                      <Loader2 className="w-4 h-4 animate-spin" /> Verifying OTP...
                     </>
                   ) : (
                     <>
                       <span>Verify & Launch Workspace</span>
-                      <ArrowRight size={18} />
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
               </form>
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px", paddingTop: "16px", borderTop: "1px solid #21262d", fontSize: "13px" }}>
+              <div className="flex justify-between items-center mt-6 pt-5 border-t border-white/10 text-xs">
                 <button
                   type="button"
                   onClick={handleResendOtp}
                   disabled={loading}
-                  style={{ background: "none", border: "none", color: "#58a6ff", fontWeight: "bold", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                  className="bg-transparent border-none text-[#eca8d6] font-mono font-semibold cursor-pointer flex items-center gap-1.5 hover:underline"
                 >
-                  <RefreshCw size={14} /> Resend OTP Code
+                  <RefreshCw className="w-3.5 h-3.5" /> Resend OTP Code
                 </button>
 
                 <span 
                   onClick={() => setShowOtpView(false)} 
-                  style={{ color: "#8b949e", cursor: "pointer", textDecoration: "underline" }}
+                  className="text-muted-foreground cursor-pointer underline hover:text-white transition-colors"
                 >
                   Back to Sign In
                 </span>
@@ -442,90 +265,102 @@ export default function Login() {
           ) : (
             /* 🔵 STEP 1: LOGIN FORM */
             <div>
-              <div style={{ marginBottom: "26px" }}>
-                <h2 style={{ margin: "0 0 8px 0", fontSize: "28px", fontWeight: "900", letterSpacing: "-0.5px", color: "#ffffff" }}>
-                  Sign in to CodeForge
+              <div className="mb-6">
+                <h2 className="text-3xl font-display text-white mb-2">
+                  Sign in
                 </h2>
-                <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
-                  Enter your validated email and password to launch your cloud IDE
+                <p className="text-sm text-muted-foreground">
+                  Enter your email and password to access your cloud IDE
                 </p>
               </div>
 
               {error && (
-                <div style={{ padding: "14px 16px", backgroundColor: "rgba(248, 81, 73, 0.15)", border: "1px solid rgba(248, 81, 73, 0.4)", borderRadius: "12px", color: "#f85149", fontSize: "13px", fontWeight: "600", marginBottom: "24px", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <AlertCircle size={18} />
+                <div className="p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs font-medium mb-5 flex items-center gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
               )}
 
-              <form onSubmit={handleSubmit}>
-                <div className="cf-input-wrapper">
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
                     Work Email
                   </label>
-                  <Mail className="cf-input-icon" size={18} />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="developer@example.com"
-                    className="cf-input-field"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="developer@example.com"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 text-white placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#eca8d6] focus:ring-1 focus:ring-[#eca8d6] transition-all"
+                    />
+                  </div>
                 </div>
 
-                <div className="cf-input-wrapper">
-                  <label style={{ display: "block", fontSize: "12px", fontWeight: "700", textTransform: "uppercase", color: "#c9d1d9", marginBottom: "8px", letterSpacing: "0.5px" }}>
+                <div>
+                  <label className="block text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
                     Password
                   </label>
-                  <Lock className="cf-input-icon" size={18} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="cf-input-field"
-                    style={{ paddingRight: "44px" }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    style={{ position: "absolute", right: "14px", top: "40px", background: "none", border: "none", color: "#8b949e", cursor: "pointer", padding: 0 }}
-                  >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••••••"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 pl-10 pr-10 text-white placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#eca8d6] focus:ring-1 focus:ring-[#eca8d6] transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
 
-                <button type="submit" disabled={loading} className="cf-btn-submit">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 px-6 bg-white hover:bg-white/90 text-black font-mono text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-white/10"
+                >
                   {loading ? (
                     <>
-                      <Loader2 size={18} className="animate-spin" /> Authenticating...
+                      <Loader2 className="w-4 h-4 animate-spin" /> Authenticating...
                     </>
                   ) : (
                     <>
                       <span>Sign In to Workspace</span>
-                      <ArrowRight size={18} />
+                      <ArrowRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
               </form>
 
-              <div style={{ display: "flex", alignItems: "center", margin: "24px 0 18px 0" }}>
-                <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
-                <span style={{ padding: "0 14px", fontSize: "11px", color: "#8b949e", fontWeight: "700", letterSpacing: "0.08em" }}>OR CONTINUE WITH</span>
-                <div style={{ flex: 1, height: "1px", backgroundColor: "#21262d" }} />
+              {/* Divider */}
+              <div className="relative my-6 text-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/10" />
+                </div>
+                <span className="relative px-3 bg-black/60 text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+                  OR CONTINUE WITH
+                </span>
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "24px" }}>
-                <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+              {/* OAuth Buttons (Google & GitHub) */}
+              <div className="space-y-3">
+                <div className="w-full flex justify-center">
                   <GoogleLogin
                     onSuccess={handleGoogleSuccess}
                     onError={handleGoogleError}
                     theme="filled_black"
                     shape="rectangular"
                     size="large"
-                    width="360"
+                    width="380"
                     text="continue_with"
                   />
                 </div>
@@ -534,19 +369,20 @@ export default function Login() {
                   type="button"
                   onClick={handleGithubLogin}
                   disabled={loading}
-                  className="cf-social-btn"
+                  className="w-full py-3 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white text-xs font-mono font-semibold flex items-center justify-center gap-3 transition-all cursor-pointer"
                 >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
                   </svg>
                   <span>GitHub</span>
                 </button>
               </div>
 
-              <div style={{ textAlign: "center", paddingTop: "18px", borderTop: "1px solid #21262d" }}>
-                <p style={{ margin: 0, fontSize: "14px", color: "#8b949e" }}>
+              {/* Bottom Navigation */}
+              <div className="text-center pt-6 mt-6 border-t border-white/10">
+                <p className="text-xs text-muted-foreground">
                   Don't have an account yet?{" "}
-                  <Link to="/signup" style={{ color: "#58a6ff", fontWeight: "bold", textDecoration: "none", transition: "color 0.2s ease" }}>
+                  <Link to="/signup" className="text-[#eca8d6] font-semibold hover:underline transition-colors">
                     Create Account
                   </Link>
                 </p>
