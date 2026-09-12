@@ -12,6 +12,8 @@ import {
 import { useAuth } from "../context/AuthContext";
 import LandingPage from "./LandingPage";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -62,7 +64,7 @@ const Dashboard = () => {
   const fetchTelemetry = async () => {
     try {
       setTelemetryLoading(true);
-      const res = await axios.get("http://localhost:5000/api/telemetry");
+      const res = await axios.get(`${API_BASE_URL}/api/telemetry`);
       setTelemetry(res.data);
       setTelemetryLastUpdated(new Date().toLocaleTimeString());
     } catch (err) {
@@ -79,7 +81,7 @@ const Dashboard = () => {
         setWorkspaces([]);
         return;
       }
-      const res = await axios.get("http://localhost:5000/api/workspaces", {
+      const res = await axios.get(`${API_BASE_URL}/api/workspaces`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWorkspaces(res.data || []);
@@ -100,7 +102,7 @@ const Dashboard = () => {
     try {
       setCreating(true);
       const res = await axios.post(
-        "http://localhost:5000/api/workspaces",
+        `${API_BASE_URL}/api/workspaces`,
         { title: titleToUse, language: langToUse },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -118,7 +120,7 @@ const Dashboard = () => {
     e.stopPropagation();
     if (!window.confirm("Are you sure you want to delete this workspace?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/workspaces/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/workspaces/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setWorkspaces((prev) => prev.filter((w) => w._id !== id));
@@ -131,7 +133,7 @@ const Dashboard = () => {
     e.stopPropagation();
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/workspaces/${id}/fork`,
+        `${API_BASE_URL}/api/workspaces/${id}/fork`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -162,7 +164,7 @@ const Dashboard = () => {
       setProfileSaving(true);
       setProfileMsg("");
       const res = await axios.put(
-        "http://localhost:5000/api/auth/profile",
+        `${API_BASE_URL}/api/auth/profile`,
         { username: editUsername, email: editEmail },
         { headers: { Authorization: `Bearer ${token}` } }
       );
