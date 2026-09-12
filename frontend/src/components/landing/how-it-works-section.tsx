@@ -23,7 +23,7 @@ const steps = [
     title: "Run",
     subtitle: "the container",
     description: "Spin up isolated ephemeral sandboxes with real-time memory limiters and instant output streaming.",
-    code: `const runner = await codeForge.run({
+    code: `const runner = await codeFlow.run({
   language: 'javascript',
   code: twoSum,
   input: [2, 7, 11, 15],
@@ -36,7 +36,7 @@ const steps = [
     title: "Review",
     subtitle: "with AI Code Review",
     description: "Receive instantaneous AI code reviews, time & space complexity analysis, and automated bug detection.",
-    code: `await codeForge.aiReview({
+    code: `await codeFlow.aiReview({
   code: twoSum,
   language: 'javascript'
 });

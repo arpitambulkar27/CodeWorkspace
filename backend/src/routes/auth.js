@@ -226,7 +226,7 @@ router.post("/google", authRateLimiter, validateBody(authSchemas.googleAuth), as
       user = await User.create({
         username: finalUsername,
         email: cleanEmail,
-        avatar: picture || "https://api.dicebear.com/7.x/bottts/svg?seed=CodeForge",
+        avatar: picture || "https://api.dicebear.com/7.x/bottts/svg?seed=CodeFlow",
         authProvider: "google",
         isVerified: true,
       });
@@ -296,7 +296,7 @@ router.post("/github", authRateLimiter, validateBody(authSchemas.githubAuth), as
     const userResponse = await axios.get("https://api.github.com/user", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "User-Agent": "CodeForge-App",
+        "User-Agent": "CodeFlow-App",
       },
     });
 
@@ -312,7 +312,7 @@ router.post("/github", authRateLimiter, validateBody(authSchemas.githubAuth), as
         const emailsResponse = await axios.get("https://api.github.com/user/emails", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "User-Agent": "CodeForge-App",
+            "User-Agent": "CodeFlow-App",
           },
         });
 
@@ -347,7 +347,7 @@ router.post("/github", authRateLimiter, validateBody(authSchemas.githubAuth), as
       user = await User.create({
         username: finalUsername,
         email: cleanEmail,
-        avatar: githubUser.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=CodeForge",
+        avatar: githubUser.avatar_url || "https://api.dicebear.com/7.x/bottts/svg?seed=CodeFlow",
         authProvider: "github",
         githubId: String(githubUser.id),
         isVerified: true,

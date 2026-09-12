@@ -2,33 +2,33 @@
 
 import { useEffect, useState, useRef } from "react";
 import {
-  Code,
-  Terminal,
-  Cpu,
-  Layers,
-  Sparkles,
-  Container,
-  GitBranch,
-  Users,
+  Code2,
+  Zap,
+  Server,
   Database,
+  Radio,
+  FileCode2,
+  Container,
+  Workflow,
+  Palette,
+  Sparkles,
   ShieldCheck,
-  KeyRound,
-  FileCode,
+  Globe,
 } from "lucide-react";
 
 const integrations = [
-  { name: "Python 3.11", category: "Runtime", icon: Terminal },
-  { name: "Java (JDK)", category: "Runtime", icon: Code },
-  { name: "C++", category: "Runtime", icon: Cpu },
-  { name: "Node.js / JS", category: "Runtime", icon: FileCode },
-  { name: "Monaco Editor", category: "IDE Engine", icon: Layers },
-  { name: "AI Code Review", category: "AI Engine", icon: Sparkles },
-  { name: "Docker Sandboxes", category: "Containers", icon: Container },
-  { name: "GitHub Connection", category: "VCS & Auth", icon: GitBranch },
-  { name: "Live Collab", category: "Real-time", icon: Users },
-  { name: "MongoDB", category: "Database", icon: Database },
-  { name: "Joi Security", category: "Validation", icon: ShieldCheck },
-  { name: "Google OAuth", category: "Identity", icon: KeyRound },
+  { name: "React 19", category: "Frontend UI", icon: Code2 },
+  { name: "Vite", category: "Build Tool", icon: Zap },
+  { name: "Node.js", category: "Backend Framework", icon: Server },
+  { name: "MongoDB (Mongoose)", category: "Database", icon: Database },
+  { name: "Socket.io", category: "Real-time Sync", icon: Radio },
+  { name: "Monaco Editor", category: "Code Editor", icon: FileCode2 },
+  { name: "Docker (Dockerode)", category: "Sandboxed Execution", icon: Container },
+  { name: "Redis + BullMQ", category: "Job Queue", icon: Workflow },
+  { name: "Tailwind CSS", category: "Styling", icon: Palette },
+  { name: "AI API", category: "AI Review & Hints", icon: Sparkles },
+  { name: "JWT + bcrypt", category: "Auth & Security", icon: ShieldCheck },
+  { name: "Cheerio + Axios", category: "Web Scraping & HTTP", icon: Globe },
 ];
 
 export function IntegrationsSection() {
@@ -50,9 +50,9 @@ export function IntegrationsSection() {
   }, []);
 
   return (
-    <section id="integrations" ref={sectionRef} className="relative overflow-hidden">
+    <section id="integrations" ref={sectionRef} className="relative py-16 lg:py-24 overflow-hidden">
       {/* Header */}
-      <div className="relative z-10 pt-32 lg:pt-40 text-center">
+      <div className="relative z-10 text-center mb-6">
         <span
           className={`inline-flex items-center gap-4 text-sm font-mono text-muted-foreground mb-8 transition-all duration-700 justify-center ${
             isVisible ? "opacity-100" : "opacity-0"
@@ -78,33 +78,33 @@ export function IntegrationsSection() {
             isVisible ? "opacity-100" : "opacity-0"
           }`}
         >
-          CodeForge integrates directly with industry-standard runtimes, AI code review models, Docker containers, and GitHub.
+          CodeFlow integrates directly with industry-standard frameworks, databases, sandboxed container runtimes, and real-time sync engines.
         </p>
       </div>
 
-      {/* Full-width image background */}
+      {/* Full-width hands connection graphic — true edge-to-edge full bleed */}
       <div
-        className={`relative left-1/2 -translate-x-1/2 w-screen -mt-16 transition-all duration-1000 delay-200 ${
+        className={`relative left-1/2 -translate-x-1/2 w-screen transition-all duration-1000 delay-200 ${
           isVisible ? "opacity-100" : "opacity-0"
         }`}
       >
         <img
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/connection-KeJwWPQvn6l0a7C48tCARYtNEdC92H.png"
-          alt=""
+          alt="Glowing hands connection"
           aria-hidden="true"
-          className="w-full h-auto object-cover"
+          className="w-full h-auto object-cover block"
         />
       </div>
 
-      {/* Integration grid */}
-      <div className="relative z-10 mt-0 lg:-mt-24 max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-16">
+      {/* Integration grid — sits over bottom fade of hands image */}
+      <div className="relative z-10 -mt-8 lg:-mt-14 max-w-[1400px] mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
           {integrations.map((integration, index) => {
             const IconComponent = integration.icon;
             return (
               <div
                 key={integration.name}
-                className={`group relative overflow-hidden p-6 lg:p-8 border transition-all duration-500 cursor-default ${
+                className={`group relative overflow-hidden p-6 lg:p-8 border transition-all duration-500 cursor-default bg-background/85 backdrop-blur-md ${
                   hoveredIndex === index
                     ? "border-foreground bg-foreground/[0.04] scale-[1.02]"
                     : "border-foreground/10 hover:border-foreground/30"
@@ -173,14 +173,14 @@ export function IntegrationsSection() {
 
         {/* Bottom stats row */}
         <div
-          className={`flex flex-wrap items-center justify-between gap-8 pt-12 border-t border-foreground/10 transition-all duration-1000 delay-500 pb-32 lg:pb-40 ${
+          className={`flex flex-wrap items-center justify-between gap-8 pt-8 border-t border-foreground/10 transition-all duration-1000 delay-500 pb-12 lg:pb-16 ${
             isVisible ? "opacity-100" : "opacity-0"
           }`}
         >
           <div className="flex flex-wrap gap-12">
             {[
-              { value: "4 Runtimes", label: "Python, Java, C++, JS" },
-              { value: "AI Review", label: "Automated AI review" },
+              { value: "React 19 & Node", label: "Full-stack framework" },
+              { value: "AI Review", label: "Automated AI hints" },
               { value: "Docker", label: "Isolated sandboxes" },
             ].map((stat) => (
               <div key={stat.label} className="flex items-baseline gap-3">

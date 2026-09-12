@@ -1,7 +1,7 @@
 {
-  "name": "codeforge-backend",
+  "name": "codeflow-backend",
   "version": "1.0.0",
-  "description": "CodeForge - sandboxed code execution engine",
+  "description": "CodeFlow - sandboxed code execution engine",
   "main": "src/index.js",
   "type": "commonjs",
   "scripts": {

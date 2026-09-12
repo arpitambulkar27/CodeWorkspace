@@ -380,7 +380,7 @@ const Dashboard = () => {
             onClick={() => navigate("/")} 
             style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
           >
-            <span className="font-display tracking-tight text-xl text-white">CODEFORGE</span>
+            <span className="font-display tracking-tight text-xl text-white">CODEFLOW</span>
             <span className="font-mono text-[10px] text-[#eca8d6] mt-0.5">IDE</span>
           </div>
 

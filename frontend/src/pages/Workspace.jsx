@@ -111,10 +111,18 @@ export default function Workspace() {
   const [problemLoading, setProblemLoading] = useState(false);
   const [problemLeftPanelOpen, setProblemLeftPanelOpen] = useState(!!problemSlug);
   const [codeSnippets, setCodeSnippets] = useState([]);
-  const [activeProblemSlug, setActiveProblemSlug] = useState(problemSlug || null);
-  const [activePlatform, setActivePlatform] = useState(searchParams.get("platform") || "LeetCode");
-  const [activeTitle, setActiveTitle] = useState(searchParams.get("title") || "");
-  const [activeExternalUrl, setActiveExternalUrl] = useState(searchParams.get("url") || "");
+
+  // True whenever the workspace is being used to solve a DSA problem — either the
+  // question is still loading (problemSlug present in the URL) or has finished
+  // loading (problem object populated). Used to hide file-explorer / workspace-only
+  // chrome (file tree, file creation buttons, Save Workspace) and show the clean
+  // DSA-solving layout (Problem Statement + Editor + Run/Submit/AI Hint) instead.
+  const isDsaMode = Boolean(problemSlug) || Boolean(problem);
+
+  // Test Case Submission State (DSA Mode)
+  const [submitting, setSubmitting] = useState(false);
+  const [submitResults, setSubmitResults] = useState(null);
+  const [submitError, setSubmitError] = useState("");
 
   // Panel Resizing States (Horizontal Width & Vertical Height)
   const [problemPanelWidth, setProblemPanelWidth] = useState(480);
@@ -122,7 +130,7 @@ export default function Workspace() {
   const [terminalHeight, setTerminalHeight] = useState(230);
   const [isResizingTerminal, setIsResizingTerminal] = useState(false);
 
-  // AI Code Reviewer Drawer State
+  // Gemini AI Drawer State
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false);
   const [aiMode, setAiMode] = useState("hints"); // 'hints' | 'analysis'
   const [aiLoading, setAiLoading] = useState(false);
@@ -133,10 +141,6 @@ export default function Workspace() {
   const lastRemoteChangeTime = useRef(0);
   const codeRef = useRef(code);
   const languageRef = useRef(language);
-  const activeProblemSlugRef = useRef(activeProblemSlug);
-  const activePlatformRef = useRef(activePlatform);
-  const activeTitleRef = useRef(activeTitle);
-  const activeExternalUrlRef = useRef(activeExternalUrl);
   const token = localStorage.getItem("token");
 
   // Keep refs in sync with state for socket callbacks
@@ -147,22 +151,6 @@ export default function Workspace() {
   useEffect(() => {
     languageRef.current = language;
   }, [language]);
-
-  useEffect(() => {
-    activeProblemSlugRef.current = activeProblemSlug;
-  }, [activeProblemSlug]);
-
-  useEffect(() => {
-    activePlatformRef.current = activePlatform;
-  }, [activePlatform]);
-
-  useEffect(() => {
-    activeTitleRef.current = activeTitle;
-  }, [activeTitle]);
-
-  useEffect(() => {
-    activeExternalUrlRef.current = activeExternalUrl;
-  }, [activeExternalUrl]);
 
   // Handle Problem Panel Resizing (Horizontal Width)
   const handleMouseDownProblemResize = (e) => {
@@ -264,12 +252,25 @@ export default function Workspace() {
     }
   }, [id]);
 
-  // 2. Fetch Official Problem Data (LeetCode or GFG) if problem slug exists on initial host load
+  // 2. Fetch Official Problem Data (LeetCode or GFG) if problem slug exists
   useEffect(() => {
     if (problemSlug) {
-      fetchOfficialProblem(problemSlug, searchParams.get("platform"), searchParams.get("title"), searchParams.get("url"), true);
+      fetchOfficialProblem(problemSlug);
     }
   }, [problemSlug]);
+
+  // Update starter code whenever selected language or code snippets change
+  useEffect(() => {
+    if (codeSnippets && codeSnippets.length > 0) {
+      const targetLang = language === "python" ? "python3" : language;
+      const snippet = codeSnippets.find(
+        (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
+      );
+      if (snippet && snippet.code) {
+        setCode(snippet.code);
+      }
+    }
+  }, [language, codeSnippets]);
 
   const fetchWorkspaceData = async (wsId) => {
     try {
@@ -324,26 +325,18 @@ export default function Workspace() {
   };
 
   // Fetch official question from backend unified problem details endpoint (/api/problems/details)
-  const fetchOfficialProblem = async (slugToFetch, platformToUse, titleToUse, urlToUse, isInitialHostLoad = false) => {
-    const slug = slugToFetch || activeProblemSlug || problemSlug;
-    if (!slug) return;
-
+  const fetchOfficialProblem = async (slug) => {
     setProblemLoading(true);
     setProblemLeftPanelOpen(true);
     setExplorerOpen(false);
 
-    const platformParam = platformToUse || activePlatform || searchParams.get("platform") || "LeetCode";
-    const titleParam = titleToUse || activeTitle || searchParams.get("title") || "";
-    const externalUrlParam = urlToUse || activeExternalUrl || searchParams.get("url") || "";
-    const isGfg = platformParam === "GFG" || (slug && slug.includes("geeksforgeeks"));
-
-    setActiveProblemSlug(slug);
-    setActivePlatform(platformParam);
-    setActiveTitle(titleParam);
-    setActiveExternalUrl(externalUrlParam);
+    const platformParam = searchParams.get("platform") || "LeetCode";
+    const titleParam = searchParams.get("title") || "";
+    const externalUrlParam = searchParams.get("url") || "";
+    const isGfg = platformParam === "GFG" || (rawProblemSlug && rawProblemSlug.includes("geeksforgeeks"));
 
     try {
-      const res = await axios.get("http://localhost:5000/api/problems/details", {
+      const res = await axios.get(`${API_BASE_URL}/api/problems/details`, {
         params: {
           slug,
           platform: platformParam,
@@ -367,27 +360,13 @@ export default function Workspace() {
 
         if (Array.isArray(data.codeSnippets) && data.codeSnippets.length > 0) {
           setCodeSnippets(data.codeSnippets);
-          const currentLang = languageRef.current || "python";
-          const targetLang = currentLang === "python" ? "python3" : currentLang;
+          const targetLang = language === "python" ? "python3" : language;
           const snippet = data.codeSnippets.find(
-            (s) => s.langSlug === currentLang || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === currentLang.toLowerCase())
+            (s) => s.langSlug === language || s.langSlug === targetLang || (s.lang && s.lang.toLowerCase() === language.toLowerCase())
           );
-          
-          // Only initialize starter code if this is the initial host load AND no remote state has been synced
-          if (isInitialHostLoad && !isRemoteSynced.current) {
-            const activeSnippetCode = snippet && snippet.code ? snippet.code : (LANGUAGE_BOILERPLATE[currentLang] || LANGUAGE_BOILERPLATE.python);
-            setCode(activeSnippetCode);
-            socket.emit("code-change", {
-              roomId: roomParam,
-              roomCode: roomParam,
-              code: activeSnippetCode,
-              language: currentLang,
-              problemSlug: slug,
-              problemTitle: data.title,
-              platform: platformParam,
-              externalUrl: externalUrlParam,
-            });
-          }
+          const activeSnippetCode = snippet && snippet.code ? snippet.code : (LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
+          setCode(activeSnippetCode);
+          socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: activeSnippetCode, language });
         }
         return;
       }
@@ -437,13 +416,17 @@ export default function Workspace() {
         description: fullMarkdown,
       };
 
+      const fallbackCode = LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python;
       setProblem(formattedProb);
-      setCode(LANGUAGE_BOILERPLATE[language] || LANGUAGE_BOILERPLATE.python);
+      setCode(fallbackCode);
       setProblemLoading(false);
+
+      // Ensure the room's authoritative state is updated so any Guest already
+      // connected (or joining shortly after) receives this starter code via
+      // the "sync-initial-state" handshake instead of stale boilerplate.
+      socket.emit("code-change", { roomId: roomParam, roomCode: roomParam, code: fallbackCode, language });
     }
   };
-
-  const isRemoteSynced = useRef(false);
 
   // 3. Socket.io Multiplayer Setup
   useEffect(() => {
@@ -457,53 +440,25 @@ export default function Workspace() {
       }
     }
 
-    socket.emit("join-room", {
-      roomId: roomParam,
-      roomCode: roomParam,
-      username,
-      code: codeRef.current,
-      language: languageRef.current,
-      problemSlug: activeProblemSlugRef.current,
-      problemTitle: activeTitleRef.current,
-      platform: activePlatformRef.current,
-      externalUrl: activeExternalUrlRef.current,
-    });
+    socket.emit("join-room", { roomId: roomParam, roomCode: roomParam, username });
 
     const handleRemoteCodeUpdate = (data) => {
       const newCode = typeof data === "string" ? data : (data?.code !== undefined ? data.code : "");
-      const newLang = typeof data === "object" ? data?.language : null;
-      const newProblemSlug = typeof data === "object" ? data?.problemSlug : null;
-
-      isRemoteSynced.current = true;
-
-      if (newLang && newLang !== languageRef.current) {
-        setLanguage(newLang);
-      }
-
-      if (newCode !== undefined && newCode !== codeRef.current) {
-        lastRemoteChangeTime.current = Date.now();
-        isRemoteChange.current = true;
-        setCode(newCode);
-        if (activeFileId) {
-          setFiles((prev) =>
-            prev.map((f) => (f.id === activeFileId ? { ...f, content: newCode } : f))
-          );
-        }
-      }
-
-      if (newProblemSlug && newProblemSlug !== activeProblemSlugRef.current) {
-        setActiveProblemSlug(newProblemSlug);
-        setProblemLeftPanelOpen(true);
-        setExplorerOpen(false);
-        fetchOfficialProblem(newProblemSlug, data.platform, data.problemTitle, data.externalUrl, false);
+      if (newCode === codeRef.current) return;
+      lastRemoteChangeTime.current = Date.now();
+      isRemoteChange.current = true;
+      setCode(newCode);
+      if (activeFileId) {
+        setFiles((prev) =>
+          prev.map((f) => (f.id === activeFileId ? { ...f, content: newCode } : f))
+        );
       }
     };
 
     const handleInitialStateSync = (state) => {
       if (state) {
-        isRemoteSynced.current = true;
         if (state.language) setLanguage(state.language);
-        if (state.code !== undefined) {
+        if (state.code !== undefined && state.code !== codeRef.current) {
           lastRemoteChangeTime.current = Date.now();
           isRemoteChange.current = true;
           setCode(state.code);
@@ -513,21 +468,6 @@ export default function Workspace() {
             );
           }
         }
-        if (state.problemSlug && state.problemSlug !== activeProblemSlugRef.current) {
-          setActiveProblemSlug(state.problemSlug);
-          setProblemLeftPanelOpen(true);
-          setExplorerOpen(false);
-          fetchOfficialProblem(state.problemSlug, state.platform, state.problemTitle, state.externalUrl, false);
-        }
-      }
-    };
-
-    const handleProblemSync = (data) => {
-      if (data && data.problemSlug && data.problemSlug !== activeProblemSlugRef.current) {
-        setActiveProblemSlug(data.problemSlug);
-        setProblemLeftPanelOpen(true);
-        setExplorerOpen(false);
-        fetchOfficialProblem(data.problemSlug, data.platform, data.problemTitle, data.externalUrl);
       }
     };
 
@@ -546,19 +486,14 @@ export default function Workspace() {
     socket.on("code-change", handleRemoteCodeUpdate);
     socket.on("sync-initial-state", handleInitialStateSync);
     socket.on("language-update", handleLanguageSync);
-    socket.on("problem-update", handleProblemSync);
 
     socket.on("user-joined", () => {
-      // Broadcast active host code, language & problem details to newly joined participant
+      // Broadcast active host code and language to newly joined participant
       socket.emit("code-change", {
         roomId: roomParam,
         roomCode: roomParam,
         code: codeRef.current,
         language: languageRef.current,
-        problemSlug: activeProblemSlugRef.current,
-        problemTitle: activeTitleRef.current,
-        platform: activePlatformRef.current,
-        externalUrl: activeExternalUrlRef.current,
       });
     });
 
@@ -583,12 +518,10 @@ export default function Workspace() {
     });
 
     return () => {
-      socket.emit("leave-room", { roomId: roomParam, roomCode: roomParam });
       socket.off("code-update", handleRemoteCodeUpdate);
       socket.off("code-change", handleRemoteCodeUpdate);
       socket.off("sync-initial-state", handleInitialStateSync);
       socket.off("language-update", handleLanguageSync);
-      socket.off("problem-update", handleProblemSync);
       socket.off("user-joined");
       socket.off("room-participants");
       socket.off("execution-result");
@@ -744,7 +677,7 @@ export default function Workspace() {
     try {
       setSaving(true);
       await axios.put(
-        `http://localhost:5000/api/workspaces/${id}`,
+        `${API_BASE_URL}/api/workspaces/${id}`,
         {
           title: workspaceTitle,
           language,
@@ -770,7 +703,7 @@ export default function Workspace() {
     setOutput("⏳ Dispatching job to Docker sandbox...");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/run", {
+      const res = await axios.post(`${API_BASE_URL}/api/run`, {
         language,
         code,
         stdin: stdinInput,
@@ -796,12 +729,44 @@ export default function Workspace() {
     }
   };
 
+  // Submit Code Against Test Cases (DSA Mode)
+  const handleSubmitTestCases = async () => {
+    if (!problem || !problem.slug) return;
+
+    setSubmitting(true);
+    setSubmitError("");
+    setSubmitResults(null);
+    setActiveTab("tests");
+
+    try {
+      const res = await axios.post(
+        `${API_BASE_URL}/api/problems/${encodeURIComponent(problem.slug)}/submit`,
+        { language, code },
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      setSubmitResults(res.data);
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 404) {
+        setSubmitError(
+          "No stored test cases are available for this problem yet, so it can't be auto-graded here. Use \"Run Code\" with the examples from the problem statement instead."
+        );
+      } else if (status === 401) {
+        setSubmitError("Please log in again to submit your solution for grading.");
+      } else {
+        setSubmitError(err.response?.data?.error || "Failed to run your solution against the test cases.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   // Toggle AI Drawer without auto-running AI request
   const toggleAIDrawer = () => {
     setAiDrawerOpen((prev) => !prev);
   };
 
-  // AI Code Review / Hints / Analysis Handler
+  // Gemini AI Code Review / Hints / Analysis Handler
   const handleAIReview = async (mode = "hints") => {
     setAiDrawerOpen(true);
     setAiMode(mode);
@@ -809,7 +774,7 @@ export default function Workspace() {
     setAiAnalysis("");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/ai/review", {
+      const response = await axios.post(`${API_BASE_URL}/api/ai/review`, {
         code,
         language,
         type: mode,
@@ -821,7 +786,7 @@ export default function Workspace() {
       const cleanOutput = rawOutput.replace(/\$|\\mathcal|\{|\}/g, "");
       setAiAnalysis(cleanOutput);
     } catch (error) {
-      setAiAnalysis(`⚠️ AI Assistance Request Failed:\n${error.response?.data?.error || error.message}`);
+      setAiAnalysis(`⚠️ Gemini AI Request Failed:\n${error.response?.data?.error || error.message}`);
     } finally {
       setAiLoading(false);
     }
@@ -902,12 +867,16 @@ export default function Workspace() {
   };
 
   // Handle Navigation Back Button (DSA Sheets vs Dashboard)
+  // Note: the DSA sheets browser is registered in App.jsx at the "/sheets" route
+  // (DsaSheets.jsx reads its active sheet from the "sheet" query param), so that is
+  // the path we must return the user to — navigating to a non-existent "/dsa-sheets"
+  // route would just bounce through the catch-all redirect back to the landing page.
   const handleBackNavigation = () => {
     const sheet = searchParams.get("sheet");
     const fromParam = searchParams.get("from");
     if (problemSlug || problem || sheet || fromParam === "dsa-sheets") {
-      const targetSheet = sheet || sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
-      navigate(`/sheets?sheet=${encodeURIComponent(targetSheet)}`);
+      const activeSheetId = sheet || sessionStorage.getItem("codeforge_active_sheet") || "striver-a2z";
+      navigate(`/sheets?sheet=${encodeURIComponent(activeSheetId)}`);
     } else {
       navigate("/dashboard");
     }
@@ -941,13 +910,13 @@ export default function Workspace() {
           </button>
         )}
 
-        {!problem && (
+        {!isDsaMode && (
           <button onClick={() => setExplorerOpen(!explorerOpen)} title="Toggle File Explorer" style={{ background: explorerOpen ? "#27272a" : "none", border: "none", color: explorerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
             <Folder size={18} />
           </button>
         )}
 
-        <button onClick={toggleAIDrawer} title="AI Code Reviewer Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
+        <button onClick={toggleAIDrawer} title="Gemini AI Assistance" style={{ background: aiDrawerOpen ? "#27272a" : "none", border: "none", color: aiDrawerOpen ? "#ffffff" : "#a1a1aa", cursor: "pointer", padding: "6px", borderRadius: "8px" }}>
           <Bot size={18} color="#ffffff" />
         </button>
 
@@ -1028,8 +997,8 @@ export default function Workspace() {
         </>
       )}
 
-      {/* 3. File Explorer Sidebar */}
-      {explorerOpen && !problemLeftPanelOpen && (
+      {/* 3. File Explorer Sidebar — never shown while solving a DSA problem */}
+      {explorerOpen && !problemLeftPanelOpen && !isDsaMode && (
         <div style={{ width: "230px", borderRight: "1px solid #27272a", backgroundColor: "#0c0c0e", display: "flex", flexDirection: "column", flexShrink: 0 }}>
           <div style={{ padding: "14px 16px", borderBottom: "1px solid #18181b", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <span style={{ fontSize: "11px", fontWeight: "700", letterSpacing: "0.08em", color: "#a1a1aa", textTransform: "uppercase" }}>EXPLORER</span>
@@ -1089,7 +1058,7 @@ export default function Workspace() {
             )}
 
             {/* Auto-Save Indicator */}
-            {id && !problem && (
+            {id && !isDsaMode && (
               <span style={{ fontSize: "11px", color: saveSuccess ? "#ffffff" : "#a1a1aa", display: "flex", alignItems: "center", gap: "4px", backgroundColor: "#18181b", padding: "3px 8px", borderRadius: "6px", border: "1px solid #27272a", flexShrink: 0 }}>
                 {saveSuccess ? <Check size={12} color="#ffffff" /> : null}
                 {saving ? "Saving..." : saveSuccess ? "Saved" : "Ctrl+S to save"}
@@ -1107,7 +1076,7 @@ export default function Workspace() {
               style={{ backgroundColor: "#09090b", color: "#ffffff", border: "1px solid #27272a", borderRadius: "8px", padding: "6px 12px", fontSize: "13px", outline: "none", cursor: "pointer", fontWeight: "600" }}
             >
               <option value="python">Python 3</option>
-              <option value="javascript">JavaScript</option>
+              <option value="javascript">JavaScript (Node.js)</option>
               <option value="java">Java 21</option>
               <option value="cpp">C++ 20</option>
             </select>
@@ -1122,8 +1091,8 @@ export default function Workspace() {
               <span style={{ backgroundColor: "#27272a", color: "#ffffff", fontSize: "10px", padding: "1px 5px", borderRadius: "4px", fontWeight: "bold" }}>{connectedUsers} online</span>
             </button>
 
-            {/* Save Button */}
-            {id && !problem && (
+            {/* Save Button — hidden entirely in DSA question mode */}
+            {id && !isDsaMode && (
               <button
                 onClick={handleSaveWorkspace}
                 disabled={saving}
@@ -1153,6 +1122,27 @@ export default function Workspace() {
               )}
             </button>
 
+            {/* Submit Test Cases Button — DSA Mode only */}
+            {isDsaMode && problem && (
+              <button
+                onClick={handleSubmitTestCases}
+                disabled={submitting}
+                style={{ backgroundColor: "#16a34a", color: "#ffffff", border: "none", padding: "7px 18px", borderRadius: "8px", fontSize: "13px", fontWeight: "700", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle size={14} />
+                    <span>Submit</span>
+                  </>
+                )}
+              </button>
+            )}
+
           </div>
         </div>
 
@@ -1161,7 +1151,7 @@ export default function Workspace() {
           
           {/* Monaco Editor Canvas or Folder Placeholder */}
           <div style={{ flex: 1, minWidth: 0, minHeight: 0, position: "relative" }}>
-            {!activeFileId && !problem ? (
+            {!activeFileId && !isDsaMode ? (
               <div style={{ width: "100%", height: "100%", backgroundColor: "#09090b", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px", boxSizing: "border-box" }}>
                 <div style={{ width: "54px", height: "54px", borderRadius: "14px", background: "#18181b", border: "1px solid #3f3f46", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px" }}>
                   <Folder size={26} color="#ffffff" />
@@ -1263,6 +1253,15 @@ export default function Workspace() {
                 >
                   <MessageSquare size={14} color="#a1a1aa" /> Custom Stdin Input
                 </button>
+
+                {isDsaMode && problem && (
+                  <button
+                    onClick={() => setActiveTab("tests")}
+                    style={{ backgroundColor: activeTab === "tests" ? "#121215" : "transparent", border: "1px solid", borderColor: activeTab === "tests" ? "#27272a" : "transparent", borderBottom: activeTab === "tests" ? "none" : "transparent", color: activeTab === "tests" ? "#ffffff" : "#a1a1aa", padding: "4px 12px", borderRadius: "6px 6px 0 0", fontSize: "12px", fontWeight: "600", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
+                  >
+                    <CheckCircle size={14} color="#a1a1aa" /> Test Results
+                  </button>
+                )}
               </div>
 
               <div style={{ fontSize: "11px", color: "#a1a1aa" }}>
@@ -1275,7 +1274,7 @@ export default function Workspace() {
                 <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
                   {output || "Output will appear here after clicking Run Code..."}
                 </pre>
-              ) : (
+              ) : activeTab === "stdin" ? (
                 <div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
                   <label style={{ display: "block", fontSize: "11px", color: "#a1a1aa", marginBottom: "6px", fontWeight: "bold" }}>
                     ENTER PROGRAM INPUT (ENTER INPUT VALUES HERE BEFORE CLICKING RUN CODE):
@@ -1287,6 +1286,65 @@ export default function Workspace() {
                     style={{ flex: 1, width: "100%", boxSizing: "border-box", backgroundColor: "#09090b", border: "1px solid #27272a", borderRadius: "8px", padding: "10px", color: "#ffffff", fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", outline: "none", resize: "none" }}
                   />
                 </div>
+              ) : (
+                <div style={{ height: "100%" }}>
+                  {submitting ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#a1a1aa" }}>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Running your solution against the test cases...</span>
+                    </div>
+                  ) : submitError ? (
+                    <div style={{ color: "#f87171" }}>{submitError}</div>
+                  ) : submitResults ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                          fontWeight: "700",
+                          color: submitResults.passed ? "#4ade80" : "#f87171",
+                        }}
+                      >
+                        {submitResults.passed ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                        <span>
+                          {submitResults.passedCount}/{submitResults.totalTestCases} test cases passed
+                        </span>
+                      </div>
+
+                      {(submitResults.scoreCard || []).map((tc) => (
+                        <div
+                          key={tc.testCaseIndex}
+                          style={{
+                            border: "1px solid #27272a",
+                            borderRadius: "8px",
+                            padding: "10px 12px",
+                            backgroundColor: "#0c0c0e",
+                          }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", gap: "6px", fontWeight: "600", color: tc.passed ? "#4ade80" : "#f87171", marginBottom: "6px" }}>
+                            {tc.passed ? <CheckCircle size={13} /> : <XCircle size={13} />}
+                            <span>Test Case {tc.testCaseIndex}</span>
+                          </div>
+                          {!tc.isHidden && (
+                            <div style={{ fontSize: "12px", color: "#a1a1aa", display: "flex", flexDirection: "column", gap: "2px" }}>
+                              <span>Input: {tc.input}</span>
+                              <span>Expected: {tc.expectedOutput}</span>
+                              <span>Got: {tc.actualOutput}</span>
+                            </div>
+                          )}
+                          {tc.error && (
+                            <div style={{ fontSize: "12px", color: "#f87171", marginTop: "4px" }}>Error: {tc.error}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div style={{ color: "#a1a1aa" }}>
+                      Click "Submit" to run your solution against this problem's test cases.
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
@@ -1295,12 +1353,12 @@ export default function Workspace() {
         </div>
       </div>
 
-      {/* AI CODE REVIEWER ASSISTANCE DRAWER */}
+      {/* GEMINI AI ASSISTANCE DRAWER */}
       {aiDrawerOpen && (
         <div style={{ width: "420px", backgroundColor: "#121215", borderLeft: "1px solid #27272a", display: "flex", flexDirection: "column", zIndex: 30 }}>
           <div style={{ padding: "14px 18px", borderBottom: "1px solid #27272a", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <h3 style={{ margin: 0, fontSize: "15px", fontWeight: "800", color: "#ffffff", display: "flex", alignItems: "center", gap: "8px" }}>
-              <Bot size={18} color="#ffffff" /> AI Code Reviewer
+              <Bot size={18} color="#ffffff" /> Gemini AI Assistant
             </h3>
             <button onClick={() => setAiDrawerOpen(false)} style={{ background: "none", border: "none", color: "#a1a1aa", cursor: "pointer" }}>
               ✕
@@ -1367,7 +1425,7 @@ export default function Workspace() {
               <div style={{ padding: "40px 16px", textAlign: "center", color: "#a1a1aa", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
                 <Bot size={32} color="#52525b" />
                 <div>
-                  <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>AI Code Reviewer</h4>
+                  <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "700", color: "#ffffff" }}>Gemini AI Assistant</h4>
                   <p style={{ margin: 0, fontSize: "12.5px", color: "#a1a1aa" }}>
                     Select an option above to generate a short GFG-style hint or analyze your code's Big-O complexity.
                   </p>

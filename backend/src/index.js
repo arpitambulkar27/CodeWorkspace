@@ -5,16 +5,12 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
-const helmet = require("helmet");
 
 // Import MongoDB connection
 const connectDB = require("./config/db");
 
-// Import Worker, Middlewares & Routes
+// Import Worker & Routes
 const { initExecutionWorker } = require("../workers/executionWorker");
-const { globalRateLimiter } = require("./middleware/rateLimiter");
-const errorHandler = require("./middleware/errorHandler");
-
 const runRoutes = require("./routes/run");
 const aiRoutes = require("./routes/ai");
 const authRoutes = require("./routes/auth");
@@ -34,7 +30,6 @@ app.set("trust proxy", 1);
 connectDB();
 
 // Middlewares
-app.use(helmet({ contentSecurityPolicy: false })); // HTTP Security Headers
 app.use(cors());
 app.use(express.json({ limit: "1mb" }));
 
@@ -55,10 +50,6 @@ app.use((req, res, next) => {
 // Health Check & Telemetry Routes
 app.get("/health", (req, res) => res.json({ status: "ok", docker: "ready", timestamp: new Date() }));
 app.use("/metrics", metricsRoutes);
-
-// Apply Global Rate Limiter to all /api endpoints (Max 120 req/min)
-app.use("/api", globalRateLimiter);
-
 app.use("/api/telemetry", telemetryRoutes);
 
 // REST Routes
@@ -87,7 +78,7 @@ io.on("connection", (socket) => {
   activeSocketsGauge.inc();
   console.log(`🔌 [Socket.io] Client connected: ${socket.id}`);
 
-  socket.on("join-room", ({ roomId, roomCode, username, code, language, problemSlug, problemTitle, platform, externalUrl }) => {
+  socket.on("join-room", ({ roomId, roomCode, username }) => {
     const targetRoom = roomId || roomCode;
     if (!targetRoom) return;
 
@@ -103,20 +94,6 @@ io.on("connection", (socket) => {
 
     const userList = Array.from(participants.values());
 
-    // Store code, language & problem metadata in room state if provided
-    if (code !== undefined || language || problemSlug) {
-      const currentState = roomStates.get(targetRoom) || {};
-      roomStates.set(targetRoom, {
-        ...currentState,
-        code: code !== undefined ? code : currentState.code,
-        language: language || currentState.language,
-        problemSlug: problemSlug || currentState.problemSlug,
-        problemTitle: problemTitle || currentState.problemTitle,
-        platform: platform || currentState.platform,
-        externalUrl: externalUrl || currentState.externalUrl,
-      });
-    }
-
     // Broadcast updated participant list to all clients in room
     io.to(targetRoom).emit("room-participants", {
       roomId: targetRoom,
@@ -130,7 +107,7 @@ io.on("connection", (socket) => {
       count: userList.length,
     });
 
-    // If active room state exists, send initial code, language & problem state sync to joining socket
+    // If active room state exists, send initial code & language sync to joining socket
     if (roomStates.has(targetRoom)) {
       socket.emit("sync-initial-state", roomStates.get(targetRoom));
     }
@@ -140,22 +117,17 @@ io.on("connection", (socket) => {
     );
   });
 
-  socket.on("code-change", ({ roomId, roomCode, code, language, problemSlug, problemTitle, platform, externalUrl }) => {
+  socket.on("code-change", ({ roomId, roomCode, code, language }) => {
     const targetRoom = roomId || roomCode;
     if (targetRoom) {
       const currentState = roomStates.get(targetRoom) || {};
-      const updatedState = {
-        ...currentState,
-        code: code !== undefined ? code : currentState.code,
-        language: language || currentState.language,
-        problemSlug: problemSlug !== undefined ? problemSlug : currentState.problemSlug,
-        problemTitle: problemTitle !== undefined ? problemTitle : currentState.problemTitle,
-        platform: platform !== undefined ? platform : currentState.platform,
-        externalUrl: externalUrl !== undefined ? externalUrl : currentState.externalUrl,
-      };
-      roomStates.set(targetRoom, updatedState);
-      socket.to(targetRoom).emit("code-update", updatedState);
-      socket.to(targetRoom).emit("code-change", updatedState);
+      roomStates.set(targetRoom, { ...currentState, code: code !== undefined ? code : currentState.code, language: language || currentState.language });
+      // Emit a single canonical event per change. Previously this also emitted a
+      // duplicate "code-change" event, which caused the same update to be
+      // processed twice on receiving clients (the second copy would race ahead
+      // of the client's own codeRef update), adding an unnecessary echo/timing
+      // risk on top of the client-side debounce guard.
+      socket.to(targetRoom).emit("code-update", code);
     }
   });
 
@@ -165,22 +137,6 @@ io.on("connection", (socket) => {
       const currentState = roomStates.get(targetRoom) || {};
       roomStates.set(targetRoom, { ...currentState, language, code: code !== undefined ? code : currentState.code });
       socket.to(targetRoom).emit("language-update", { language, code });
-    }
-  });
-
-  socket.on("problem-change", ({ roomId, roomCode, problemSlug, problemTitle, platform, externalUrl }) => {
-    const targetRoom = roomId || roomCode;
-    if (targetRoom) {
-      const currentState = roomStates.get(targetRoom) || {};
-      const updatedState = {
-        ...currentState,
-        problemSlug,
-        problemTitle,
-        platform,
-        externalUrl,
-      };
-      roomStates.set(targetRoom, updatedState);
-      socket.to(targetRoom).emit("problem-update", updatedState);
     }
   });
 
@@ -195,42 +151,28 @@ io.on("connection", (socket) => {
     }
   });
 
-  const handleLeaveRoom = (targetRoom) => {
-    if (targetRoom && roomUsers.has(targetRoom)) {
-      const participants = roomUsers.get(targetRoom);
+  socket.on("disconnect", () => {
+    activeSocketsGauge.dec();
+    const roomId = socket.roomId;
+    if (roomId && roomUsers.has(roomId)) {
+      const participants = roomUsers.get(roomId);
       participants.delete(socket.id);
-      socket.leave(targetRoom);
       if (participants.size === 0) {
-        roomUsers.delete(targetRoom);
-        roomStates.delete(targetRoom);
+        roomUsers.delete(roomId);
       } else {
         const userList = Array.from(participants.values());
-        io.to(targetRoom).emit("room-participants", {
-          roomId: targetRoom,
+        io.to(roomId).emit("room-participants", {
+          roomId,
           participants: userList,
           count: userList.length,
         });
       }
     }
-  };
-
-  socket.on("leave-room", ({ roomId, roomCode }) => {
-    const targetRoom = roomId || roomCode || socket.roomId;
-    handleLeaveRoom(targetRoom);
-  });
-
-  socket.on("disconnect", () => {
-    activeSocketsGauge.dec();
-    const roomId = socket.roomId;
-    handleLeaveRoom(roomId);
     console.log(`🔌 [Socket.io] Client disconnected: ${socket.id}`);
   });
 });
 
 initExecutionWorker(io);
-
-// Global Error Handler Middleware
-app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

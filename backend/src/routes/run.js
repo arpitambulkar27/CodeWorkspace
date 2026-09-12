@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { runCode } = require("../services/dockerService");
+const { runCode } = require("../services/codeExecution");
 const { runRateLimiter } = require("../middleware/rateLimiter");
 const { protect } = require("../middleware/authMiddleware");
-const { validateBody, runSchemas } = require("../middleware/schemaValidation");
 
-// Apply Auth Protection, Joi Validation, & Redis Sliding-Window Rate Limiter (Max 10 runs per minute)
-router.post("/run", protect, runRateLimiter, validateBody(runSchemas.run), async (req, res) => {
+// Apply Auth Protection & Redis Sliding-Window Rate Limiter (Max 10 runs per minute)
+router.post("/run", protect, runRateLimiter, async (req, res) => {
   const { language, code, stdin, stdinInput, roomId, roomCode } = req.body;
 
   const targetStdin = stdinInput !== undefined ? stdinInput : stdin;
@@ -26,8 +25,17 @@ router.post("/run", protect, runRateLimiter, validateBody(runSchemas.run), async
   }
 
   try {
-    // Execute code safely inside sandboxed Docker container
+    // Execute code via the active execution provider (Docker or Judge0 — see services/codeExecution)
     const result = await runCode({ language, code, stdin: targetStdin });
+
+    // Emit Socket.io result if room exists
+    const io = req.app.get("io");
+    if (io && targetRoom) {
+      io.to(targetRoom).emit("execution-result", {
+        output: result.output || result.stdout,
+        error: result.error || result.stderr,
+      });
+    }
 
     return res.status(200).json({
       status: "completed",
@@ -36,8 +44,8 @@ router.post("/run", protect, runRateLimiter, validateBody(runSchemas.run), async
       output: result.output || result.stdout || result.stderr || result.error || "Program executed with no stdout output.",
     });
   } catch (err) {
-    console.error("Direct Docker Execution Error:", err);
-    return res.status(500).json({ error: "Failed to execute code in Docker container." });
+    console.error("Code Execution Error:", err);
+    return res.status(500).json({ error: "Failed to execute code." });
   }
 });
 

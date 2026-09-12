@@ -5,14 +5,14 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "CodeForge allowed our team to run thousands of code sandboxes per day. The Monaco Editor and Gemini integration made code reviews instant.",
+    quote: "CodeFlow allowed our team to run thousands of code sandboxes per day. The Monaco Editor and Gemini integration made code reviews instant.",
     author: "Sarah Chen",
     role: "CTO",
     company: "Meridian Labs",
     metric: { value: "<45ms", label: "Average container launch" },
   },
   {
-    quote: "We switched all our dev environments to CodeForge. Writing code in Monaco and getting Gemini AI feedback in real-time doubled our velocity.",
+    quote: "We switched all our dev environments to CodeFlow. Writing code in Monaco and getting Gemini AI feedback in real-time doubled our velocity.",
     author: "Marcus Webb",
     role: "Head of Engineering",
     company: "Flux Systems",
@@ -26,7 +26,7 @@ const testimonials = [
     metric: { value: "99.9%", label: "Sandbox reliability" },
   },
   {
-    quote: "Security and speed were non-negotiable for us. CodeForge's Joi validation shielding and instant Gemini AI reviews delivered both.",
+    quote: "Security and speed were non-negotiable for us. CodeFlow's Joi validation shielding and instant Gemini AI reviews delivered both.",
     author: "James Liu",
     role: "CISO",
     company: "Prism Analytics",

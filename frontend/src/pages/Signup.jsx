@@ -165,7 +165,7 @@ export default function Signup() {
           {/* Header Brand & Close Button */}
           <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
             <Link to="/" className="flex items-center gap-2 group">
-              <span className="text-2xl font-display tracking-tight text-white">CODEFORGE</span>
+              <span className="text-2xl font-display tracking-tight text-white">CODEFLOW</span>
               <span className="text-xs font-mono text-[#eca8d6] mt-0.5">IDE</span>
             </Link>
             <div className="flex items-center gap-3">

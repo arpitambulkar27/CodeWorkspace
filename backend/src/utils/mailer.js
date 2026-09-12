@@ -26,13 +26,13 @@ async function sendOTP(toEmail, otp) {
   });
 
   const mailOptions = {
-    from: `"CodeForge Security" <${user}>`,
+    from: `"CodeFlow Security" <${user}>`,
     to: toEmail,
-    subject: "Your CodeForge Verification Code",
+    subject: "Your CodeFlow Verification Code",
     html: `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 30px; background-color: #0d1117; color: #f0f6fc; border-radius: 16px; border: 1px solid #30363d;">
         <div style="text-align: center; margin-bottom: 24px;">
-          <h2 style="color: #58a6ff; margin: 0 0 6px 0; font-size: 24px; font-weight: 800;">CodeForge</h2>
+          <h2 style="color: #58a6ff; margin: 0 0 6px 0; font-size: 24px; font-weight: 800;">CodeFlow</h2>
           <p style="color: #8b949e; margin: 0; font-size: 13px;">Cloud IDE & Technical Workspaces</p>
         </div>
         <div style="background-color: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">

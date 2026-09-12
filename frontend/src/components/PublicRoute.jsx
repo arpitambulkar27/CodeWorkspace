@@ -9,7 +9,7 @@ export default function PublicRoute({ children }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0d1117] flex items-center justify-center text-white text-sm font-sans">
-        Loading CodeForge...
+        Loading CodeFlow...
       </div>
     );
   }

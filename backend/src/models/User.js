@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: "https://api.dicebear.com/7.x/bottts/svg?seed=CodeForge",
+      default: "https://api.dicebear.com/7.x/bottts/svg?seed=CodeFlow",
     },
   },
   { timestamps: true }

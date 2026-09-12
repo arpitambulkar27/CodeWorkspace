@@ -54,11 +54,11 @@ export function CtaSection() {
                 <h2 className="text-6xl md:text-7xl lg:text-[72px] font-display tracking-tight mb-8 leading-[0.95]">
                   Ready to start coding
                   <br />
-                  on CodeForge?
+                  on CodeFlow?
                 </h2>
 
                 <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-xl">
-                  Join thousands of developers writing, executing, and reviewing code in the cloud with CodeForge IDE. Deploy your first sandbox in seconds.
+                  Join thousands of developers writing, executing, and reviewing code in the cloud with CodeFlow IDE. Deploy your first sandbox in seconds.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -67,7 +67,7 @@ export function CtaSection() {
                       size="lg"
                       className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full group cursor-pointer"
                     >
-                      Launch CodeForge IDE
+                      Launch CodeFlow IDE
                       <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </Link>

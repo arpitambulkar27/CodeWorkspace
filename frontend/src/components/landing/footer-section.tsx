@@ -30,9 +30,8 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { name: "Twitter", href: "#" },
-  { name: "GitHub", href: "#" },
-  { name: "LinkedIn", href: "#" },
+  { name: "GitHub", href: "https://github.com/arpitambulkar27" },
+  { name: "LinkedIn", href: "https://www.linkedin.com/in/arpit-ambulkar-955842345/" },
 ];
 
 function AnimatedWaveCanvas() {
@@ -115,7 +114,7 @@ export function FooterSection() {
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display text-white">CODEFORGE IDE</span>
+                <span className="text-2xl font-display text-white">CODEFLOW IDE</span>
                 <span className="text-xs text-white/40 font-mono">TM</span>
               </a>
 
@@ -129,6 +128,8 @@ export function FooterSection() {
                   <a
                     key={link.name}
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm text-white/40 hover:text-white transition-colors flex items-center gap-1 group"
                   >
                     {link.name}
@@ -167,7 +168,19 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/30">
-            &copy; 2026 CodeForge. All rights reserved.
+            &copy; 2026 CodeFlow. All rights reserved.
+          </p>
+
+          <p className="text-sm text-white/50 font-medium flex items-center gap-1.5">
+            Engineered by{" "}
+            <a
+              href="https://github.com/arpitambulkar27"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white hover:text-[#eca8d6] font-semibold transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-[#eca8d6]"
+            >
+              Arpit Ambulkar
+            </a>
           </p>
 
           <div className="flex items-center gap-4 text-sm text-white/30">

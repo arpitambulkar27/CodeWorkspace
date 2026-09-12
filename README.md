@@ -1,6 +1,6 @@
-# CodeForge 🛠️⚡
+# CodeFlow 🛠️⚡
 
-CodeForge is a production-grade, cloud-native collaborative developer workspace. It combines an in-browser IDE with safe multi-language execution inside Docker containers, real-time multiplayer editing via WebSockets, an asynchronous Redis/BullMQ task queue, and AI-powered code reviews using Google Gemini.
+CodeFlow is a production-grade, cloud-native collaborative developer workspace. It combines an in-browser IDE with safe multi-language execution inside Docker containers, real-time multiplayer editing via WebSockets, an asynchronous Redis/BullMQ task queue, and AI-powered code reviews using Google Gemini.
 
 ### ✨ Key Features
 - **🔒 Sandboxed Code Execution:** Secure, ephemeral execution in isolated Docker containers with strict CPU/RAM limits for Python, JavaScript, Java, and C++.
