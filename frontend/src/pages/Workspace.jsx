@@ -82,11 +82,12 @@ export default function Workspace() {
   // Query Params
   const roomParam = searchParams.get("room") || (id ? `CF-${id.slice(-6)}` : "default-room");
   const langParam = searchParams.get("lang") || "python";
+  const titleParam = searchParams.get("title");
   const rawProblemSlug = searchParams.get("problem");
   const problemSlug = extractCleanSlug(rawProblemSlug);
 
   // Workspace & Code State
-  const [workspaceTitle, setWorkspaceTitle] = useState("Untitled Workspace");
+  const [workspaceTitle, setWorkspaceTitle] = useState(titleParam || "Untitled Workspace");
   const [editingTitle, setEditingTitle] = useState(false);
   const [language, setLanguage] = useState(langParam);
   const [code, setCode] = useState(LANGUAGE_BOILERPLATE[langParam] || LANGUAGE_BOILERPLATE.python);
@@ -161,12 +162,12 @@ export default function Workspace() {
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isResizingProblem) return;
-      // Reserve at least 450px for Code Editor & Header Bar
-      const maxAllowedWidth = Math.max(250, window.innerWidth - 450);
-      const newWidth = Math.max(250, Math.min(e.clientX - 52, maxAllowedWidth));
-      setProblemPanelWidth(newWidth);
-      if (editorRef.current && typeof editorRef.current.layout === "function") {
-        editorRef.current.layout();
+      const newWidth = e.clientX;
+      if (newWidth > 280 && newWidth < window.innerWidth - 350) {
+        setProblemPanelWidth(newWidth);
+        if (editorRef.current && typeof editorRef.current.layout === "function") {
+          editorRef.current.layout();
+        }
       }
     };
 
@@ -231,7 +232,7 @@ export default function Workspace() {
     } else if (!problemSlug) {
       const rootFolder = {
         id: `folder-root-${Date.now()}`,
-        name: "src",
+        name: titleParam || "src",
         type: "folder",
         parentId: null,
       };
@@ -246,7 +247,7 @@ export default function Workspace() {
       setFiles([rootFolder, defaultFile]);
       setSelectedFolderId(rootFolder.id);
       setExpandedFolders({ [rootFolder.id]: true });
-      setExplorerOpen(false); // Hide explorer by default on join
+      setExplorerOpen(true);
       setActiveFileId(defaultFile.id);
       setCode(defaultFile.content);
     }
@@ -286,38 +287,41 @@ export default function Workspace() {
           setStdinInput(res.data.stdinInput);
         }
 
-        if (Array.isArray(res.data.files) && res.data.files.length > 0) {
-          setFiles(res.data.files);
-          const firstFile = res.data.files.find((f) => f.type === "file");
-          const firstFolder = res.data.files.find((f) => f.type === "folder");
+        let fileList = Array.isArray(res.data.files) ? res.data.files : [];
+        let firstFolder = fileList.find((f) => f.type === "folder");
+        let firstFile = fileList.find((f) => f.type === "file");
 
-          if (firstFolder) {
-            setSelectedFolderId(firstFolder.id);
-            setExpandedFolders({ [firstFolder.id]: true });
-            setExplorerOpen(true);
-          }
-
-          if (firstFile) {
-            setActiveFileId(firstFile.id);
-            setCode(firstFile.content || "");
-          } else {
-            setActiveFileId(null);
-            setCode("");
-          }
-        } else {
-          const rootFolder = {
+        if (!firstFolder) {
+          firstFolder = {
             id: `folder-root-${Date.now()}`,
             name: res.data.title || "src",
             type: "folder",
             parentId: null,
           };
-          setFiles([rootFolder]);
-          setSelectedFolderId(rootFolder.id);
-          setExpandedFolders({ [rootFolder.id]: true });
-          setExplorerOpen(true);
-          setActiveFileId(null);
-          setCode("");
+          fileList = [firstFolder, ...fileList];
         }
+
+        if (!firstFile) {
+          const rootFolderId = firstFolder.id;
+          const defaultFileName = DEFAULT_FILE_NAMES[loadedLang] || "main.py";
+          const defaultContent = res.data.code || LANGUAGE_BOILERPLATE[loadedLang] || LANGUAGE_BOILERPLATE.python;
+          firstFile = {
+            id: `file-main-${Date.now()}`,
+            name: defaultFileName,
+            type: "file",
+            parentId: rootFolderId,
+            content: defaultContent,
+            language: loadedLang,
+          };
+          fileList = [...fileList, firstFile];
+        }
+
+        setFiles(fileList);
+        setSelectedFolderId(firstFolder.id);
+        setExpandedFolders({ [firstFolder.id]: true });
+        setExplorerOpen(true);
+        setActiveFileId(firstFile.id);
+        setCode(firstFile.content || res.data.code || "");
       }
     } catch (err) {
       console.error("Failed to load workspace:", err);

@@ -5,18 +5,44 @@ const { protect } = require("../middleware/authMiddleware");
 const { validateBody, workspaceSchemas } = require("../middleware/schemaValidation");
 
 // @route   POST /api/workspaces
-// @desc    Create a new workspace (Strictly 1 root folder only, no files by default)
+// @desc    Create a new workspace (Root folder + default starter file)
 router.post("/", protect, validateBody(workspaceSchemas.create), async (req, res) => {
   try {
     const { title, language = "python", customInput } = req.body;
     const folderName = title?.trim() || "src";
+    const rootFolderId = `folder-root-${Date.now()}`;
+
+    const defaultFileNames = {
+      python: "main.py",
+      javascript: "index.js",
+      java: "Main.java",
+      cpp: "main.cpp",
+    };
+
+    const defaultBoilerplates = {
+      python: `# Python 3 Starter Code\nprint("Hello, CodeFlow!")\n`,
+      javascript: `// JavaScript Starter Code\nconsole.log("Hello, CodeFlow!");\n`,
+      java: `public class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, CodeFlow!");\n    }\n}\n`,
+      cpp: `#include <iostream>\n\nint main() {\n    std::cout << "Hello, CodeFlow!" << std::endl;\n    return 0;\n}\n`,
+    };
+
+    const mainFileName = defaultFileNames[language] || "main.py";
+    const mainFileContent = defaultBoilerplates[language] || defaultBoilerplates.python;
 
     const initialFiles = [
       {
-        id: `folder-root-${Date.now()}`,
+        id: rootFolderId,
         name: folderName,
         type: "folder",
         parentId: null,
+      },
+      {
+        id: `file-main-${Date.now()}`,
+        name: mainFileName,
+        type: "file",
+        parentId: rootFolderId,
+        content: mainFileContent,
+        language: language,
       },
     ];
 
@@ -24,7 +50,7 @@ router.post("/", protect, validateBody(workspaceSchemas.create), async (req, res
       userId: req.user._id,
       title: title?.trim() || "Untitled Workspace",
       language,
-      code: "",
+      code: mainFileContent,
       files: initialFiles,
       customInput: customInput || "",
     });

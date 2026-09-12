@@ -101,16 +101,28 @@ const Dashboard = () => {
     if (!titleToUse) return;
     try {
       setCreating(true);
-      const res = await axios.post(
-        `${API_BASE_URL}/api/workspaces`,
-        { title: titleToUse, language: langToUse },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const activeToken = localStorage.getItem("token");
+      if (activeToken) {
+        const res = await axios.post(
+          `${API_BASE_URL}/api/workspaces`,
+          { title: titleToUse, language: langToUse },
+          { headers: { Authorization: `Bearer ${activeToken}` } }
+        );
+        setIsNewWorkspaceModalOpen(false);
+        setNewTitle("");
+        if (res.data && res.data._id) {
+          navigate(`/workspace/${res.data._id}`);
+          return;
+        }
+      }
       setIsNewWorkspaceModalOpen(false);
       setNewTitle("");
-      navigate(`/workspace/${res.data._id}`);
+      navigate(`/workspace?title=${encodeURIComponent(titleToUse)}&lang=${encodeURIComponent(langToUse)}`);
     } catch (err) {
       console.error("Error creating workspace:", err);
+      setIsNewWorkspaceModalOpen(false);
+      setNewTitle("");
+      navigate(`/workspace?title=${encodeURIComponent(titleToUse)}&lang=${encodeURIComponent(langToUse)}`);
     } finally {
       setCreating(false);
     }
