@@ -5,6 +5,7 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { API_BASE_URL } from "../config/api";
 import {
   Play,
   Bot,
@@ -66,8 +67,6 @@ const extractCleanSlug = (val) => {
   const parts = str.split("/");
   return parts[parts.length - 1] || str;
 };
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
 // Initialize Socket connection
 const socket = io(API_BASE_URL, {
